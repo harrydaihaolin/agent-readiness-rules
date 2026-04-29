@@ -1,0 +1,29 @@
+rules_version: 1
+id: safety.dependency_automation
+pillar: safety
+title: Automated dependency updates configured
+weight: 1.0
+severity: warn
+explanation: |
+  Stale dependencies are the most common path from "agent merged a
+  small change" to "merged a CVE". A repo that declares either
+  Dependabot or Renovate gets PRs for vulnerable transitive deps
+  automatically, so coding agents reviewing those PRs can act on
+  them rather than re-discovering the issue from scratch.
+match:
+  type: path_glob
+  require_globs:
+    - .github/dependabot.yml
+    - .github/dependabot.yaml
+    - .renovaterc
+    - .renovaterc.json
+    - .renovaterc.json5
+    - renovate.json
+    - renovate.json5
+    - .github/renovate.json
+    - .github/renovate.json5
+fix_hint: |
+  Drop a minimal `.github/dependabot.yml` (or `renovate.json`) at the
+  repo root that updates `pip` / `npm` / `github-actions` weekly. See
+  https://docs.github.com/en/code-security/dependabot for examples.
+insight_query: dependabot renovate dependency updates automated agent reviews CVE
