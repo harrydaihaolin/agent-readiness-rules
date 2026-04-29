@@ -1,0 +1,47 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agent-readiness-rules"
+version = "2.0.0a0"
+description = "Declarative YAML rule pack consumed by the agent-readiness OSS evaluator and the closed insights engine."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "agent-readiness contributors" }]
+keywords = ["ai", "agents", "code-quality", "developer-experience", "rules"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Quality Assurance",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+[project.urls]
+Homepage = "https://github.com/harrydaihaolin/agent-readiness-rules"
+Repository = "https://github.com/harrydaihaolin/agent-readiness-rules"
+"Bug Tracker" = "https://github.com/harrydaihaolin/agent-readiness-rules/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agent_readiness_rules"]
+
+# YAML rules and the manifest live at the repo root for editor / CI
+# convenience. Hatch maps them into the wheel under the package
+# namespace so importlib.resources can find them after install.
+[tool.hatch.build.targets.wheel.force-include]
+"rules" = "agent_readiness_rules/rules"
+"manifest.toml" = "agent_readiness_rules/manifest.toml"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/agent_readiness_rules/**",
+    "rules/**",
+    "manifest.toml",
+    "README.md",
+    "LICENSE",
+]
