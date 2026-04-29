@@ -76,11 +76,12 @@ jobs:
     needs: validate-schema
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: pip
-      - run: pip install --upgrade agent-readiness
+      - run: pip install --upgrade "agent-readiness>=1.1.0"
       # YAML-only data repo: manifest/lockfile/typecheck checks aren't
       # applicable. 75 is the realistic ceiling.
       - run: agent-readiness scan . --fail-below 75
