@@ -1,6 +1,10 @@
-.DS_Store
 __pycache__/
-.venv/
-*.log
+.DS_Store
 .tmp/
+.venv/
+*.egg-info/
+*.log
+build/
+dist/
 rule.schema.json
+src/agent_readiness_rules/__pycache__/
