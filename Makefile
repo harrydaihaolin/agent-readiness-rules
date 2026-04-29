@@ -1,6 +1,8 @@
 .PHONY: schema-fetch validate eval clean test lint
 
-PROTOCOL_TAG ?= v0.1.0
+# Tracks protocol main, which now ships PrivateMatch (post protocol#5).
+# When a v0.2.0 release is cut, switch to the versioned tag.
+PROTOCOL_TAG ?= main
 SCHEMA_URL = https://raw.githubusercontent.com/harrydaihaolin/agent-readiness-insights-protocol/$(PROTOCOL_TAG)/schemas/rule.schema.json
 
 schema-fetch:

@@ -10,7 +10,9 @@ permissions:
   contents: read
 
 env:
-  PROTOCOL_TAG: v0.1.0
+  # Tracks protocol main, which now ships PrivateMatch (post protocol#5).
+  # When a v0.2.0 release is cut, switch to the versioned tag.
+  PROTOCOL_TAG: main
   FIXTURES_TAG: v1.0.0
 
 jobs:
