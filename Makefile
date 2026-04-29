@@ -1,6 +1,9 @@
 .PHONY: schema-fetch validate eval clean test lint
 
-PROTOCOL_TAG ?= v0.1.0
+# Tracks the protocol branch that ships PrivateMatch (Q1 phase 0)
+# until protocol#5 is merged + tagged. Once a v0.2.0 release is cut,
+# bump this back to a versioned tag (e.g. v0.2.0).
+PROTOCOL_TAG ?= feat/private-match-type
 SCHEMA_URL = https://raw.githubusercontent.com/harrydaihaolin/agent-readiness-insights-protocol/$(PROTOCOL_TAG)/schemas/rule.schema.json
 
 schema-fetch:

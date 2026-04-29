@@ -10,7 +10,10 @@ permissions:
   contents: read
 
 env:
-  PROTOCOL_TAG: v0.1.0
+  # Tracks the protocol branch that ships PrivateMatch (Q1 phase 0)
+  # until protocol#5 is merged + tagged. Once a v0.2.0 release is cut,
+  # bump this back to a versioned tag (e.g. v0.2.0).
+  PROTOCOL_TAG: feat/private-match-type
   FIXTURES_TAG: v1.0.0
 
 jobs:
