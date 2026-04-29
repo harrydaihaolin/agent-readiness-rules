@@ -27,10 +27,8 @@ jobs:
         run: |
           curl -fsSL -o rule.schema.json \
             "https://raw.githubusercontent.com/harrydaihaolin/agent-readiness-insights-protocol/${PROTOCOL_TAG}/schemas/rule.schema.json"
-      - name: Validate every rule
-        run: |
-          shopt -s globstar
-          check-jsonschema --schemafile rule.schema.json rules/**/*.yaml
+      - name: Validate every rule (make test)
+        run: make test
 
   reference-eval:
     runs-on: ubuntu-latest

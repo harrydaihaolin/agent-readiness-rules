@@ -1,4 +1,4 @@
-.PHONY: schema-fetch validate eval clean
+.PHONY: schema-fetch validate eval clean test lint
 
 PROTOCOL_TAG ?= v0.1.0
 SCHEMA_URL = https://raw.githubusercontent.com/harrydaihaolin/agent-readiness-insights-protocol/$(PROTOCOL_TAG)/schemas/rule.schema.json
@@ -17,6 +17,12 @@ eval:
 	agent-readiness rules-eval ../agent-readiness-fixtures/fixtures/good --rules ./rules
 	agent-readiness rules-eval ../agent-readiness-fixtures/fixtures/noisy --rules ./rules
 	agent-readiness rules-eval ../agent-readiness-fixtures/fixtures/broken --rules ./rules
+
+# `test` runs the canonical sanity check (schema validation). Aliased
+# so `agent-readiness scan` and contributor habit both find the entry.
+test: validate
+
+lint: validate
 
 clean:
 	rm -f rule.schema.json
