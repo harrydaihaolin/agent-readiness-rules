@@ -20,13 +20,23 @@ match:
   require_globs:
     - AGENTS.md
     - CLAUDE.md
+    - GEMINI.md
     - .cursorrules
     - .cursor/rules/*.mdc
+    - .cursor/settings.json
     - .github/copilot-instructions.md
+    - .github/instructions/*.md
     - .ai/**
     - prompts/**
     - .windsurfrules
     - .clinerules
+    - .aider.conf.yml
+    - .aiderconfig
+    - .zed/settings.json
+    - .replit
+    - .bolt/**
+    - .amazon-q/**
+    - .idea/copilot/**
 fix_hint: |
   Add an AGENTS.md to the root with at least: canonical commands
   (install/test/lint/run), do-not-touch list, and commit conventions.
