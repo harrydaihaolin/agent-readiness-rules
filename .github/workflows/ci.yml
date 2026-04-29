@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PROTOCOL_TAG: v0.1.0
+  FIXTURES_TAG: v1.0.0
+
+jobs:
+  validate-schema:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install check-jsonschema
+        run: pip install check-jsonschema
+      - name: Fetch rule.schema.json
+        run: |
+          curl -fsSL -o rule.schema.json \
+            "https://raw.githubusercontent.com/harrydaihaolin/agent-readiness-insights-protocol/${PROTOCOL_TAG}/schemas/rule.schema.json"
+      - name: Validate every rule
+        run: |
+          shopt -s globstar
+          check-jsonschema --schemafile rule.schema.json rules/**/*.yaml
+
+  reference-eval:
+    runs-on: ubuntu-latest
+    needs: validate-schema
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: rules-pack
+      - uses: actions/checkout@v4
+        with:
+          repository: harrydaihaolin/agent-readiness-fixtures
+          ref: ${{ env.FIXTURES_TAG }}
+          path: fixtures
+      - uses: actions/checkout@v4
+        with:
+          repository: harrydaihaolin/agent-readiness
+          ref: main
+          path: agent-readiness
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install agent-readiness with insights-protocol
+        run: |
+          pip install --upgrade pip
+          pip install -e ./agent-readiness
+      - name: Skip if rules-eval not yet shipped in agent-readiness
+        run: |
+          if ! agent-readiness --help 2>&1 | grep -q "rules-eval"; then
+            echo "agent-readiness rules-eval is not available on main yet."
+            echo "This job will start asserting once the agent-readiness 1.1.0 PR lands."
+            exit 0
+          fi
+      - name: Evaluate rules against fixtures
+        run: |
+          for fix in good noisy broken; do
+            echo "=== fixture: $fix ==="
+            agent-readiness rules-eval "fixtures/fixtures/$fix" --rules rules-pack/rules --json > "rules-pack/tests/expected/${fix}.actual.json" || true
+            if [ -f "rules-pack/tests/expected/${fix}.json" ]; then
+              diff -u "rules-pack/tests/expected/${fix}.json" "rules-pack/tests/expected/${fix}.actual.json" || (echo "snapshot drift for $fix"; exit 1)
+            fi
+          done
