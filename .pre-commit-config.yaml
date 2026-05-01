@@ -7,3 +7,13 @@ repos:
       - id: check-yaml
       - id: check-merge-conflict
       - id: detect-private-key
+  # Surface the same schema validation CI runs (`make test`). Catches
+  # missing/typo'd rule fields locally instead of on a red CI run.
+  - repo: local
+    hooks:
+      - id: rules-schema-validate
+        name: validate rules against pinned protocol schema (make test)
+        entry: bash -c 'make test'
+        language: system
+        files: ^(rules/.*\.yaml|Makefile)$
+        pass_filenames: false
