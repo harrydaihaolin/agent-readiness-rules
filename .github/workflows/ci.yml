@@ -14,7 +14,7 @@ env:
   # protocol main can't red rules CI overnight. Bump deliberately when
   # the protocol cuts a new tag (target: v0.2.0 once the CompositeMatch
   # surface stabilises). See AGENTS.md for bump cadence.
-  PROTOCOL_TAG: 2ae29a02f4bcb16aef3944ddf86d11393a72ccc9
+  PROTOCOL_TAG: e9c8eeb6f05c084e9cc56c1e21be33a0ad465530
   FIXTURES_TAG: v1.0.0
 
 jobs:
