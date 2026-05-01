@@ -33,6 +33,13 @@ jobs:
             "https://raw.githubusercontent.com/harrydaihaolin/agent-readiness-insights-protocol/${PROTOCOL_TAG}/schemas/rule.schema.json"
       - name: Validate every rule (make test)
         run: make test
+      # Belt-and-braces: run the same hooks contributors are expected to
+      # install via `pre-commit install`. If `pre-commit install` was
+      # skipped locally, CI still surfaces what would have been caught.
+      - name: Install pre-commit
+        run: pip install pre-commit
+      - name: Run all pre-commit hooks
+        run: pre-commit run --all-files --show-diff-on-failure
 
   reference-eval:
     runs-on: ubuntu-latest

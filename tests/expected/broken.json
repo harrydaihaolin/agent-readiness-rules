@@ -363,10 +363,20 @@
     {
       "check_id": "git.has_history",
       "explanation": "An agent that needs to reason about *why* a piece of code looks the\nway it does \u2014 to backport, to revert, to bisect \u2014 depends on\ncommit history. A repo with one squash-import commit looks the same\nas a repo with no history at all: every change is a mystery. This\nrule fires when fewer than `min_commits` commits exist (and gives\na `not_measured` finding on shallow clones).",
-      "findings": [],
+      "findings": [
+        {
+          "check_id": "git.has_history",
+          "file": null,
+          "fix_hint": "If you imported the project as a single squash, re-import preserving\nhistory (`git filter-repo` or a fresh clone of the source). For new\nprojects, just keep committing \u2014 agents need the trail.\n",
+          "line": null,
+          "message": "Repository has 1 commits \u2014 fewer than min_commits=5.",
+          "pillar": "flow",
+          "severity": "warn"
+        }
+      ],
       "not_measured": false,
       "pillar": "flow",
-      "score": 100.0,
+      "score": 80.0,
       "weight": 1.0
     },
     {
