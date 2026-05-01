@@ -10,17 +10,19 @@ permissions:
   contents: read
 
 env:
-  # Tracks protocol main, which now ships PrivateMatch (post protocol#5).
-  # When a v0.2.0 release is cut, switch to the versioned tag.
-  PROTOCOL_TAG: main
+  # Pinned to a specific protocol commit so an unrelated change on
+  # protocol main can't red rules CI overnight. Bump deliberately when
+  # the protocol cuts a new tag (target: v0.2.0 once the CompositeMatch
+  # surface stabilises). See AGENTS.md for bump cadence.
+  PROTOCOL_TAG: 2ae29a02f4bcb16aef3944ddf86d11393a72ccc9
   FIXTURES_TAG: v1.0.0
 
 jobs:
   validate-schema:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin to v6
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # pin to v6
         with:
           python-version: "3.12"
       - name: Install check-jsonschema
@@ -36,54 +38,85 @@ jobs:
     runs-on: ubuntu-latest
     needs: validate-schema
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin to v6
         with:
           path: rules-pack
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin to v6
         with:
           repository: harrydaihaolin/agent-readiness-fixtures
           ref: ${{ env.FIXTURES_TAG }}
           path: fixtures
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin to v6
         with:
           repository: harrydaihaolin/agent-readiness
           ref: main
           path: agent-readiness
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # pin to v6
         with:
           python-version: "3.12"
       - name: Install agent-readiness with insights-protocol
         run: |
           pip install --upgrade pip
           pip install -e ./agent-readiness
-      - name: Skip if rules-eval not yet shipped in agent-readiness
+      - name: Assert rules-eval is available (fail loud)
         run: |
-          if ! agent-readiness --help 2>&1 | grep -q "rules-eval"; then
-            echo "agent-readiness rules-eval is not available on main yet."
-            echo "This job will start asserting once the agent-readiness 1.1.0 PR lands."
-            exit 0
-          fi
-      - name: Evaluate rules against fixtures
+          # The conditional "skip if missing" path was removed deliberately:
+          # rules-eval has shipped in agent-readiness since 1.1.0 and is a
+          # hard requirement of this CI. If a future agent-readiness release
+          # ever drops the subcommand, we want CI to be red.
+          agent-readiness --help 2>&1 | grep -q "rules-eval"
+      - name: Evaluate rules against fixtures (snapshot diff)
         run: |
-          for fix in good noisy broken; do
+          set -euo pipefail
+          mkdir -p rules-pack/tests/expected
+          # Normalise absolute paths in the JSON output so the snapshot is
+          # portable across runners. Keep this in sync with the script that
+          # generates `tests/expected/*.json` locally.
+          normalise() {
+            python3 - "$1" "$2" <<'PY'
+          import json, sys
+          path, fixture_name = sys.argv[1], sys.argv[2]
+          with open(path) as fh:
+              data = json.load(fh)
+          data['repo_path'] = f'fixtures/{fixture_name}'
+          for check in data.get('checks', []):
+              for f in (check.get('findings') or []):
+                  if isinstance(f, dict) and isinstance(f.get('file'), str):
+                      key = f'/fixtures/{fixture_name}/'
+                      idx = f['file'].find(key)
+                      if idx >= 0:
+                          f['file'] = f['file'][idx + len(key):]
+          with open(path, 'w') as fh:
+              json.dump(data, fh, indent=2, sort_keys=True)
+              fh.write('\n')
+          PY
+          }
+          for fix in good noisy broken monorepo; do
             echo "=== fixture: $fix ==="
-            agent-readiness rules-eval "fixtures/fixtures/$fix" --rules rules-pack/rules --json > "rules-pack/tests/expected/${fix}.actual.json" || true
-            if [ -f "rules-pack/tests/expected/${fix}.json" ]; then
-              diff -u "rules-pack/tests/expected/${fix}.json" "rules-pack/tests/expected/${fix}.actual.json" || (echo "snapshot drift for $fix"; exit 1)
+            actual="rules-pack/tests/expected/${fix}.actual.json"
+            agent-readiness rules-eval "fixtures/fixtures/$fix" --rules rules-pack/rules --json > "$actual"
+            normalise "$actual" "$fix"
+            expected="rules-pack/tests/expected/${fix}.json"
+            if [ ! -f "$expected" ]; then
+              echo "::error::snapshot missing: $expected"
+              echo "Generate it locally with the steps in AGENTS.md and commit."
+              exit 1
             fi
+            diff -u "$expected" "$actual" || { echo "::error::snapshot drift for $fix"; exit 1; }
           done
 
   self-scan:
     runs-on: ubuntu-latest
     needs: validate-schema
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin to v6
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # pin to v6
         with:
           python-version: "3.12"
-      - run: pip install --upgrade "agent-readiness>=1.1.0"
+      # Pin to a major range so a PyPI release can't red CI overnight.
+      - run: pip install 'agent-readiness>=1.1,<2'
       # YAML-only data repo: manifest/lockfile/typecheck checks aren't
       # applicable. 75 is the realistic ceiling.
       - run: agent-readiness scan . --fail-below 75

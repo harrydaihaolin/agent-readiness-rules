@@ -9,7 +9,10 @@ explanation: |
   way a human reviewer would. Without it, the agent ships PRs that
   green-on-laptop, red-in-prod, and the project picks up the cleanup.
   Any modern CI provider counts; the rule is just "*some* automated
-  test pipeline is configured."
+  test pipeline is configured." Some teams use hosted CI (BuildKite
+  cloud, TeamCity hosted, Jenkins on a remote server) where there's
+  no in-repo config to detect — for those repos, document the CI
+  with a README badge so the agent knows the loop exists.
 match:
   type: composite
   op: or
@@ -47,7 +50,9 @@ fix_hint: |
   Drop a `.github/workflows/ci.yml` that installs deps, runs the test
   command, and reports status to PRs. Even a 20-line workflow is
   worth more than nothing — the agent gets red/green feedback per
-  push.
+  push. If you use a hosted CI system (BuildKite, TeamCity, Jenkins),
+  add a status badge to your README so the loop is visible to agents
+  even without an in-repo config file.
 fix_template:
   kind: create_file
   path: .github/workflows/ci.yml
