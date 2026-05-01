@@ -13,6 +13,10 @@ This repo is **pure data**. There is no Python module to import, no
 runtime to vendor, no transient state. The Makefile orchestrates
 external tools (`check-jsonschema`, `agent-readiness`).
 
+## CI and the feedback loop
+
+**CI is part of the feedback loop.** After you push or update a PR, **monitor GitHub Actions / workflow runs and check results**. When **CI fails**, read the logs, **fix the root cause**, and push follow-up commits. Do not stop while checks are red or ignore failing workflows.
+
 ## Schema source of truth
 
 `rule.schema.json` is downloaded from a release of
