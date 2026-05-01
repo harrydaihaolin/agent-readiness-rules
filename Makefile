@@ -1,4 +1,4 @@
-.PHONY: schema-fetch validate eval clean test lint
+.PHONY: schema-fetch validate eval clean test lint snapshots
 
 # Tracks protocol main, which now ships PrivateMatch (post protocol#5).
 # When a v0.2.0 release is cut, switch to the versioned tag.
@@ -25,6 +25,12 @@ eval:
 test: validate
 
 lint: validate
+
+snapshots:
+	@echo "Regenerating tests/expected/*.json from sibling agent-readiness-fixtures..."
+	# Mirrors the normalisation block in .github/workflows/ci.yml so the
+	# snapshots committed here diff cleanly against what CI re-runs.
+	python3 scripts/regen_snapshots.py
 
 clean:
 	rm -f rule.schema.json
