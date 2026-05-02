@@ -48,6 +48,15 @@
       "weight": 0.7
     },
     {
+      "check_id": "cognitive_load.readme_root_present",
+      "explanation": "Agents and contributors expect a root README.md as the primary orientation\nsurface. Its absence forces guesswork from filenames and CI config alone.",
+      "findings": [],
+      "not_measured": false,
+      "pillar": "cognitive_load",
+      "score": 100.0,
+      "weight": 0.8
+    },
+    {
       "check_id": "docs.contributing_guide",
       "explanation": "A CONTRIBUTING.md tells agents (and humans) the contribution flow:\nbranch naming, commit message style, PR template expectations,\nrequired pre-commit checks. Absence forces the agent to infer this\nfrom git log, which it gets wrong on small repos with little history.\nCommunity-contributed demo rule.",
       "findings": [
@@ -114,21 +123,11 @@
     },
     {
       "check_id": "repo_shape.large_files",
-      "explanation": "Files over 500 lines or 50 KB exceed an agent's working memory in a\nsingle read and force a chunked-reading pattern that loses context\nacross chunk boundaries. This rule excludes lock files, generated\ndata, binary assets, long-form tests, vendored third-party code, and\nbuild/template artefacts \u2014 which are large but not \"source\" files an\nagent would meaningfully edit.",
-      "findings": [
-        {
-          "check_id": "repo_shape.large_files",
-          "file": "src/noisy_fixture/generated.py",
-          "fix_hint": "Split the file into smaller modules grouped by concept, or add an\nexclusion in `.agent-readiness.toml` if the file is truly intentional\n(large generated tables, etc.).\n",
-          "line": null,
-          "message": "Large file: src/noisy_fixture/generated.py (804 lines > 500)",
-          "pillar": "cognitive_load",
-          "severity": "warn"
-        }
-      ],
+      "explanation": "Files over 1500 lines or 150 KB exceed an agent's working memory in\na single read and force a chunked-reading pattern that loses\ncontext across chunk boundaries. This rule excludes lock files,\ngenerated data, binary assets, long-form tests, vendored\nthird-party code, and build/template artefacts \u2014 which are large\nbut not \"source\" files an agent would meaningfully edit. Threshold\nrecalibrated in v1.5.0 from the 500-line / 50 KB v1.4.0 setting;\nsee the rule comment block for v3.1 cohort calibration data.",
+      "findings": [],
       "not_measured": false,
       "pillar": "cognitive_load",
-      "score": 80.0,
+      "score": 100.0,
       "weight": 0.5
     },
     {
@@ -603,5 +602,5 @@
     }
   ],
   "repo_path": "fixtures/noisy",
-  "rules_evaluated": 37
+  "rules_evaluated": 38
 }
