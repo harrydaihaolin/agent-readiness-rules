@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: headless.no_setup_prompts
 pillar: flow
 title: Setup is reachable headlessly
@@ -39,3 +39,14 @@ fix_hint: |
   Move any GUI step into a one-time human bootstrap section clearly
   separated from the headless install / run flow.
 insight_query: headless setup GUI authorization browser OAuth interactive prompts
+action:
+  kind: run_command
+  command: |
+    # Audit setup scripts for interactive prompts (read, $1 unset, etc.).
+    grep -rE '(read -p|read [A-Z]+|\$\{1\?)' scripts/ Makefile 2>/dev/null
+  description: |
+    Replace each interactive prompt with an environment variable or
+    a CLI flag default so headless agents don't hang.
+verify:
+  command: "true"
+  description: Manual; re-scan is the closed loop.

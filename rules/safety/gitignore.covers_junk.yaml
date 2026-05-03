@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: gitignore.covers_junk
 pillar: safety
 title: .gitignore covers build artifacts and secrets
@@ -68,3 +68,22 @@ fix_template:
     .env
     .env.*
 insight_query: .gitignore build artifacts secrets node_modules pycache .env coverage
+action:
+  kind: edit_gitignore
+  entries:
+    - .env
+    - .env.*
+    - "!.env.example"
+    - .venv/
+    - venv/
+    - node_modules/
+    - dist/
+    - build/
+    - "*.log"
+    - .DS_Store
+    - "*.pyc"
+    - __pycache__/
+verify:
+  command: |
+    grep -E '^(\.env|node_modules|\.venv|dist|__pycache__)' .gitignore >/dev/null
+  description: .gitignore must cover the standard junk groups.

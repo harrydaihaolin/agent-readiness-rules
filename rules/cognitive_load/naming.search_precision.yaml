@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: naming.search_precision
 pillar: cognitive_load
 title: File names are search-precise (no vague utils/helpers)
@@ -40,3 +40,16 @@ fix_hint: |
   helpers, that's the signal to split it into five files named for
   what they do.
 insight_query: vague names utils helpers search precision rename intent
+action:
+  kind: run_command
+  command: |
+    # Identify ambiguous identifiers (e.g. `util`, `helper`, `manager`)
+    # and rename them to domain-specific names so an agent's grep query
+    # converges on a single match.
+    rg -t py 'def (util|helper|manager|do_)' src/ || true
+  description: |
+    Rename generic identifiers to domain-specific names so codebase
+    search returns a single, unambiguous result for each concept.
+verify:
+  command: "true"
+  description: Manual rename; re-scan is the closed loop.

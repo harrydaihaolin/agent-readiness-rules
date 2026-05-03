@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: code.complexity
 pillar: cognitive_load
 title: Code cyclomatic complexity is bounded
@@ -26,3 +26,19 @@ fix_hint: |
   separate helper functions named for the branch's intent. Aim for
   CC ≤ 10 per function as a steady-state.
 insight_query: cyclomatic complexity function CC AST agent error rate refactor
+action:
+  kind: run_command
+  command: |
+    # Run a complexity audit and split the highest-complexity functions
+    # below the configured threshold. Then re-scan to confirm the rule
+    # no longer fires.
+    radon cc src/ -s -n B && echo "Refactor any functions above CC threshold."
+  description: |
+    Run radon (Python) / eslint complexity / similar in your stack to
+    identify high-complexity functions and split them by responsibility.
+verify:
+  command: "true"
+  description: |
+    No deterministic verify exists for complexity refactors; the rule
+    re-scan is the closed loop. Marked offline-safe so the agent can
+    proceed without networked tools.

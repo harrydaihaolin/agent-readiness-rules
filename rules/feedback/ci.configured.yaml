@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: ci.configured
 pillar: feedback
 title: CI pipeline configured
@@ -77,3 +77,25 @@ fix_template:
               # Replace with the canonical test command from AGENTS.md.
               echo "TODO: run tests"
 insight_query: continuous integration GitHub Actions CircleCI GitLab CI workflow
+action:
+  kind: create_file
+  path: .github/workflows/ci.yml
+  template: |
+    name: CI
+    on:
+      pull_request:
+      push:
+        branches: [main]
+    jobs:
+      test:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v4
+          - run: {language_test_command}
+  preconditions:
+    - not_exists: .github/workflows/ci.yml
+  context_probe:
+    - detect: primary_language
+verify:
+  command: "test -f .github/workflows/ci.yml"
+  description: A CI workflow must exist under .github/workflows/.

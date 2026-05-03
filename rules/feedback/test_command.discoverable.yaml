@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: test_command.discoverable
 pillar: feedback
 title: Test command is statically discoverable
@@ -61,3 +61,20 @@ fix_template:
     test:
     	python -m pytest tests/
 insight_query: test command discoverable makefile pyproject scripts pytest tox
+action:
+  kind: append_to_file
+  path: Makefile
+  template: |
+
+    .PHONY: test
+    test:
+    	{language_test_command}
+  preconditions:
+    - not_exists: Makefile
+  context_probe:
+    - detect: primary_language
+verify:
+  command: "make -n test"
+  description: |
+    `make -n test` must resolve to a runnable command (dry-run; does
+    not actually execute the tests).

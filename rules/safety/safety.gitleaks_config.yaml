@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: safety.gitleaks_config
 pillar: safety
 title: Secret-scanning config present
@@ -45,3 +45,19 @@ fix_template:
       '''vendor/''',
     ]
 insight_query: gitleaks trufflehog detect-secrets secret scanning agent push
+action:
+  kind: create_file
+  path: .gitleaks.toml
+  template: |
+    # gitleaks configuration: tunes which paths and rules are scanned
+    # for secrets in pre-commit hooks and CI.
+    title = "gitleaks config"
+
+    [[allowlist.regexes]]
+    description = "Allow .env.example placeholder values"
+    regex = '''EXAMPLE_VAR\s*='''
+  preconditions:
+    - not_exists: .gitleaks.toml
+verify:
+  command: "test -f .gitleaks.toml"
+  description: .gitleaks.toml must exist.

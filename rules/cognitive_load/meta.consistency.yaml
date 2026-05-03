@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: meta.consistency
 pillar: cognitive_load
 title: README claims match repo contents
@@ -33,3 +33,16 @@ fix_hint: |
   be backed by the corresponding target/script/manifest. Agent docs
   should be ≥ 100 bytes of real content, not a stub.
 insight_query: README repo drift consistency placeholder pytest npm AGENTS.md make target npm run pip editable
+action:
+  kind: run_command
+  command: |
+    # Audit the README/AGENTS.md/CONTRIBUTING setup commands for
+    # consistency. Any drift between them confuses agents.
+    grep -E '(make install|pip install|npm install|setup)' \
+      README.md AGENTS.md CONTRIBUTING.md 2>/dev/null
+  description: |
+    Reconcile setup / test commands across README.md, AGENTS.md, and
+    CONTRIBUTING.md so all three documents reference the same flow.
+verify:
+  command: "true"
+  description: Manual reconciliation; re-scan is the closed loop.

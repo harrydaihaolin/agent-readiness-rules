@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: typecheck.configured
 pillar: feedback
 title: Type checker is configured
@@ -43,3 +43,16 @@ fix_hint: |
   with `strict: true`. Type checking pays for itself within ~3
   agent-driven changes.
 insight_query: type checker mypy pyright tsconfig type checking config
+action:
+  kind: modify_manifest_field
+  manifest: pyproject.toml
+  field_path: tool.mypy
+  value: |
+    python_version = "3.11"
+    strict = false
+  preconditions:
+    - exists: pyproject.toml
+    - manifest_language: python
+verify:
+  command: "grep -E '(\\[tool\\.mypy\\]|tsconfig|tsc)' pyproject.toml tsconfig.json 2>/dev/null"
+  description: A typecheck configuration must exist.

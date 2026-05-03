@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: lint.configured
 pillar: feedback
 title: Linter is configured
@@ -57,3 +57,16 @@ fix_hint: |
   config is fine — what matters is that the rules are explicit, not
   inherited from the agent's defaults.
 insight_query: linter eslint ruff pylint biome stylelint config
+action:
+  kind: modify_manifest_field
+  manifest: pyproject.toml
+  field_path: tool.ruff
+  value: |
+    line-length = 100
+    target-version = "py311"
+  preconditions:
+    - exists: pyproject.toml
+    - manifest_language: python
+verify:
+  command: "grep -E '(\\[tool\\.ruff\\]|eslint|tslint|golangci)' pyproject.toml package.json .golangci.yml 2>/dev/null"
+  description: A lint configuration must exist.

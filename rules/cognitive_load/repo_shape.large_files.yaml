@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: repo_shape.large_files
 pillar: cognitive_load
 title: Large source files
@@ -132,3 +132,21 @@ insight_query: large file false positive lock files generated assets
 # the v3 cohort (ideas.md IL3-V31-A). Production confirmation lives
 # in agent-readiness-leaderboard/data/releases/scores_v3_*.json from
 # the v3.2 snapshot run.
+action:
+  kind: run_command
+  command: |
+    # Identify files exceeding the threshold; split each along its
+    # dominant concept axis or move to a vendored / generated-output
+    # exclude list.
+    find . -type f \( -name '*.py' -o -name '*.ts' -o -name '*.tsx' \
+      -o -name '*.js' -o -name '*.go' \) \
+      -not -path './node_modules/*' -not -path './.venv/*' \
+      | xargs wc -l 2>/dev/null \
+      | awk '$1 > 1500 {print}'
+  description: |
+    No deterministic action — splitting a large source file is a human
+    refactor decision. The command above lists candidates so the agent
+    can propose a structured split.
+verify:
+  command: "true"
+  description: Manual refactor; re-scan is the closed loop.

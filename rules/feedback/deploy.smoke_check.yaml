@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: deploy.smoke_check
 pillar: feedback
 title: Deploy workflow has a post-deploy smoke check
@@ -95,3 +95,24 @@ fix_template:
               # GitHub Pages SPA fallback: 404 with redirect HTML is fine.
               test "$code" = "200" -o "$code" = "404"
 insight_query: post-deploy smoke test deployed site verification curl playwright lighthouse SPA pages 404 fallback
+action:
+  kind: create_file
+  path: .github/workflows/deploy-smoke.yml
+  template: |
+    name: deploy-smoke
+    on:
+      deployment_status:
+    jobs:
+      smoke:
+        if: github.event.deployment_status.state == 'success'
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v4
+          - run: curl -fsSL "$DEPLOY_URL/healthz"
+            env:
+              DEPLOY_URL: ${{ github.event.deployment_status.target_url }}
+  preconditions:
+    - not_exists: .github/workflows/deploy-smoke.yml
+verify:
+  command: "test -f .github/workflows/deploy-smoke.yml"
+  description: deploy-smoke workflow must exist.
