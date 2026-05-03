@@ -5,13 +5,32 @@
       "explanation": "AGENTS.md at the repo root is the emerging canonical contract between\nhuman authors and coding agents (canonical commands, do-not-touch\nlists, commit conventions). Other formats (.cursorrules, CLAUDE.md,\n.ai/) help, but a single, well-named file at the root is the most\npredictable surface for any agent. This rule fires `warn` only when\nthe canonical AGENTS.md is missing; partial coverage by sibling\nformats is rewarded by the softer `agent_docs.present` rule.",
       "findings": [
         {
+          "action": {
+            "context_probe": [
+              {
+                "detect": "primary_language"
+              }
+            ],
+            "kind": "create_file",
+            "path": "AGENTS.md",
+            "preconditions": [
+              {
+                "not_exists": "AGENTS.md"
+              }
+            ],
+            "template": "# Agents guide\n\nA concise (<2 KB) orientation document for autonomous coding agents\nworking in this repository. Document, in order:\n\n1. What this repo does in one sentence.\n2. The single command an agent runs to set up the environment.\n3. The single command to run tests.\n4. The single command to lint.\n5. Where the entry point lives (file path + function/binary name).\n\nKeep it < 60 lines so it fits in any agent's context window.\n"
+          },
           "check_id": "agent_docs.canonical",
           "file": null,
           "fix_hint": "Add an AGENTS.md to the repo root with: canonical commands\n(install/test/lint/run), a do-not-touch list, and commit conventions.\nSee agent-readiness/AGENTS.md for an example.\n",
           "line": null,
           "message": "None of these expected paths exist: AGENTS.md",
           "pillar": "cognitive_load",
-          "severity": "warn"
+          "severity": "warn",
+          "verify": {
+            "command": "test -f AGENTS.md",
+            "description": "AGENTS.md must exist at the repo root."
+          }
         }
       ],
       "not_measured": false,
@@ -24,13 +43,27 @@
       "explanation": "Agents perform measurably better when the repo includes docs aimed at\nthem (canonical commands, do-not-touch lists, branch conventions). A\nREADME is for humans; AGENTS.md / CLAUDE.md / .cursorrules /\n.cursor/rules/*.mdc / .github/copilot-instructions.md / .ai/ /\nprompts/ are common locations for agent-targeted material. This rule\nfires `info` when none of them are present.",
       "findings": [
         {
+          "action": {
+            "kind": "create_file",
+            "path": "AGENTS.md",
+            "preconditions": [
+              {
+                "not_exists": "AGENTS.md"
+              }
+            ],
+            "template": "# Agents guide\n\nSingle-page orientation for AI coding agents. Spell out the setup\ncommand, the test command, and the entry point. Keep it short.\n"
+          },
           "check_id": "agent_docs.present",
           "file": null,
           "fix_hint": "Add an AGENTS.md to the root with at least: canonical commands\n(install/test/lint/run), do-not-touch list, and commit conventions.\nAlternatively, document agent-targeted material under .ai/ or\n.cursor/rules/. See agent-readiness/AGENTS.md for an example.\n",
           "line": null,
           "message": "None of these expected paths exist: AGENTS.md, CLAUDE.md, GEMINI.md, .cursorrules, .cursor/rules/*.mdc, .cursor/settings.json, .github/copilot-instructions.md, .github/instructions/*.md, .ai/**, prompts/**, .windsurfrules, .clinerules, .aider.conf.yml, .aiderconfig, .zed/settings.json, .replit, .bolt/**, .amazon-q/**, .idea/copilot/**",
           "pillar": "cognitive_load",
-          "severity": "info"
+          "severity": "info",
+          "verify": {
+            "command": "test -f AGENTS.md",
+            "description": "An AGENTS.md (or AGENTS.txt) file must exist."
+          }
         }
       ],
       "not_measured": false,
@@ -52,13 +85,32 @@
       "explanation": "Agents and contributors expect a root README.md as the primary orientation\nsurface. Its absence forces guesswork from filenames and CI config alone.",
       "findings": [
         {
+          "action": {
+            "context_probe": [
+              {
+                "detect": "primary_language"
+              }
+            ],
+            "kind": "create_file",
+            "path": "README.md",
+            "preconditions": [
+              {
+                "not_exists": "README.md"
+              }
+            ],
+            "template": "# {primary_language} project\n\nOne-line description.\n\n## Setup\n`make install`\n\n## Test\n`make test`\n"
+          },
           "check_id": "cognitive_load.readme_root_present",
           "file": null,
           "fix_hint": "Add a README.md at the repo root with install, run, and test instructions.\n",
           "line": null,
           "message": "None of these expected paths exist: README.md, readme.md",
           "pillar": "cognitive_load",
-          "severity": "warn"
+          "severity": "warn",
+          "verify": {
+            "command": "test -f README.md",
+            "description": "README.md must exist at the repo root."
+          }
         }
       ],
       "not_measured": false,
@@ -71,13 +123,27 @@
       "explanation": "A CONTRIBUTING.md tells agents (and humans) the contribution flow:\nbranch naming, commit message style, PR template expectations,\nrequired pre-commit checks. Absence forces the agent to infer this\nfrom git log, which it gets wrong on small repos with little history.\nCommunity-contributed demo rule.",
       "findings": [
         {
+          "action": {
+            "kind": "create_file",
+            "path": "CONTRIBUTING.md",
+            "preconditions": [
+              {
+                "not_exists": "CONTRIBUTING.md"
+              }
+            ],
+            "template": "# Contributing\n\n## Setup\n`make install`\n\n## Test\n`make test`\n\n## Lint\n`make lint`\n\n## Submitting changes\nFork, branch, PR. CI must be green before review.\n"
+          },
           "check_id": "docs.contributing_guide",
           "file": null,
           "fix_hint": "Add a CONTRIBUTING.md describing branch naming, commit style,\nrequired local checks, and the PR review flow.\n",
           "line": null,
           "message": "None of these expected paths exist: CONTRIBUTING.md, CONTRIBUTING, .github/CONTRIBUTING.md",
           "pillar": "cognitive_load",
-          "severity": "info"
+          "severity": "info",
+          "verify": {
+            "command": "test -f CONTRIBUTING.md",
+            "description": "CONTRIBUTING.md must exist at the repo root."
+          }
         }
       ],
       "not_measured": false,
@@ -117,13 +183,35 @@
       "explanation": "The README is the agent's first stop. If it has prose but no\n`install` / `run` / `test` signals \u2014 paragraphs without fenced code\nblocks, or no mention of those steps at all \u2014 the agent has to\nreverse-engineer the workflow from manifests and CI configs. Each\nof the three signals (install / run / test) is independently\nscored; the rule fires when any are missing.",
       "findings": [
         {
+          "action": {
+            "context_probe": [
+              {
+                "detect": "package_manager"
+              },
+              {
+                "detect": "primary_language"
+              }
+            ],
+            "kind": "append_to_file",
+            "path": "README.md",
+            "preconditions": [
+              {
+                "exists": "README.md"
+              }
+            ],
+            "template": "\n## Run\n\n```\n{package_manager} install\n{language_test_command}\n```\n"
+          },
           "check_id": "readme.has_run_instructions",
           "file": null,
           "fix_hint": "Add three short sections to README: Install (one fenced block),\nRun (one fenced block showing the canonical entry point), Test\n(one fenced block). Three fenced blocks is the floor; if your\nproject genuinely needs more, write more.\n",
           "line": null,
           "message": "No README found at repo root.",
           "pillar": "cognitive_load",
-          "severity": "warn"
+          "severity": "warn",
+          "verify": {
+            "command": "grep -E '(make|npm|pip|cargo|go) ' README.md >/dev/null",
+            "description": "README.md must contain a runnable command."
+          }
         }
       ],
       "not_measured": false,
@@ -172,31 +260,88 @@
       "explanation": "CI is how a coding agent confirms that \"my change passes\" the same\nway a human reviewer would. Without it, the agent ships PRs that\ngreen-on-laptop, red-in-prod, and the project picks up the cleanup.\nAny modern CI provider counts; the rule is just \"*some* automated\ntest pipeline is configured.\" Some teams use hosted CI (BuildKite\ncloud, TeamCity hosted, Jenkins on a remote server) where there's\nno in-repo config to detect \u2014 for those repos, document the CI\nwith a README badge so the agent knows the loop exists.",
       "findings": [
         {
+          "action": {
+            "context_probe": [
+              {
+                "detect": "primary_language"
+              }
+            ],
+            "kind": "create_file",
+            "path": ".github/workflows/ci.yml",
+            "preconditions": [
+              {
+                "not_exists": ".github/workflows/ci.yml"
+              }
+            ],
+            "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: {language_test_command}\n"
+          },
           "check_id": "ci.configured",
           "file": null,
           "fix_hint": "Drop a `.github/workflows/ci.yml` that installs deps, runs the test\ncommand, and reports status to PRs. Even a 20-line workflow is\nworth more than nothing \u2014 the agent gets red/green feedback per\npush. If you use a hosted CI system (BuildKite, TeamCity, Jenkins),\nadd a status badge to your README so the loop is visible to agents\neven without an in-repo config file.\n",
           "line": null,
           "message": "At least one CI provider config is present. (no clause matched)",
           "pillar": "feedback",
-          "severity": "warn"
+          "severity": "warn",
+          "verify": {
+            "command": "test -f .github/workflows/ci.yml",
+            "description": "A CI workflow must exist under .github/workflows/."
+          }
         },
         {
+          "action": {
+            "context_probe": [
+              {
+                "detect": "primary_language"
+              }
+            ],
+            "kind": "create_file",
+            "path": ".github/workflows/ci.yml",
+            "preconditions": [
+              {
+                "not_exists": ".github/workflows/ci.yml"
+              }
+            ],
+            "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: {language_test_command}\n"
+          },
           "check_id": "ci.configured",
           "file": null,
           "fix_hint": "Drop a `.github/workflows/ci.yml` that installs deps, runs the test\ncommand, and reports status to PRs. Even a 20-line workflow is\nworth more than nothing \u2014 the agent gets red/green feedback per\npush. If you use a hosted CI system (BuildKite, TeamCity, Jenkins),\nadd a status badge to your README so the loop is visible to agents\neven without an in-repo config file.\n",
           "line": null,
           "message": "None of these expected paths exist: .github/workflows/*.yml, .github/workflows/*.yaml, .circleci/config.yml, .gitlab-ci.yml, .travis.yml, azure-pipelines.yml, bitbucket-pipelines.yml, .buildkite/**, .drone.yml, .woodpecker.yml, .woodpecker/**, Jenkinsfile, appveyor.yml, .appveyor.yml, cloudbuild.yaml, .semaphore/**, codefresh.yaml, .teamcity/**",
           "pillar": "feedback",
-          "severity": "warn"
+          "severity": "warn",
+          "verify": {
+            "command": "test -f .github/workflows/ci.yml",
+            "description": "A CI workflow must exist under .github/workflows/."
+          }
         },
         {
+          "action": {
+            "context_probe": [
+              {
+                "detect": "primary_language"
+              }
+            ],
+            "kind": "create_file",
+            "path": ".github/workflows/ci.yml",
+            "preconditions": [
+              {
+                "not_exists": ".github/workflows/ci.yml"
+              }
+            ],
+            "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: {language_test_command}\n"
+          },
           "check_id": "ci.configured",
           "file": null,
           "fix_hint": "Drop a `.github/workflows/ci.yml` that installs deps, runs the test\ncommand, and reports status to PRs. Even a 20-line workflow is\nworth more than nothing \u2014 the agent gets red/green feedback per\npush. If you use a hosted CI system (BuildKite, TeamCity, Jenkins),\nadd a status badge to your README so the loop is visible to agents\neven without an in-repo config file.\n",
           "line": null,
           "message": "None of these expected paths exist: tekton/**, dagger.json, dagger.cue, earthly.yml, Earthfile, .prow.yaml",
           "pillar": "feedback",
-          "severity": "warn"
+          "severity": "warn",
+          "verify": {
+            "command": "test -f .github/workflows/ci.yml",
+            "description": "A CI workflow must exist under .github/workflows/."
+          }
         }
       ],
       "not_measured": false,
@@ -218,13 +363,31 @@
       "explanation": "Coverage configuration (`.coveragerc`, `codecov.yml`, `coveralls.yml`,\n`pyproject.toml [tool.coverage.*]`) signals that the repo tracks which\ncode is exercised by tests. Agents benefit from knowing what is and\nisn't tested before making a change, so they can target tests\nappropriately. Community-contributed demo rule.",
       "findings": [
         {
+          "action": {
+            "field_path": "tool.coverage.report.fail_under",
+            "kind": "modify_manifest_field",
+            "manifest": "pyproject.toml",
+            "preconditions": [
+              {
+                "exists": "pyproject.toml"
+              },
+              {
+                "manifest_language": "python"
+              }
+            ],
+            "value": "80"
+          },
           "check_id": "feedback.test_coverage_hint",
           "file": null,
           "fix_hint": "Add a coverage config (`.coveragerc` for pytest-cov, `codecov.yml` for\nCodecov) so coverage signal is visible to both humans and agents.\n",
           "line": null,
           "message": "None of these expected paths exist: .coveragerc, codecov.yml, .codecov.yml, coveralls.yml, .coveralls.yml",
           "pillar": "feedback",
-          "severity": "info"
+          "severity": "info",
+          "verify": {
+            "command": "grep -E 'fail_under\\s*=' pyproject.toml >/dev/null",
+            "description": "A coverage threshold must be configured."
+          }
         }
       ],
       "not_measured": false,
@@ -255,13 +418,44 @@
       "explanation": "A manifest (`pyproject.toml`, `package.json`, `Cargo.toml`,\n`go.mod`, \u2026) is the contract that tells an agent what the project\nis, how to install it, and what depends on what. Without one, the\nagent has to infer everything from filenames and tribal knowledge.\nThis rule looks for a manifest at the repo root or, for monorepos,\nat depth \u2264 2 (`packages/<name>/pyproject.toml`).",
       "findings": [
         {
+          "action": {
+            "context_probe": [
+              {
+                "detect": "primary_language"
+              },
+              {
+                "detect": "primary_manifest"
+              }
+            ],
+            "kind": "create_file",
+            "path": "pyproject.toml",
+            "preconditions": [
+              {
+                "not_exists": "pyproject.toml"
+              },
+              {
+                "not_exists": "package.json"
+              },
+              {
+                "not_exists": "go.mod"
+              },
+              {
+                "not_exists": "Cargo.toml"
+              }
+            ],
+            "template": "[project]\nname = \"{primary_language}-project\"\nversion = \"0.1.0\"\nrequires-python = \">=3.11\"\n\n[build-system]\nrequires = [\"hatchling\"]\nbuild-backend = \"hatchling.build\"\n"
+          },
           "check_id": "manifest.detected",
           "file": null,
           "fix_hint": "Drop a `pyproject.toml` (or `package.json` / `Cargo.toml` / etc.)\nat the repo root with at least name + version + dependencies. For\nmonorepos, every package directory should have its own manifest.\n",
           "line": null,
           "message": "No project manifest found (pyproject.toml, package.json, Cargo.toml, go.mod, ...).",
           "pillar": "feedback",
-          "severity": "warn"
+          "severity": "warn",
+          "verify": {
+            "command": "test -f pyproject.toml || test -f package.json || \\\n  test -f go.mod || test -f Cargo.toml\n",
+            "description": "A primary manifest must exist."
+          }
         }
       ],
       "not_measured": false,
@@ -274,31 +468,73 @@
       "explanation": "A lockfile pins the exact dependency tree the project was last\nvalidated against. Without one, `pip install` / `npm install` will\nresolve different versions on different machines, so an agent that\ninstalls deps and runs tests can't trust a green run on its laptop\nto predict a green run in CI. Some ecosystems (Cargo, Poetry, npm)\nproduce lockfiles automatically; others (bare requirements.txt) do\nnot, and the project has to opt in.",
       "findings": [
         {
+          "action": {
+            "command": "# Generate a lockfile using the language's package manager.\n{package_manager} lock || {package_manager} install --frozen-lockfile\n",
+            "context_probe": [
+              {
+                "detect": "package_manager"
+              }
+            ],
+            "description": "Run the package manager's lock command (e.g. `uv lock`,\n`npm install --package-lock-only`, `cargo generate-lockfile`).\n",
+            "kind": "run_command"
+          },
           "check_id": "manifest.lockfile_present",
           "file": null,
           "fix_hint": "Run `poetry lock` / `npm install` / `cargo update` (whichever your\nmanifest needs) and commit the resulting lockfile. For pip-only\nPython projects, freezing `requirements.txt` to exact versions or\nswitching to `uv` / `poetry` is acceptable.\n",
           "line": null,
           "message": "At least one ecosystem-specific lockfile is committed. (no clause matched)",
           "pillar": "feedback",
-          "severity": "warn"
+          "severity": "warn",
+          "verify": {
+            "command": "test -f uv.lock || test -f poetry.lock || test -f package-lock.json || \\\n  test -f yarn.lock || test -f pnpm-lock.yaml || test -f Cargo.lock\n",
+            "description": "A lockfile must exist."
+          }
         },
         {
+          "action": {
+            "command": "# Generate a lockfile using the language's package manager.\n{package_manager} lock || {package_manager} install --frozen-lockfile\n",
+            "context_probe": [
+              {
+                "detect": "package_manager"
+              }
+            ],
+            "description": "Run the package manager's lock command (e.g. `uv lock`,\n`npm install --package-lock-only`, `cargo generate-lockfile`).\n",
+            "kind": "run_command"
+          },
           "check_id": "manifest.lockfile_present",
           "file": null,
           "fix_hint": "Run `poetry lock` / `npm install` / `cargo update` (whichever your\nmanifest needs) and commit the resulting lockfile. For pip-only\nPython projects, freezing `requirements.txt` to exact versions or\nswitching to `uv` / `poetry` is acceptable.\n",
           "line": null,
           "message": "None of these expected paths exist: poetry.lock, uv.lock, Pipfile.lock, pdm.lock, package-lock.json, npm-shrinkwrap.json, yarn.lock, pnpm-lock.yaml, Cargo.lock, Gemfile.lock, composer.lock, go.sum, mix.lock, flake.lock, conda-lock.yml, pixi.lock",
           "pillar": "feedback",
-          "severity": "warn"
+          "severity": "warn",
+          "verify": {
+            "command": "test -f uv.lock || test -f poetry.lock || test -f package-lock.json || \\\n  test -f yarn.lock || test -f pnpm-lock.yaml || test -f Cargo.lock\n",
+            "description": "A lockfile must exist."
+          }
         },
         {
+          "action": {
+            "command": "# Generate a lockfile using the language's package manager.\n{package_manager} lock || {package_manager} install --frozen-lockfile\n",
+            "context_probe": [
+              {
+                "detect": "package_manager"
+              }
+            ],
+            "description": "Run the package manager's lock command (e.g. `uv lock`,\n`npm install --package-lock-only`, `cargo generate-lockfile`).\n",
+            "kind": "run_command"
+          },
           "check_id": "manifest.lockfile_present",
           "file": null,
           "fix_hint": "Run `poetry lock` / `npm install` / `cargo update` (whichever your\nmanifest needs) and commit the resulting lockfile. For pip-only\nPython projects, freezing `requirements.txt` to exact versions or\nswitching to `uv` / `poetry` is acceptable.\n",
           "line": null,
           "message": "None of these expected paths exist: requirements*.txt, environment.yml, environment.yaml",
           "pillar": "feedback",
-          "severity": "warn"
+          "severity": "warn",
+          "verify": {
+            "command": "test -f uv.lock || test -f poetry.lock || test -f package-lock.json || \\\n  test -f yarn.lock || test -f pnpm-lock.yaml || test -f Cargo.lock\n",
+            "description": "A lockfile must exist."
+          }
         }
       ],
       "not_measured": false,
@@ -338,22 +574,60 @@
       "explanation": "A devcontainer / Nix flake / Gitpod config / Vagrantfile lets an\nagent (or a new contributor) get a reproducible environment without\nhand-installing system deps. The project that ships one cuts the\n\"wrong Python version\" / \"missing libssl-dev\" class of failure\nto zero.",
       "findings": [
         {
+          "action": {
+            "context_probe": [
+              {
+                "detect": "primary_language"
+              }
+            ],
+            "kind": "create_file",
+            "path": ".devcontainer/devcontainer.json",
+            "preconditions": [
+              {
+                "not_exists": ".devcontainer/devcontainer.json"
+              }
+            ],
+            "template": "{\n  \"name\": \"{primary_language} dev\",\n  \"image\": \"mcr.microsoft.com/devcontainers/{primary_language}:1\",\n  \"postCreateCommand\": \"make install\"\n}\n"
+          },
           "check_id": "devcontainer.present",
           "file": null,
           "fix_hint": "Drop a minimal `.devcontainer/devcontainer.json` referencing a\nMicrosoft base image plus `postCreateCommand: pip install -e .`.\nFor Nix shops, `flake.nix` with a dev shell is the equivalent.\n",
           "line": null,
           "message": "At least one reproducible-workspace config is present. (no clause matched)",
           "pillar": "flow",
-          "severity": "info"
+          "severity": "info",
+          "verify": {
+            "command": "test -f .devcontainer/devcontainer.json",
+            "description": ".devcontainer/devcontainer.json must exist."
+          }
         },
         {
+          "action": {
+            "context_probe": [
+              {
+                "detect": "primary_language"
+              }
+            ],
+            "kind": "create_file",
+            "path": ".devcontainer/devcontainer.json",
+            "preconditions": [
+              {
+                "not_exists": ".devcontainer/devcontainer.json"
+              }
+            ],
+            "template": "{\n  \"name\": \"{primary_language} dev\",\n  \"image\": \"mcr.microsoft.com/devcontainers/{primary_language}:1\",\n  \"postCreateCommand\": \"make install\"\n}\n"
+          },
           "check_id": "devcontainer.present",
           "file": null,
           "fix_hint": "Drop a minimal `.devcontainer/devcontainer.json` referencing a\nMicrosoft base image plus `postCreateCommand: pip install -e .`.\nFor Nix shops, `flake.nix` with a dev shell is the equivalent.\n",
           "line": null,
           "message": "None of these expected paths exist: .devcontainer/devcontainer.json, .devcontainer/**, .devcontainer.json, .gitpod.yml, .gitpod.Dockerfile, flake.nix, shell.nix, default.nix, .nix/**, devbox.json, mise.toml, .mise.toml, .tool-versions, Vagrantfile, .codesandbox/**, docker-compose.dev.yml, docker-compose.dev.yaml, compose.dev.yml, compose.dev.yaml",
           "pillar": "flow",
-          "severity": "info"
+          "severity": "info",
+          "verify": {
+            "command": "test -f .devcontainer/devcontainer.json",
+            "description": ".devcontainer/devcontainer.json must exist."
+          }
         }
       ],
       "not_measured": false,
@@ -382,20 +656,10 @@
     {
       "check_id": "git.has_history",
       "explanation": "An agent that needs to reason about *why* a piece of code looks the\nway it does \u2014 to backport, to revert, to bisect \u2014 depends on\ncommit history. A repo with one squash-import commit looks the same\nas a repo with no history at all: every change is a mystery. This\nrule fires when fewer than `min_commits` commits exist (and gives\na `not_measured` finding on shallow clones).",
-      "findings": [
-        {
-          "check_id": "git.has_history",
-          "file": null,
-          "fix_hint": "If you imported the project as a single squash, re-import preserving\nhistory (`git filter-repo` or a fresh clone of the source). For new\nprojects, just keep committing \u2014 agents need the trail.\n",
-          "line": null,
-          "message": "Repository has 1 commits \u2014 fewer than min_commits=5.",
-          "pillar": "flow",
-          "severity": "warn"
-        }
-      ],
+      "findings": [],
       "not_measured": false,
       "pillar": "flow",
-      "score": 80.0,
+      "score": 100.0,
       "weight": 1.0
     },
     {
@@ -421,13 +685,27 @@
       "explanation": "Many AI coding agents (and new human contributors) try `make help`\nfirst to discover what a repo can do. A Makefile with multiple\ntargets and no `help:` target forces every onboarding agent to read\nthe Makefile by hand. Cheap to add, surprisingly load-bearing for\nfirst-touch ergonomics. Demo rule for the `insert_after` fix kind.",
       "findings": [
         {
+          "action": {
+            "kind": "append_to_file",
+            "path": "Makefile",
+            "preconditions": [
+              {
+                "exists": "Makefile"
+              }
+            ],
+            "template": "\n.PHONY: help\nhelp:\n\t@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) \\\n\t  | awk 'BEGIN {FS = \":.*?## \"}; {printf \"%-20s %s\\n\", $$1, $$2}'\n"
+          },
           "check_id": "makefile.help_target",
           "file": "Makefile",
           "fix_hint": "Add a `help:` target that prints each target with its inline `##`\ncomment. Inserting after `.PHONY:` keeps the canonical declaration\nblock tidy.\n",
           "line": null,
           "message": "Makefile not present.",
           "pillar": "flow",
-          "severity": "info"
+          "severity": "info",
+          "verify": {
+            "command": "make -n help",
+            "description": "`make help` must resolve to a runnable target."
+          }
         }
       ],
       "not_measured": false,
@@ -449,40 +727,96 @@
       "explanation": "Issue templates, PR templates, and CODEOWNERS make agent-opened PRs\nroutable: the right reviewer is auto-assigned, the right metadata\nfields are filled in, and the project's expectations are explicit.\nRepos without these get a flood of agent PRs that all look the same\nand have no obvious reviewer.",
       "findings": [
         {
+          "action": {
+            "kind": "create_file",
+            "path": ".github/PULL_REQUEST_TEMPLATE.md",
+            "preconditions": [
+              {
+                "not_exists": ".github/PULL_REQUEST_TEMPLATE.md"
+              }
+            ],
+            "template": "## Summary\n\nWhat does this change do, in 1-2 sentences?\n\n## Test plan\n\n- [ ] Unit tests\n- [ ] Manual verification\n"
+          },
           "check_id": "templates.present",
           "file": null,
           "fix_hint": "At minimum: drop `.github/ISSUE_TEMPLATE/bug_report.md` (GitHub has\na wizard), a `.github/PULL_REQUEST_TEMPLATE.md` with a checklist,\nand a `CODEOWNERS` file mapping `*` to the team that should review\nagent-opened PRs.\n",
           "line": null,
           "message": "Issue templates, PR template, or CODEOWNERS configured. (no clause matched)",
           "pillar": "flow",
-          "severity": "info"
+          "severity": "info",
+          "verify": {
+            "command": "test -f .github/PULL_REQUEST_TEMPLATE.md",
+            "description": ".github/PULL_REQUEST_TEMPLATE.md must exist."
+          }
         },
         {
+          "action": {
+            "kind": "create_file",
+            "path": ".github/PULL_REQUEST_TEMPLATE.md",
+            "preconditions": [
+              {
+                "not_exists": ".github/PULL_REQUEST_TEMPLATE.md"
+              }
+            ],
+            "template": "## Summary\n\nWhat does this change do, in 1-2 sentences?\n\n## Test plan\n\n- [ ] Unit tests\n- [ ] Manual verification\n"
+          },
           "check_id": "templates.present",
           "file": null,
           "fix_hint": "At minimum: drop `.github/ISSUE_TEMPLATE/bug_report.md` (GitHub has\na wizard), a `.github/PULL_REQUEST_TEMPLATE.md` with a checklist,\nand a `CODEOWNERS` file mapping `*` to the team that should review\nagent-opened PRs.\n",
           "line": null,
           "message": "None of these expected paths exist: .github/ISSUE_TEMPLATE/**, .gitlab/issue_templates/**",
           "pillar": "flow",
-          "severity": "info"
+          "severity": "info",
+          "verify": {
+            "command": "test -f .github/PULL_REQUEST_TEMPLATE.md",
+            "description": ".github/PULL_REQUEST_TEMPLATE.md must exist."
+          }
         },
         {
+          "action": {
+            "kind": "create_file",
+            "path": ".github/PULL_REQUEST_TEMPLATE.md",
+            "preconditions": [
+              {
+                "not_exists": ".github/PULL_REQUEST_TEMPLATE.md"
+              }
+            ],
+            "template": "## Summary\n\nWhat does this change do, in 1-2 sentences?\n\n## Test plan\n\n- [ ] Unit tests\n- [ ] Manual verification\n"
+          },
           "check_id": "templates.present",
           "file": null,
           "fix_hint": "At minimum: drop `.github/ISSUE_TEMPLATE/bug_report.md` (GitHub has\na wizard), a `.github/PULL_REQUEST_TEMPLATE.md` with a checklist,\nand a `CODEOWNERS` file mapping `*` to the team that should review\nagent-opened PRs.\n",
           "line": null,
           "message": "None of these expected paths exist: .github/PULL_REQUEST_TEMPLATE.md, .github/PULL_REQUEST_TEMPLATE/**, .github/pull_request_template.md, .gitlab/merge_request_templates/**",
           "pillar": "flow",
-          "severity": "info"
+          "severity": "info",
+          "verify": {
+            "command": "test -f .github/PULL_REQUEST_TEMPLATE.md",
+            "description": ".github/PULL_REQUEST_TEMPLATE.md must exist."
+          }
         },
         {
+          "action": {
+            "kind": "create_file",
+            "path": ".github/PULL_REQUEST_TEMPLATE.md",
+            "preconditions": [
+              {
+                "not_exists": ".github/PULL_REQUEST_TEMPLATE.md"
+              }
+            ],
+            "template": "## Summary\n\nWhat does this change do, in 1-2 sentences?\n\n## Test plan\n\n- [ ] Unit tests\n- [ ] Manual verification\n"
+          },
           "check_id": "templates.present",
           "file": null,
           "fix_hint": "At minimum: drop `.github/ISSUE_TEMPLATE/bug_report.md` (GitHub has\na wizard), a `.github/PULL_REQUEST_TEMPLATE.md` with a checklist,\nand a `CODEOWNERS` file mapping `*` to the team that should review\nagent-opened PRs.\n",
           "line": null,
           "message": "None of these expected paths exist: CODEOWNERS, .github/CODEOWNERS, docs/CODEOWNERS",
           "pillar": "flow",
-          "severity": "info"
+          "severity": "info",
+          "verify": {
+            "command": "test -f .github/PULL_REQUEST_TEMPLATE.md",
+            "description": ".github/PULL_REQUEST_TEMPLATE.md must exist."
+          }
         }
       ],
       "not_measured": false,
@@ -504,13 +838,34 @@
       "explanation": "An agent that runs `pip install` / `npm install` / a build will\nproduce artefact directories (`__pycache__`, `node_modules`,\n`dist/`, `build/`, IDE settings, coverage reports). If the\n`.gitignore` doesn't cover them, those artefacts get accidentally\ncommitted and pollute future diffs. The same pattern catches\nsecrets \u2014 `.env` not being ignored is how API keys end up in\npublic history.",
       "findings": [
         {
+          "action": {
+            "entries": [
+              ".env",
+              ".env.*",
+              "!.env.example",
+              ".venv/",
+              "venv/",
+              "node_modules/",
+              "dist/",
+              "build/",
+              "*.log",
+              ".DS_Store",
+              "*.pyc",
+              "__pycache__/"
+            ],
+            "kind": "edit_gitignore"
+          },
           "check_id": "gitignore.covers_junk",
           "file": ".gitignore",
           "fix_hint": "Run `gitignore.io` for your stack and paste the result into\n`.gitignore`. At minimum, cover: `__pycache__`, `node_modules`,\n`.env`, `dist/`, `build/`, `*.log`, IDE settings, coverage dirs.\n",
           "line": null,
           "message": "No .gitignore found.",
           "pillar": "safety",
-          "severity": "warn"
+          "severity": "warn",
+          "verify": {
+            "command": "grep -E '^(\\.env|node_modules|\\.venv|dist|__pycache__)' .gitignore >/dev/null\n",
+            "description": ".gitignore must cover the standard junk groups."
+          }
         }
       ],
       "not_measured": false,
@@ -532,13 +887,27 @@
       "explanation": "An agent that handles credentials or pushes commits is one\ncopy-paste away from leaking a secret into git history. Repos that\ndeclare a secret-scanning config (gitleaks, trufflehog, .pre-commit\nwith detect-secrets, or GitHub's native push protection markers)\nsignal that secret scanning is enforced as part of the contributor\nflow, which materially reduces leak risk in agent-driven changes.",
       "findings": [
         {
+          "action": {
+            "kind": "create_file",
+            "path": ".gitleaks.toml",
+            "preconditions": [
+              {
+                "not_exists": ".gitleaks.toml"
+              }
+            ],
+            "template": "# gitleaks configuration: tunes which paths and rules are scanned\n# for secrets in pre-commit hooks and CI.\ntitle = \"gitleaks config\"\n\n[[allowlist.regexes]]\ndescription = \"Allow .env.example placeholder values\"\nregex = '''EXAMPLE_VAR\\s*='''\n"
+          },
           "check_id": "safety.gitleaks_config",
           "file": null,
           "fix_hint": "Add a `.gitleaks.toml` (or `.secrets.baseline` for detect-secrets) and\nwire it into pre-commit or a GitHub Actions workflow. Example:\nhttps://github.com/gitleaks/gitleaks-action.\n",
           "line": null,
           "message": "None of these expected paths exist: .gitleaks.toml, .gitleaks.yaml, .gitleaks.yml, gitleaks.toml, .trufflehog.yaml, .trufflehog.yml, .secrets.baseline, .pre-commit-config.yaml, .github/workflows/gitleaks.yml, .github/workflows/secret-scan.yml",
           "pillar": "safety",
-          "severity": "warn"
+          "severity": "warn",
+          "verify": {
+            "command": "test -f .gitleaks.toml",
+            "description": ".gitleaks.toml must exist."
+          }
         }
       ],
       "not_measured": false,
@@ -551,13 +920,22 @@
       "explanation": "Tracked files containing AWS access keys, GitHub tokens, Slack\ntokens, Google API keys, Stripe live keys, or PEM private keys\nare almost always a credential leak. Even rotating after the fact\ndoesn't help \u2014 the leaked secret is in git history forever. This\nrule catches the high-confidence patterns; for full coverage,\nlayer a tool like `gitleaks` (see safety.gitleaks_config) on top.",
       "findings": [
         {
+          "action": {
+            "command": "# Run a basic secret scan. Use a regex pattern matching common\n# secret formats (AWS, GCP, GitHub PAT, generic API keys).\nrg -E '(AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|sk-[A-Za-z0-9]{32,})' \\\n  --type-not lockfile || echo \"no obvious secrets found\"\n",
+            "description": "Run a regex-based secret scan. False positives belong in\n.gitleaks.toml allowlists.\n",
+            "kind": "run_command"
+          },
           "check_id": "secrets.basic_scan",
           "file": "main.py",
           "fix_hint": "ROTATE the leaked credential immediately (don't just delete it\nfrom the file \u2014 assume it's compromised the moment it touched\ngit). Then remove it from history (`git filter-repo`) and\nconfigure a secrets scanner (`gitleaks`, GitHub secret scanning)\nto prevent recurrence.\n",
           "line": 4,
           "message": "Possible aws_access_key_id found.",
           "pillar": "safety",
-          "severity": "error"
+          "severity": "error",
+          "verify": {
+            "command": "true",
+            "description": "Manual / pre-commit-driven; the gitleaks-config rule is the\nstructural complement.\n"
+          }
         }
       ],
       "not_measured": false,
@@ -570,13 +948,27 @@
       "explanation": "A SECURITY.md (or .github/SECURITY.md / docs/SECURITY.md) tells\nagents and reporters where to send vulnerability disclosures and what\nthe project's response window is. Without it, a coding agent that\nfinds a security issue has no documented escalation path and may\ndefault to opening a public issue.",
       "findings": [
         {
+          "action": {
+            "kind": "create_file",
+            "path": "SECURITY.md",
+            "preconditions": [
+              {
+                "not_exists": "SECURITY.md"
+              }
+            ],
+            "template": "# Security policy\n\n## Reporting a vulnerability\n\nEmail security@example.com or open a GitHub Security Advisory.\nWe respond within 48 hours and aim to ship a fix within 14 days.\n"
+          },
           "check_id": "security.policy_present",
           "file": null,
           "fix_hint": "Add a SECURITY.md at the repo root with at least: how to report a\nvulnerability (private channel), supported versions, and expected\nresponse time. GitHub's \"Add a security policy\" template is fine.\n",
           "line": null,
           "message": "None of these expected paths exist: SECURITY.md, .github/SECURITY.md, docs/SECURITY.md",
           "pillar": "safety",
-          "severity": "info"
+          "severity": "info",
+          "verify": {
+            "command": "test -f SECURITY.md",
+            "description": "SECURITY.md must exist at the repo root."
+          }
         }
       ],
       "not_measured": false,
