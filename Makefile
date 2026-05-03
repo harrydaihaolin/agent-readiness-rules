@@ -7,7 +7,7 @@
 # Currently pinned to the v0.2.0-prep feature branch HEAD while
 # protocol PR #10 (action contract) is in review. Repoint to the
 # merged main commit once that PR lands.
-PROTOCOL_TAG ?= 41d8c0f661c9b7a06573578e0d95c037432727f1
+PROTOCOL_TAG ?= 5300bd78e4d98a9a9f8fc406cc916af9d23bd9a9
 SCHEMA_URL = https://raw.githubusercontent.com/harrydaihaolin/agent-readiness-insights-protocol/$(PROTOCOL_TAG)/schemas/rule.schema.json
 
 schema-fetch:
