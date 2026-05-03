@@ -13,27 +13,33 @@ title: Large source files
 # closer to a property of "large active codebase" than "this repo has
 # a problematic large file." The rule's exclude_globs already cover
 # the obvious non-source noise, so the remaining lever is threshold
-# height: bump threshold_lines 500 → 1500 and threshold_bytes 50 KB →
-# 150 KB to land fire rate inside the calibration target band of
-# 30–60% (which is where git.churn_hotspots already sits and where the
-# rule discriminates again). Validation gate is enforced by
-# scripts/validate_proposed_checks.py against a 15-repo stratified
-# sample; the v3.2 cohort re-snapshot is the production confirmation.
+# height.
+#
+# v2.0.1 (2026-05): EXP-2. The v1.5.0 bump (500 → 1500 lines / 50 KB →
+# 150 KB) only moved the dial from ~88% to ~70% top-finding rate on
+# the v3.2 (post-v1.5.0) cohort. Files in the 1500-3000 line band are
+# uncomfortably common in real Python / TS codebases (frontend route
+# manifests, Pydantic schemas, etc.) and aren't actually outliers — so
+# bump again to 3000 lines / 300 KB to land the fire rate in the
+# calibration target band of 30-60%. Phase 2 v3.3 dispatch is the
+# production confirmation; if the band still isn't hit, the next lever
+# is requiring BOTH thresholds (lines AND bytes) instead of either.
 weight: 0.5
 severity: warn
 explanation: |
-  Files over 1500 lines or 150 KB exceed an agent's working memory in
+  Files over 3000 lines or 300 KB exceed an agent's working memory in
   a single read and force a chunked-reading pattern that loses
   context across chunk boundaries. This rule excludes lock files,
   generated data, binary assets, long-form tests, vendored
   third-party code, and build/template artefacts — which are large
-  but not "source" files an agent would meaningfully edit. Threshold
-  recalibrated in v1.5.0 from the 500-line / 50 KB v1.4.0 setting;
-  see the rule comment block for v3.1 cohort calibration data.
+  but not "source" files an agent would meaningfully edit. Thresholds
+  recalibrated in v2.0.1 (3000 lines / 300 KB) from v1.5.0's 1500 /
+  150 KB setting after EXP-2 fire-rate measurement on the v3.2 cohort;
+  see the rule comment block for cohort calibration history.
 match:
   type: file_size
-  threshold_lines: 1500
-  threshold_bytes: 153600
+  threshold_lines: 3000
+  threshold_bytes: 307200
   exclude_globs:
     # Lock files of every flavour
     - "*.lock"
@@ -142,7 +148,7 @@ action:
       -o -name '*.js' -o -name '*.go' \) \
       -not -path './node_modules/*' -not -path './.venv/*' \
       | xargs wc -l 2>/dev/null \
-      | awk '$1 > 1500 {print}'
+      | awk '$1 > 3000 {print}'
   description: |
     No deterministic action — splitting a large source file is a human
     refactor decision. The command above lists candidates so the agent
