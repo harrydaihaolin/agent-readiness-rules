@@ -13,10 +13,18 @@ explanation: |
   size thresholds; gives `not_measured` on shallow clones and
   repos with very few commits.
 match:
+  # v2.0.1 (EXP-2): bumped min_commits_touching_file 10 → 25 and
+  # min_file_lines 200 → 500. The v1.4 thresholds caught any file
+  # touched twice a quarter, which over a 1000-repo cohort hit 80.8%
+  # of repos and stopped discriminating. The new pair reserves
+  # "hotspot" for files that really are both heavily-touched (>= a
+  # touch every other week over a quarter) and large enough that the
+  # touch involves real surface (>= 500 lines). Target band: 30-60%
+  # on the v3.3 dispatch.
   type: git_log_query
   mode: churn_hotspots
-  min_commits_touching_file: 10
-  min_file_lines: 200
+  min_commits_touching_file: 25
+  min_file_lines: 500
   max_findings: 5
   neutral_on_shallow: true
 fix_hint: |
