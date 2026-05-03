@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: git.churn_hotspots
 pillar: cognitive_load
 title: No high-churn large files (hotspots)
@@ -24,3 +24,19 @@ fix_hint: |
   file holds both API routing and validation logic) and split along
   those lines. After the split, both halves see lower per-file churn.
 insight_query: churn hotspot large file frequently edited refactor split
+action:
+  kind: run_command
+  command: |
+    # Identify the highest-churn files over the last 90 days and split
+    # them along their dominant axis of change (feature, layer, domain).
+    git log --since='90 days ago' --name-only --pretty=format: \
+      | sort | uniq -c | sort -rn | head -20
+  description: |
+    No deterministic file-edit fixes a churn hotspot — they require a
+    human refactor decision. The command above identifies the top-20
+    hotspots so the agent can propose a targeted split.
+verify:
+  command: "true"
+  description: |
+    Manual refactor; verification is the next scan no longer flagging
+    the file.

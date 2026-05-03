@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: makefile.help_target
 pillar: flow
 title: Makefile exposes a `help:` target
@@ -32,3 +32,17 @@ fix_template:
     	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | \
     	  awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
 insight_query: makefile help target onboarding agents discoverability
+action:
+  kind: append_to_file
+  path: Makefile
+  template: |
+
+    .PHONY: help
+    help:
+    	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) \
+    	  | awk 'BEGIN {FS = ":.*?## "}; {printf "%-20s %s\n", $$1, $$2}'
+  preconditions:
+    - exists: Makefile
+verify:
+  command: "make -n help"
+  description: "`make help` must resolve to a runnable target."

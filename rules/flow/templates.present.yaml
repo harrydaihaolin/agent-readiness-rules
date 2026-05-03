@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: templates.present
 pillar: flow
 title: Issue / PR templates and CODEOWNERS present
@@ -55,3 +55,20 @@ fix_template:
 
     <!-- Any feature flags, migrations, or rollback steps reviewers should know. -->
 insight_query: issue template PR template CODEOWNERS GitHub repository scaffolding
+action:
+  kind: create_file
+  path: .github/PULL_REQUEST_TEMPLATE.md
+  template: |
+    ## Summary
+
+    What does this change do, in 1-2 sentences?
+
+    ## Test plan
+
+    - [ ] Unit tests
+    - [ ] Manual verification
+  preconditions:
+    - not_exists: .github/PULL_REQUEST_TEMPLATE.md
+verify:
+  command: "test -f .github/PULL_REQUEST_TEMPLATE.md"
+  description: .github/PULL_REQUEST_TEMPLATE.md must exist.

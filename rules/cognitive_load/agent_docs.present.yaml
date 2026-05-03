@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: agent_docs.present
 pillar: cognitive_load
 title: Any agent-targeted docs present
@@ -43,3 +43,16 @@ fix_hint: |
   Alternatively, document agent-targeted material under .ai/ or
   .cursor/rules/. See agent-readiness/AGENTS.md for an example.
 insight_query: AGENTS.md CLAUDE.md cursor rules adoption
+action:
+  kind: create_file
+  path: AGENTS.md
+  template: |
+    # Agents guide
+
+    Single-page orientation for AI coding agents. Spell out the setup
+    command, the test command, and the entry point. Keep it short.
+  preconditions:
+    - not_exists: AGENTS.md
+verify:
+  command: "test -f AGENTS.md"
+  description: An AGENTS.md (or AGENTS.txt) file must exist.

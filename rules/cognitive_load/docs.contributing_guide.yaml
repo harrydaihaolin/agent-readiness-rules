@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: docs.contributing_guide
 pillar: cognitive_load
 title: CONTRIBUTING.md present
@@ -48,3 +48,25 @@ fix_template:
     - Fill in the PR template; describe what changed and how to verify.
     - Expect a review within ~1 business day; ping if stuck.
 insight_query: contributing guide PR conventions branch naming
+action:
+  kind: create_file
+  path: CONTRIBUTING.md
+  template: |
+    # Contributing
+
+    ## Setup
+    `make install`
+
+    ## Test
+    `make test`
+
+    ## Lint
+    `make lint`
+
+    ## Submitting changes
+    Fork, branch, PR. CI must be green before review.
+  preconditions:
+    - not_exists: CONTRIBUTING.md
+verify:
+  command: "test -f CONTRIBUTING.md"
+  description: CONTRIBUTING.md must exist at the repo root.

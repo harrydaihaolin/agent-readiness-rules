@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: workflow.concurrency_guard
 pillar: flow
 title: Self-pushing workflow lacks `concurrency:` guard
@@ -56,3 +56,17 @@ fix_hint: |
   run picks up the first run's commit instead of failing on a non-fast
   forward.
 insight_query: github actions workflow concurrency self-push race condition
+action:
+  kind: insert_after
+  path: .github/workflows/release.yml
+  after_pattern: "^name:\\s"
+  template: |
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: false
+  preconditions:
+    - exists: .github/workflows/release.yml
+verify:
+  command: "grep -E '^concurrency:' .github/workflows/*.yml >/dev/null"
+  description: At least one workflow must declare a concurrency group.

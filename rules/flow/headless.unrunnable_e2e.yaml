@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: headless.unrunnable_e2e
 pillar: flow
 title: Repo is unrunnable end-to-end by an agent
@@ -141,3 +141,15 @@ fix_hint: |
   `test:` target in a Makefile, etc.). The goal is for an agent to be
   able to read one file and run two commands without guessing.
 insight_query: agent-blind unrunnable e2e no entry point no test command no AGENTS.md
+action:
+  kind: run_command
+  command: |
+    # Identify e2e tests that require a browser/display and gate them
+    # behind a CI-only env var.
+    grep -rE '(playwright|puppeteer|selenium|cypress)' tests/ e2e/ 2>/dev/null
+  description: |
+    Mark non-headless e2e tests as skipped when DISPLAY is unset, or
+    install xvfb-run in the test command.
+verify:
+  command: "true"
+  description: Manual; re-scan is the closed loop.

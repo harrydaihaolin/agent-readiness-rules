@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: entry_points.detected
 pillar: flow
 title: Entry point detected
@@ -57,3 +57,15 @@ fix_hint: |
   package.json. The goal: an agent running `--help` on the package
   should find a command that works.
 insight_query: entry point manifest scripts main bin __main__ cmd cli
+action:
+  kind: modify_manifest_field
+  manifest: pyproject.toml
+  field_path: project.scripts
+  value: |
+    main = "package.cli:main"
+  preconditions:
+    - exists: pyproject.toml
+    - manifest_language: python
+verify:
+  command: "grep -E '(project\\.scripts|\"bin\"|main\\.go|cmd/)' pyproject.toml package.json 2>/dev/null"
+  description: An entry point must be declared.

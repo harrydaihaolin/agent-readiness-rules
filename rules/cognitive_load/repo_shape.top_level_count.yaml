@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: repo_shape.top_level_count
 pillar: cognitive_load
 title: Few non-meta files at repo root
@@ -41,3 +41,14 @@ fix_hint: |
   into `docs/`. The root should contain manifest + README + license
   + maybe a Makefile, and that's it.
 insight_query: repo shape top level files root flat structure src package
+action:
+  kind: run_command
+  command: |
+    # Reduce top-level directory count to ≤ 12 by grouping related
+    # subtrees under a parent (e.g. apps/, packages/, services/).
+    ls -1 . | wc -l
+  description: |
+    A flat top level confuses agents; group subtrees under parents.
+verify:
+  command: "true"
+  description: Manual; re-scan is the closed loop.

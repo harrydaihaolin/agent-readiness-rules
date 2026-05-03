@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: devcontainer.present
 pillar: flow
 title: Dev container or reproducible workspace configured
@@ -55,3 +55,19 @@ fix_template:
       }
     }
 insight_query: devcontainer Nix Gitpod reproducible environment workspace
+action:
+  kind: create_file
+  path: .devcontainer/devcontainer.json
+  template: |
+    {
+      "name": "{primary_language} dev",
+      "image": "mcr.microsoft.com/devcontainers/{primary_language}:1",
+      "postCreateCommand": "make install"
+    }
+  preconditions:
+    - not_exists: .devcontainer/devcontainer.json
+  context_probe:
+    - detect: primary_language
+verify:
+  command: "test -f .devcontainer/devcontainer.json"
+  description: .devcontainer/devcontainer.json must exist.

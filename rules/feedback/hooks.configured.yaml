@@ -1,4 +1,4 @@
-rules_version: 1
+rules_version: 2
 id: hooks.configured
 pillar: feedback
 title: Git or agent hooks configured
@@ -57,3 +57,20 @@ fix_template:
             args: [--fix]
           - id: ruff-format
 insight_query: pre-commit husky lefthook lint-staged git hooks pre-commit-config
+action:
+  kind: create_file
+  path: .pre-commit-config.yaml
+  template: |
+    repos:
+      - repo: https://github.com/pre-commit/pre-commit-hooks
+        rev: v4.6.0
+        hooks:
+          - id: trailing-whitespace
+          - id: end-of-file-fixer
+          - id: check-yaml
+          - id: check-merge-conflict
+  preconditions:
+    - not_exists: .pre-commit-config.yaml
+verify:
+  command: "test -f .pre-commit-config.yaml"
+  description: .pre-commit-config.yaml must exist.

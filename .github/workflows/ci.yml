@@ -12,9 +12,13 @@ permissions:
 env:
   # Pinned to a specific protocol commit so an unrelated change on
   # protocol main can't red rules CI overnight. Bump deliberately when
-  # the protocol cuts a new tag (target: v0.2.0 once the CompositeMatch
-  # surface stabilises). See AGENTS.md for bump cadence.
-  PROTOCOL_TAG: e9c8eeb6f05c084e9cc56c1e21be33a0ad465530
+  # the protocol cuts a new tag (target: v0.2.0 — action contract,
+  # rules_version 2). See AGENTS.md for bump cadence.
+  #
+  # NOTE: temporarily pinned to the v0.2.0-prep feature branch HEAD
+  # while protocol PR #10 (action contract) is in review. Repoint to
+  # the merged main commit once that PR lands.
+  PROTOCOL_TAG: 41d8c0f661c9b7a06573578e0d95c037432727f1
   FIXTURES_TAG: v1.0.0
 
 jobs:

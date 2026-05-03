@@ -1,8 +1,13 @@
 .PHONY: schema-fetch validate eval clean test lint snapshots
 
-# Tracks protocol main, which now ships PrivateMatch (post protocol#5).
-# When a v0.2.0 release is cut, switch to the versioned tag.
-PROTOCOL_TAG ?= main
+# Pinned to the same protocol commit CI uses so `make validate` agrees
+# with the GitHub Actions run. The Makefile and ci.yml stay in sync via
+# code review; bump both when protocol cuts a new tag.
+#
+# Currently pinned to the v0.2.0-prep feature branch HEAD while
+# protocol PR #10 (action contract) is in review. Repoint to the
+# merged main commit once that PR lands.
+PROTOCOL_TAG ?= 41d8c0f661c9b7a06573578e0d95c037432727f1
 SCHEMA_URL = https://raw.githubusercontent.com/harrydaihaolin/agent-readiness-insights-protocol/$(PROTOCOL_TAG)/schemas/rule.schema.json
 
 schema-fetch:
