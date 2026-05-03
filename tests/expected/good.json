@@ -135,10 +135,34 @@
     {
       "check_id": "agent_docs.ci_feedback_loop",
       "explanation": "CI is the main automated feedback channel once an agent pushes a\nbranch. repos that never tell agents to watch workflow results or to\ntreat failing checks as something to fix (not noise) see agents land\nred PRs, declare \"done,\" and disappear \u2014 the same failure mode as\nmissing hooks, only slower. Root `AGENTS.md` should explicitly bind\n**monitor CI / checks \u2192 read failures \u2192 fix and iterate** into the\nagent contract.",
-      "findings": [],
+      "findings": [
+        {
+          "action": {
+            "kind": "create_file",
+            "path": "AGENTS.md",
+            "preconditions": [
+              {
+                "not_exists": "AGENTS.md"
+              }
+            ],
+            "template": "# Agents guide\n\n## Feedback loop\n\n- To preview locally: `make ci-local`\n- To re-run the failing CI step: `gh run rerun --failed`\n- CI artifacts are uploaded to the run page.\n"
+          },
+          "check_id": "agent_docs.ci_feedback_loop",
+          "file": null,
+          "fix_hint": "Add a short \"CI and the feedback loop\" section to `AGENTS.md`: after\npushing or updating a PR, monitor workflow / PR check results; when CI\nfails, use logs as signal, fix the root cause, and iterate until green.\n",
+          "line": null,
+          "message": "AGENTS.md is present but does not tell agents to monitor CI runs /\ncheck results and act on failures as feedback.\n",
+          "pillar": "feedback",
+          "severity": "warn",
+          "verify": {
+            "command": "grep -i 'feedback\\|ci\\|test' AGENTS.md >/dev/null",
+            "description": "AGENTS.md must reference the CI feedback loop."
+          }
+        }
+      ],
       "not_measured": false,
       "pillar": "feedback",
-      "score": 100.0,
+      "score": 80.0,
       "weight": 0.75
     },
     {
@@ -416,10 +440,29 @@
     {
       "check_id": "git.has_history",
       "explanation": "An agent that needs to reason about *why* a piece of code looks the\nway it does \u2014 to backport, to revert, to bisect \u2014 depends on\ncommit history. A repo with one squash-import commit looks the same\nas a repo with no history at all: every change is a mystery. This\nrule fires when fewer than `min_commits` commits exist (and gives\na `not_measured` finding on shallow clones).",
-      "findings": [],
+      "findings": [
+        {
+          "action": {
+            "command": "# Initialize the repo and stage an initial commit so agents can\n# see a baseline diff.\ngit init && git add -A && git commit -m 'initial commit'\n",
+            "description": "Initialize a git repo (or commit at least 5 changes). Required for\nagents that diff against the merge base.\n",
+            "kind": "run_command"
+          },
+          "check_id": "git.has_history",
+          "file": null,
+          "fix_hint": "If you imported the project as a single squash, re-import preserving\nhistory (`git filter-repo` or a fresh clone of the source). For new\nprojects, just keep committing \u2014 agents need the trail.\n",
+          "line": null,
+          "message": "Repository has 1 commits \u2014 fewer than min_commits=5.",
+          "pillar": "flow",
+          "severity": "warn",
+          "verify": {
+            "command": "test $(git rev-list --count HEAD 2>/dev/null) -ge 5",
+            "description": "Repo must have \u2265 5 commits."
+          }
+        }
+      ],
       "not_measured": false,
       "pillar": "flow",
-      "score": 100.0,
+      "score": 80.0,
       "weight": 1.0
     },
     {
