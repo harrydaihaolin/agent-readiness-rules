@@ -71,8 +71,13 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install agent-readiness with insights-protocol
+        # Pre-install protocol from the EXP-1 feature branch so the
+        # editable engine install can satisfy `>=0.2` without the
+        # 0.2.0 PyPI release being cut yet. Drop the first pip line
+        # once protocol 0.2.0 is on PyPI.
         run: |
           pip install --upgrade pip
+          pip install "agent-readiness-insights-protocol @ git+https://github.com/harrydaihaolin/agent-readiness-insights-protocol@${PROTOCOL_TAG}"
           pip install -e ./agent-readiness
       - name: Assert rules-eval is available (fail loud)
         run: |
