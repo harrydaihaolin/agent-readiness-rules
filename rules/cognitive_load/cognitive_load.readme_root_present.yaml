@@ -1,4 +1,4 @@
-rules_version: 2
+rules_version: 1
 id: cognitive_load.readme_root_present
 pillar: cognitive_load
 title: README at repository root
@@ -15,23 +15,3 @@ match:
 fix_hint: |
   Add a README.md at the repo root with install, run, and test instructions.
 insight_query: README missing repository root documentation orientation
-action:
-  kind: create_file
-  path: README.md
-  template: |
-    # {primary_language} project
-
-    One-line description.
-
-    ## Setup
-    `make install`
-
-    ## Test
-    `make test`
-  preconditions:
-    - not_exists: README.md
-  context_probe:
-    - detect: primary_language
-verify:
-  command: "test -f README.md"
-  description: README.md must exist at the repo root.
