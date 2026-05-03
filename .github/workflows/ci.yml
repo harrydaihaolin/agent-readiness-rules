@@ -18,8 +18,13 @@ env:
   # NOTE: temporarily pinned to the v0.2.0-prep feature branch HEAD
   # while protocol PR #10 (action contract) is in review. Repoint to
   # the merged main commit once that PR lands.
-  PROTOCOL_TAG: 41d8c0f661c9b7a06573578e0d95c037432727f1
+  PROTOCOL_TAG: 5300bd78e4d98a9a9f8fc406cc916af9d23bd9a9
   FIXTURES_TAG: v1.0.0
+  # Same coupling for the engine: `rules_version=2` is a hard-pin
+  # against the EXP-1 engine branch until agent-readiness#64 merges,
+  # otherwise reference-eval skips every rule with "rules_version=2
+  # is not in supported set [1]".
+  ENGINE_REF: feat/exp1-action-contract-engine
 
 jobs:
   validate-schema:
@@ -60,7 +65,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin to v6
         with:
           repository: harrydaihaolin/agent-readiness
-          ref: main
+          ref: ${{ env.ENGINE_REF }}
           path: agent-readiness
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # pin to v6
         with:
