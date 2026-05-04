@@ -4,10 +4,9 @@
 # with the GitHub Actions run. The Makefile and ci.yml stay in sync via
 # code review; bump both when protocol cuts a new tag.
 #
-# Currently pinned to the v0.2.0-prep feature branch HEAD while
-# protocol PR #10 (action contract) is in review. Repoint to the
-# merged main commit once that PR lands.
-PROTOCOL_TAG ?= 5300bd78e4d98a9a9f8fc406cc916af9d23bd9a9
+# Pinned to protocol v0.3.0 (PR #11) which makes the `provenance:`
+# field schema-required.
+PROTOCOL_TAG ?= 0cb44a0
 SCHEMA_URL = https://raw.githubusercontent.com/harrydaihaolin/agent-readiness-insights-protocol/$(PROTOCOL_TAG)/schemas/rule.schema.json
 
 schema-fetch:
