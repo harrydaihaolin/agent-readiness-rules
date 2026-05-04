@@ -12,19 +12,16 @@ permissions:
 env:
   # Pinned to a specific protocol commit so an unrelated change on
   # protocol main can't red rules CI overnight. Bump deliberately when
-  # the protocol cuts a new tag (target: v0.2.0 — action contract,
-  # rules_version 2). See AGENTS.md for bump cadence.
+  # the protocol cuts a new tag. See AGENTS.md for bump cadence.
   #
-  # NOTE: temporarily pinned to the v0.2.0-prep feature branch HEAD
-  # while protocol PR #10 (action contract) is in review. Repoint to
-  # the merged main commit once that PR lands.
-  PROTOCOL_TAG: 5300bd78e4d98a9a9f8fc406cc916af9d23bd9a9
+  # Pinned to protocol v0.3.0 (PR #11) — `provenance:` is now schema-
+  # required on every rule.
+  PROTOCOL_TAG: 0cb44a0
   FIXTURES_TAG: v1.0.0
-  # Same coupling for the engine: `rules_version=2` is a hard-pin
-  # against the EXP-1 engine branch until agent-readiness#64 merges,
-  # otherwise reference-eval skips every rule with "rules_version=2
-  # is not in supported set [1]".
-  ENGINE_REF: feat/exp1-action-contract-engine
+  # Engine `main` carries the EXP-1 action-contract change (#64) and
+  # the v2.0.0 release. Pinning to main keeps reference-eval honest
+  # against whatever the engine ships.
+  ENGINE_REF: main
 
 jobs:
   validate-schema:

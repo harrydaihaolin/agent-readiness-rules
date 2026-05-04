@@ -1,5 +1,6 @@
 rules_version: 2
 id: code.complexity
+provenance: agent-readiness/code.complexity
 pillar: cognitive_load
 title: Code cyclomatic complexity is bounded
 weight: 0.7

@@ -1,5 +1,6 @@
 rules_version: 2
 id: git.churn_hotspots
+provenance: agent-readiness/git.churn_hotspots
 pillar: cognitive_load
 title: No high-churn large files (hotspots)
 weight: 0.6

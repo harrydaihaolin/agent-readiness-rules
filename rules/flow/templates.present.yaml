@@ -1,5 +1,6 @@
 rules_version: 2
 id: templates.present
+provenance: agent-readiness/templates.present
 pillar: flow
 title: Issue / PR templates and CODEOWNERS present
 weight: 0.7

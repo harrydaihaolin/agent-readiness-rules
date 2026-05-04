@@ -1,5 +1,6 @@
 rules_version: 2
 id: readme.has_run_instructions
+provenance: agent-readiness/readme.has_run_instructions
 pillar: cognitive_load
 title: README documents install / run / test
 weight: 1.0

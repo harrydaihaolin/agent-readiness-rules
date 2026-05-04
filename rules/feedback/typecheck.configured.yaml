@@ -1,5 +1,6 @@
 rules_version: 2
 id: typecheck.configured
+provenance: agent-readiness/typecheck.configured
 pillar: feedback
 title: Type checker is configured
 weight: 0.9

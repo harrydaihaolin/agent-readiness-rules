@@ -1,5 +1,6 @@
 rules_version: 2
 id: headless.no_setup_prompts
+provenance: agent-readiness/headless.no_setup_prompts
 pillar: flow
 title: Setup is reachable headlessly
 weight: 1.0

@@ -63,4 +63,8 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md). Short version:
 
 ## License
 
-MIT.
+MIT for the code; see [`LICENSE`](LICENSE). The project name and
+logo are governed separately by [`TRADEMARK.md`](TRADEMARK.md):
+forks are welcome, "agent-readiness" the brand is reserved for the
+canonical project. Attribution expectations for redistributing
+individual rules are in [`LICENSE-NOTICES.md`](LICENSE-NOTICES.md).

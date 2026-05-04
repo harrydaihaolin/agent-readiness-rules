@@ -1,5 +1,6 @@
 rules_version: 2
 id: setup.command_count
+provenance: agent-readiness/setup.command_count
 pillar: flow
 title: Setup requires few commands
 weight: 0.7

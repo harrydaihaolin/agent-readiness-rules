@@ -1,5 +1,6 @@
 rules_version: 2
 id: docs.contributing_guide
+provenance: agent-readiness/docs.contributing_guide
 pillar: cognitive_load
 title: CONTRIBUTING.md present
 weight: 0.5

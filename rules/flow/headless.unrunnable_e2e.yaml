@@ -1,5 +1,6 @@
 rules_version: 2
 id: headless.unrunnable_e2e
+provenance: agent-readiness/headless.unrunnable_e2e
 pillar: flow
 title: Repo is unrunnable end-to-end by an agent
 # Heaviest single rule in the pack — this is the "all three load-bearing
