@@ -1,5 +1,6 @@
 rules_version: 2
 id: feedback.test_coverage_hint
+provenance: agent-readiness/feedback.test_coverage_hint
 pillar: feedback
 title: Coverage configuration hint
 weight: 0.5

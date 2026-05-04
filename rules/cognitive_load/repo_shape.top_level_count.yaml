@@ -1,5 +1,6 @@
 rules_version: 2
 id: repo_shape.top_level_count
+provenance: agent-readiness/repo_shape.top_level_count
 pillar: cognitive_load
 title: Few non-meta files at repo root
 weight: 0.8

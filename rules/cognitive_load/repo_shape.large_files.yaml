@@ -1,5 +1,6 @@
 rules_version: 2
 id: repo_shape.large_files
+provenance: agent-readiness/repo_shape.large_files
 pillar: cognitive_load
 title: Large source files
 # Weight halved (1.0 → 0.5) after empirical analysis: this rule alone

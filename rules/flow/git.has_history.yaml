@@ -1,5 +1,6 @@
 rules_version: 2
 id: git.has_history
+provenance: agent-readiness/git.has_history
 pillar: flow
 title: Repository has meaningful commit history
 weight: 1.0

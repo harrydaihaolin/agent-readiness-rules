@@ -1,5 +1,6 @@
 rules_version: 2
 id: deploy.smoke_check
+provenance: agent-readiness/deploy.smoke_check
 pillar: feedback
 title: Deploy workflow has a post-deploy smoke check
 weight: 0.9

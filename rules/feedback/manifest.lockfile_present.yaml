@@ -1,5 +1,6 @@
 rules_version: 2
 id: manifest.lockfile_present
+provenance: agent-readiness/manifest.lockfile_present
 pillar: feedback
 title: Dependency lockfile present
 weight: 1.0

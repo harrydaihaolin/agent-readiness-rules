@@ -1,5 +1,6 @@
 rules_version: 2
 id: repo_shape.token_budget
+provenance: agent-readiness/repo_shape.token_budget
 pillar: cognitive_load
 title: Orientation fits in agent context window
 weight: 0.7

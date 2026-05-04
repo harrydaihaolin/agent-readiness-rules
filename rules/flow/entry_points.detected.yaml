@@ -1,5 +1,6 @@
 rules_version: 2
 id: entry_points.detected
+provenance: agent-readiness/entry_points.detected
 pillar: flow
 title: Entry point detected
 weight: 1.0

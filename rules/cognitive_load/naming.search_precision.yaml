@@ -1,5 +1,6 @@
 rules_version: 2
 id: naming.search_precision
+provenance: agent-readiness/naming.search_precision
 pillar: cognitive_load
 title: File names are search-precise (no vague utils/helpers)
 weight: 0.6

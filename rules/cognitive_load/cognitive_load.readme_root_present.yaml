@@ -1,5 +1,6 @@
 rules_version: 2
 id: cognitive_load.readme_root_present
+provenance: agent-readiness/cognitive_load.readme_root_present
 pillar: cognitive_load
 title: README at repository root
 weight: 0.8

@@ -1,5 +1,6 @@
 rules_version: 2
 id: safety.gitleaks_config
+provenance: agent-readiness/safety.gitleaks_config
 pillar: safety
 title: Secret-scanning config present
 weight: 1.0

@@ -1,5 +1,6 @@
 rules_version: 2
 id: hooks.configured
+provenance: agent-readiness/hooks.configured
 pillar: feedback
 title: Git or agent hooks configured
 weight: 0.7

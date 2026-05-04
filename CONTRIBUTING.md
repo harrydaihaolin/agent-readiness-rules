@@ -37,8 +37,26 @@ belongs in the closed engine.
 - [ ] YAML lives at `rules/<pillar>/<rule_id>.yaml`
 - [ ] `rules_version: 1` is the first field
 - [ ] `id` matches filename
+- [ ] `provenance:` field is set. Use
+      `agent-readiness/<rule-id>` for native rules; for ports of
+      another OSS rule pack, cite the upstream as
+      `<owner>/<repo>#<anchor>` (see
+      [`LICENSE-NOTICES.md`](LICENSE-NOTICES.md))
 - [ ] `explanation` names a concrete agent failure mode (one paragraph)
 - [ ] `make validate` passes locally
 - [ ] If you added a new fixture, the PR for `agent-readiness-fixtures`
       is linked and merged first
 - [ ] If snapshots in `tests/expected/` change, you committed the new ones
+
+## Why provenance is mandatory
+
+Every rule in this pack carries an attribution line in its
+`provenance:` field. The schema validator
+([`agent-readiness-insights-protocol`](../agent-readiness-insights-protocol/schemas/rule.schema.json))
+enforces it; PRs that omit it won't pass `make validate`.
+
+The rule pack is MIT, so anyone can fork and redistribute. The
+`provenance:` field exists so a fork is forced to either preserve the
+original attribution or replace it with their own — the diff makes
+the choice visible. See [`TRADEMARK.md`](TRADEMARK.md) for the
+broader policy.

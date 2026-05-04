@@ -1,5 +1,6 @@
 rules_version: 2
 id: security.policy_present
+provenance: agent-readiness/security.policy_present
 pillar: safety
 title: Security policy (SECURITY.md) present
 weight: 0.6

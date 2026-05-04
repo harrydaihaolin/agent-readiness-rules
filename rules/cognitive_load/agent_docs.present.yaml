@@ -1,5 +1,6 @@
 rules_version: 2
 id: agent_docs.present
+provenance: agent-readiness/agent_docs.present
 pillar: cognitive_load
 title: Any agent-targeted docs present
 # Downgraded warn → info (and weight 1.5 → 0.5) after empirical analysis:

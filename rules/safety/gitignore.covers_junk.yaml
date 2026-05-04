@@ -1,5 +1,6 @@
 rules_version: 2
 id: gitignore.covers_junk
+provenance: agent-readiness/gitignore.covers_junk
 pillar: safety
 title: .gitignore covers build artifacts and secrets
 weight: 1.0

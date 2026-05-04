@@ -1,5 +1,6 @@
 rules_version: 2
 id: lint.configured
+provenance: agent-readiness/lint.configured
 pillar: feedback
 title: Linter is configured
 weight: 0.9
