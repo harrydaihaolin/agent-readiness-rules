@@ -98,7 +98,7 @@
                 "not_exists": "README.md"
               }
             ],
-            "template": "# {primary_language} project\n\nOne-line description.\n\n## Setup\n`make install`\n\n## Test\n`make test`\n"
+            "template": "# python project\n\nOne-line description.\n\n## Setup\n`make install`\n\n## Test\n`make test`\n"
           },
           "check_id": "cognitive_load.readme_root_present",
           "file": null,
@@ -199,7 +199,7 @@
                 "exists": "README.md"
               }
             ],
-            "template": "\n## Run\n\n```\n{package_manager} install\n{language_test_command}\n```\n"
+            "template": "\n## Run\n\n```\n install\npython -m pytest tests/\n```\n"
           },
           "check_id": "readme.has_run_instructions",
           "file": null,
@@ -273,7 +273,7 @@
                 "not_exists": ".github/workflows/ci.yml"
               }
             ],
-            "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: {language_test_command}\n"
+            "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: python -m pytest tests/\n"
           },
           "check_id": "ci.configured",
           "file": null,
@@ -301,7 +301,7 @@
                 "not_exists": ".github/workflows/ci.yml"
               }
             ],
-            "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: {language_test_command}\n"
+            "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: python -m pytest tests/\n"
           },
           "check_id": "ci.configured",
           "file": null,
@@ -329,7 +329,7 @@
                 "not_exists": ".github/workflows/ci.yml"
               }
             ],
-            "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: {language_test_command}\n"
+            "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: python -m pytest tests/\n"
           },
           "check_id": "ci.configured",
           "file": null,
@@ -443,7 +443,7 @@
                 "not_exists": "Cargo.toml"
               }
             ],
-            "template": "[project]\nname = \"{primary_language}-project\"\nversion = \"0.1.0\"\nrequires-python = \">=3.11\"\n\n[build-system]\nrequires = [\"hatchling\"]\nbuild-backend = \"hatchling.build\"\n"
+            "template": "[project]\nname = \"python-project\"\nversion = \"0.1.0\"\nrequires-python = \">=3.11\"\n\n[build-system]\nrequires = [\"hatchling\"]\nbuild-backend = \"hatchling.build\"\n"
           },
           "check_id": "manifest.detected",
           "file": null,
@@ -469,7 +469,7 @@
       "findings": [
         {
           "action": {
-            "command": "# Generate a lockfile using the language's package manager.\n{package_manager} lock || {package_manager} install --frozen-lockfile\n",
+            "command": "# Generate a lockfile using the language's package manager.\n lock ||  install --frozen-lockfile\n",
             "context_probe": [
               {
                 "detect": "package_manager"
@@ -492,7 +492,7 @@
         },
         {
           "action": {
-            "command": "# Generate a lockfile using the language's package manager.\n{package_manager} lock || {package_manager} install --frozen-lockfile\n",
+            "command": "# Generate a lockfile using the language's package manager.\n lock ||  install --frozen-lockfile\n",
             "context_probe": [
               {
                 "detect": "package_manager"
@@ -515,7 +515,7 @@
         },
         {
           "action": {
-            "command": "# Generate a lockfile using the language's package manager.\n{package_manager} lock || {package_manager} install --frozen-lockfile\n",
+            "command": "# Generate a lockfile using the language's package manager.\n lock ||  install --frozen-lockfile\n",
             "context_probe": [
               {
                 "detect": "package_manager"

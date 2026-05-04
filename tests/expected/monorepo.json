@@ -183,7 +183,7 @@
                 "not_exists": ".github/workflows/ci.yml"
               }
             ],
-            "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: {language_test_command}\n"
+            "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: npm test\n"
           },
           "check_id": "ci.configured",
           "file": null,
@@ -211,7 +211,7 @@
                 "not_exists": ".github/workflows/ci.yml"
               }
             ],
-            "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: {language_test_command}\n"
+            "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: npm test\n"
           },
           "check_id": "ci.configured",
           "file": null,
@@ -239,7 +239,7 @@
                 "not_exists": ".github/workflows/ci.yml"
               }
             ],
-            "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: {language_test_command}\n"
+            "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: npm test\n"
           },
           "check_id": "ci.configured",
           "file": null,
@@ -338,7 +338,7 @@
       "findings": [
         {
           "action": {
-            "command": "# Generate a lockfile using the language's package manager.\n{package_manager} lock || {package_manager} install --frozen-lockfile\n",
+            "command": "# Generate a lockfile using the language's package manager.\n lock ||  install --frozen-lockfile\n",
             "context_probe": [
               {
                 "detect": "package_manager"
@@ -361,7 +361,7 @@
         },
         {
           "action": {
-            "command": "# Generate a lockfile using the language's package manager.\n{package_manager} lock || {package_manager} install --frozen-lockfile\n",
+            "command": "# Generate a lockfile using the language's package manager.\n lock ||  install --frozen-lockfile\n",
             "context_probe": [
               {
                 "detect": "package_manager"
@@ -384,7 +384,7 @@
         },
         {
           "action": {
-            "command": "# Generate a lockfile using the language's package manager.\n{package_manager} lock || {package_manager} install --frozen-lockfile\n",
+            "command": "# Generate a lockfile using the language's package manager.\n lock ||  install --frozen-lockfile\n",
             "context_probe": [
               {
                 "detect": "package_manager"
