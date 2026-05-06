@@ -6,8 +6,8 @@ Review each YAML before merge.
 ### Round data
 ```json
 {
-  "round_id": "20260502T161238Z",
-  "generated_at": "2026-05-02T16:12:40.388513+00:00",
+  "round_id": "20260503T084452Z",
+  "generated_at": "2026-05-03T08:44:54.769862+00:00",
   "proposals": [
     {
       "id": "cognitive_load.readme_root_present",
