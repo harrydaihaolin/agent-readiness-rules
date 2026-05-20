@@ -38,3 +38,16 @@ action:
 verify:
   command: "true"
   description: Manual; re-scan is the closed loop.
+fix_prompt: |
+  Without this, an agent's first session truncates the orientation bundle
+  and works from incomplete knowledge of the project.
+
+  Trim `AGENTS.md` and `README.md` so the combined orientation cost stays
+  under 32k tokens. Move detail into linked sub-pages under `docs/`
+  rather than inlining. Split monolithic source files so the largest
+  representative file an agent would read on entry is under 500 lines.
+  The orientation budget is fixed — the lever is signal density, not
+  length.
+
+  Verify with: `wc -l AGENTS.md README.md` and confirm the total fits
+  your stack's token budget.

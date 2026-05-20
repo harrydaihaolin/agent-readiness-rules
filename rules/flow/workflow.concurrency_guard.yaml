@@ -61,7 +61,7 @@ action:
   kind: insert_after
   path: .github/workflows/release.yml
   after_pattern: "^name:\\s"
-  template: |
+  template: |2
 
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
@@ -71,3 +71,17 @@ action:
 verify:
   command: "grep -E '^concurrency:' .github/workflows/*.yml >/dev/null"
   description: At least one workflow must declare a concurrency group.
+fix_prompt: |
+  Without this, two scheduled runs of a self-pushing workflow race each
+  other — the second `git push` is rejected silently and one set of
+  changes is lost.
+
+  Insert a top-level `concurrency:` block at the top of every workflow
+  that does `git push`. Use a stable group name and disable
+  cancel-in-progress so the second run waits: `concurrency:` then
+  `group: ${{ github.workflow }}-${{ github.ref }}` then
+  `cancel-in-progress: false`. Combine with `git pull --rebase` before
+  the `git push` so the second run picks up the first run's commit
+  instead of failing on a non-fast-forward.
+
+  Verify with: `grep -E '^concurrency:' .github/workflows/*.yml`

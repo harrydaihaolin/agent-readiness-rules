@@ -117,3 +117,16 @@ action:
 verify:
   command: "test -f .github/workflows/deploy-smoke.yml"
   description: deploy-smoke workflow must exist.
+fix_prompt: |
+  Without this, "deploy exited 0" is the only feedback an agent gets —
+  silent regressions (broken base paths, asset 404s, missing data) ship
+  green and the agent declares done.
+
+  Create `.github/workflows/deploy-smoke.yml` that triggers on
+  `deployment_status` (or `workflow_run` after your deploy workflow) and
+  runs a `curl --fail` against the deployed URL plus a `grep` for an
+  expected marker (e.g. the SPA root element). For SPA-on-Pages, also
+  probe a deep route and accept 200 or 404 (the SPA fallback). Wire it
+  to fail the workflow on any non-2xx.
+
+  Verify with: `test -f .github/workflows/deploy-smoke.yml`

@@ -57,3 +57,18 @@ action:
 verify:
   command: "grep -E '(\\[tool\\.mypy\\]|tsconfig|tsc)' pyproject.toml tsconfig.json 2>/dev/null"
   description: A typecheck configuration must exist.
+fix_prompt: |
+  Without this, an agent's edits ship missing fields, wrong arg shapes,
+  or stale imports that runtime would catch only after a partial test
+  run.
+
+  Add a type-checker config. For Python: append `[tool.mypy]` (or
+  `[tool.pyright]`) to `pyproject.toml` with `python_version = "3.11"`
+  and `strict = false` for incremental adoption; drop a `py.typed`
+  marker in your package directory. For TypeScript: create
+  `tsconfig.json` with `"strict": true`. Statically-typed-language repos
+  (Rust, Go) pass automatically; verify by ensuring the manifest is
+  detected.
+
+  Verify with: `grep -E '(\[tool\.mypy\]|tsconfig)' pyproject.toml
+  tsconfig.json 2>/dev/null`

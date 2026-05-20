@@ -62,3 +62,17 @@ verify:
     test -f uv.lock || test -f poetry.lock || test -f package-lock.json || \
       test -f yarn.lock || test -f pnpm-lock.yaml || test -f Cargo.lock
   description: A lockfile must exist.
+fix_prompt: |
+  Without this, `pip install` / `npm install` resolves different
+  versions on different machines and the agent's green run on its laptop
+  can't predict CI's outcome.
+
+  Generate and commit a lockfile using your package manager. Run
+  `{package_manager} lock` (or `{package_manager} install
+  --frozen-lockfile` to verify an existing one). For bare-pip Python
+  projects, switch to `uv` or `poetry` for a real lockfile, or pin
+  `requirements.txt` to exact versions with `pip freeze > requirements.txt`.
+
+  Verify with: `test -f uv.lock || test -f poetry.lock || test -f
+  package-lock.json || test -f yarn.lock || test -f pnpm-lock.yaml ||
+  test -f Cargo.lock`

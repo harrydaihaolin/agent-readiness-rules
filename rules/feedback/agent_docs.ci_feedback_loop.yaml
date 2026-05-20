@@ -42,7 +42,7 @@ fix_hint: |
 fix_template:
   kind: append_to_file
   path: AGENTS.md
-  content: |
+  content: |2
 
     ## CI and the feedback loop
 
@@ -64,3 +64,15 @@ action:
 verify:
   command: "grep -i 'feedback\\|ci\\|test' AGENTS.md >/dev/null"
   description: AGENTS.md must reference the CI feedback loop.
+fix_prompt: |
+  Without this, an agent pushes a PR and declares "done" without checking
+  whether CI went red — the feedback loop is open-circuited.
+
+  Append a `## CI and the feedback loop` section to `AGENTS.md`. State
+  explicitly: "After you push or update a PR, monitor GitHub Actions /
+  workflow runs and check results. When CI fails, read the logs, fix the
+  root cause, and push follow-up commits. Do not stop while checks are
+  red." Cite the canonical command an agent should run to inspect runs
+  (e.g. `gh run watch`).
+
+  Verify with: `grep -i 'feedback\|ci\|workflow' AGENTS.md`

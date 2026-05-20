@@ -157,3 +157,17 @@ action:
 verify:
   command: "true"
   description: Manual refactor; re-scan is the closed loop.
+fix_prompt: |
+  Without this, an agent editing a 3000+-line file exceeds its working
+  memory in a single read and loses context across chunk boundaries.
+
+  List candidates: run `find . -type f -name '*.py' -o -name '*.ts' -o
+  -name '*.go'` (extend for your stack), excluding `node_modules` and
+  `.venv`, then `xargs wc -l` and filter for files over 3000 lines. For
+  each file in the list, split along its dominant concept axis (feature,
+  layer, domain). If the file is intentionally large (generated tables,
+  fixtures, snapshots), add it to `.agent-readiness.toml` under
+  `[exclude]`.
+
+  Verify with: re-scan; no file in the list above should remain over
+  3000 lines or 300 KB.

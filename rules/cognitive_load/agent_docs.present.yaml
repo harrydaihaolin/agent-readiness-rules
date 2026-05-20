@@ -57,3 +57,14 @@ action:
 verify:
   command: "test -f AGENTS.md"
   description: An AGENTS.md (or AGENTS.txt) file must exist.
+fix_prompt: |
+  Without this, an agent has nowhere to find canonical commands or
+  do-not-touch lists and must reverse-engineer them from CI.
+
+  Create `AGENTS.md` at the repo root with: a one-line repo description,
+  the single setup command, the single test command, and the entry-point
+  file path. Keep it short — under 60 lines. If your team uses a different
+  agent-docs convention (`CLAUDE.md`, `.cursor/rules/`, `.github/copilot-instructions.md`),
+  either of those satisfies the rule, but `AGENTS.md` is the most portable.
+
+  Verify with: `test -f AGENTS.md`

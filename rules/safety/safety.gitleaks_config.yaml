@@ -62,3 +62,17 @@ action:
 verify:
   command: "test -f .gitleaks.toml"
   description: .gitleaks.toml must exist.
+fix_prompt: |
+  Without this, an agent one copy-paste away from leaking a credential
+  has no automated catch — the leak makes it into git history before
+  review.
+
+  Create `.gitleaks.toml` at the repo root with a minimal config: a
+  `title` string and one `[allowlist]` block listing your known
+  false-positive paths (lockfiles, vendor/, node_modules/). Then wire
+  gitleaks into pre-commit (add a `gitleaks` hook to
+  `.pre-commit-config.yaml`) AND CI (add `.github/workflows/gitleaks.yml`
+  using `gitleaks/gitleaks-action@v2`). Detect-secrets via
+  `.secrets.baseline` is an acceptable alternative.
+
+  Verify with: `test -f .gitleaks.toml`

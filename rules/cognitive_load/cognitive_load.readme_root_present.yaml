@@ -36,3 +36,15 @@ action:
 verify:
   command: "test -f README.md"
   description: README.md must exist at the repo root.
+fix_prompt: |
+  Without this, an agent has no orientation surface and must infer the
+  project from filenames and CI alone.
+
+  Create `README.md` at the repo root for a {primary_language} project.
+  Open with a one-line description, then three sections in this order:
+  **Setup** (one fenced code block with the install command), **Test**
+  (one fenced block with the canonical test command), **Run** (one fenced
+  block showing how to start the project). Three fenced blocks is the
+  floor.
+
+  Verify with: `test -f README.md`

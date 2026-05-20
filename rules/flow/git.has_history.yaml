@@ -35,3 +35,16 @@ action:
 verify:
   command: "test $(git rev-list --count HEAD 2>/dev/null) -ge 5"
   description: Repo must have ≥ 5 commits.
+fix_prompt: |
+  Without this, an agent that needs to backport, revert, or bisect has
+  no commit trail — every change is a mystery.
+
+  If the repo was imported as a single squash, re-import preserving
+  history with `git filter-repo` or a fresh clone of the source. For a
+  genuinely new project, just keep committing in small logical chunks
+  (one logical change per commit, imperative-mood messages) until you
+  have at least 5 real commits. For shallow clones the rule emits
+  `not_measured` rather than firing — re-clone with full depth to get
+  a real signal.
+
+  Verify with: `test $(git rev-list --count HEAD) -ge 5`

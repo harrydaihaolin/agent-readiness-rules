@@ -16,7 +16,7 @@ env:
   #
   # Pinned to protocol v0.3.0 (PR #11) — `provenance:` is now schema-
   # required on every rule.
-  PROTOCOL_TAG: 0cb44a0
+  PROTOCOL_TAG: v0.4.0
   FIXTURES_TAG: v1.0.0
   # Engine `main` carries the EXP-1 action-contract change (#64) and
   # the v2.0.0 release. Pinning to main keeps reference-eval honest
