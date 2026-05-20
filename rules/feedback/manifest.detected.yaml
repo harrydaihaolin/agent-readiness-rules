@@ -46,3 +46,17 @@ verify:
     test -f pyproject.toml || test -f package.json || \
       test -f go.mod || test -f Cargo.toml
   description: A primary manifest must exist.
+fix_prompt: |
+  Without this, an agent has no contract telling it what the project is,
+  how to install it, or what depends on what — every action becomes
+  guesswork.
+
+  Create a manifest at the repo root matching your {primary_language}:
+  `pyproject.toml` for Python, `package.json` for JS/TS, `Cargo.toml`
+  for Rust, `go.mod` for Go. Include name, version, and at least one
+  declared dependency. For monorepos, drop a manifest in each package
+  directory too (depth ≤ 2). If `{primary_manifest}` already exists
+  elsewhere, move it to the root or document its location in `AGENTS.md`.
+
+  Verify with: `test -f pyproject.toml || test -f package.json || test
+  -f go.mod || test -f Cargo.toml`

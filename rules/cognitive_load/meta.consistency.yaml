@@ -47,3 +47,16 @@ action:
 verify:
   command: "true"
   description: Manual reconciliation; re-scan is the closed loop.
+fix_prompt: |
+  Without this, an agent that follows the README will hit a missing tool
+  or undefined target and either revert or invent a workaround.
+
+  Reconcile every command mentioned in `README.md`, `AGENTS.md`, and
+  `CONTRIBUTING.md` so they all reference the same flow. Specifically:
+  every `make X` line must correspond to a target in your Makefile;
+  every `npm run X` must exist in `package.json` `scripts`; every
+  `pytest` mention requires `[tool.pytest.ini_options]` in
+  `pyproject.toml`; every `pip install -e .` requires a manifest. Don't
+  let agent-targeted docs ship as stubs (< 100 bytes of real content).
+
+  Verify with: re-run the scan; the rule should no longer flag drift.

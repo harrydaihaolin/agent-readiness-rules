@@ -40,3 +40,16 @@ action:
 verify:
   command: "make -n install"
   description: "`make install` (or equivalent single command) must work."
+fix_prompt: |
+  Without this, the agent has to chain 5+ setup commands and fails at
+  near-100% above command 3.
+
+  Bundle every step under a single `make setup` (or `scripts/setup`)
+  target. The README then documents one command instead of five — the
+  script can still do five things, but the agent sees one. Append the
+  target to your `Makefile`: `.PHONY: setup` then `setup:` with the
+  chained commands underneath, one per line with `-e` so failures
+  abort. Update `README.md` Setup section to reference only `make
+  setup`.
+
+  Verify with: `make -n setup`

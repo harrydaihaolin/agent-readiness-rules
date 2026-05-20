@@ -61,3 +61,17 @@ action:
 verify:
   command: "test -f SECURITY.md"
   description: SECURITY.md must exist at the repo root.
+fix_prompt: |
+  Without this, an agent that finds a security issue has no documented
+  escalation path and may default to opening a public issue, leaking the
+  vulnerability before a fix lands.
+
+  Create `SECURITY.md` at the repo root with three sections: (1)
+  **Reporting a vulnerability** — explicitly tell reporters NOT to open
+  a public issue; give a private channel (`security@<your-domain>` or
+  GitHub's private vulnerability reporting if enabled). (2) **Supported
+  versions** — a small table showing which versions you patch. (3)
+  **Response window** — your acknowledgement and fix SLAs (e.g. 2
+  business days to ack, 30 days for high-severity).
+
+  Verify with: `test -f SECURITY.md`

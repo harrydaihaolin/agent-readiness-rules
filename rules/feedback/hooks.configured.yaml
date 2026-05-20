@@ -75,3 +75,15 @@ action:
 verify:
   command: "test -f .pre-commit-config.yaml"
   description: .pre-commit-config.yaml must exist.
+fix_prompt: |
+  Without this, an agent's edit/wait/fix loop runs at CI speed (minutes)
+  instead of pre-commit speed (seconds).
+
+  Create `.pre-commit-config.yaml` at the repo root with at least
+  `pre-commit-hooks` (trailing-whitespace, end-of-file-fixer,
+  check-yaml, check-merge-conflict) plus your stack's formatter and
+  linter (`ruff` for Python, `eslint` + `prettier` for JS/TS,
+  `gofmt` for Go). After committing the file, run `pre-commit install`
+  once so the hooks fire on every commit.
+
+  Verify with: `test -f .pre-commit-config.yaml`

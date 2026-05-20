@@ -71,3 +71,14 @@ action:
 verify:
   command: "test -f CONTRIBUTING.md"
   description: CONTRIBUTING.md must exist at the repo root.
+fix_prompt: |
+  Without this, an agent has to infer branch naming, commit style, and
+  PR conventions from `git log` and gets them wrong on small repos.
+
+  Create `CONTRIBUTING.md` at the repo root. Document: (1) branch naming
+  (e.g. `feat/<slug>`, `fix/<slug>`), (2) commit message style (imperative
+  mood, one logical change per commit), (3) the local checks that must
+  pass before pushing (cite your canonical lint and test commands), and
+  (4) the PR review flow. Keep it under 80 lines.
+
+  Verify with: `test -f CONTRIBUTING.md`

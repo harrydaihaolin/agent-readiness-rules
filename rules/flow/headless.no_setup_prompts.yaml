@@ -51,3 +51,18 @@ action:
 verify:
   command: "true"
   description: Manual; re-scan is the closed loop.
+fix_prompt: |
+  Without this, an agent's setup hits "click here to authorize" or
+  "open the dashboard" and dead-ends — there's no human at a browser.
+
+  Audit `README.md` and any setup scripts for phrases like "click here",
+  "open the dashboard", "sign in with Google", "authorize the
+  application", "oauth callback". Replace each interactive step with an
+  env-var-or-flag equivalent: instead of "open the dashboard to copy
+  your API key", write "set `$APP_API_KEY` (get one at
+  https://example.com/settings/api)". Move any genuine GUI bootstrap
+  into a clearly-marked one-time human section, separate from the
+  headless flow.
+
+  Verify with: re-scan; no GUI/OAuth phrases should remain in the
+  setup section of README.

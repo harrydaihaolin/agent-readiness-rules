@@ -34,3 +34,15 @@ action:
 verify:
   command: "grep -E 'fail_under\\s*=' pyproject.toml >/dev/null"
   description: A coverage threshold must be configured.
+fix_prompt: |
+  Without this, an agent making a change has no signal about which lines
+  are tested and may add behaviour into an untested path.
+
+  Add a coverage configuration. For Python with pytest-cov, add a
+  `[tool.coverage.report]` table to `pyproject.toml` with `fail_under =
+  80`. For JS, add `codecov.yml` with `coverage.status.project.target:
+  80%`. The exact threshold matters less than its presence — what an
+  agent needs is a visible signal that coverage is tracked.
+
+  Verify with: `grep -E 'fail_under|coverage' pyproject.toml codecov.yml
+  2>/dev/null`

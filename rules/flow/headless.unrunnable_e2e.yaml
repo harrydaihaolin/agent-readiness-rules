@@ -154,3 +154,19 @@ action:
 verify:
   command: "true"
   description: Manual; re-scan is the closed loop.
+fix_prompt: |
+  Without this, an agent landing in the repo cannot read agent-targeted
+  docs, cannot find an entry point, and cannot discover a test command
+  — it is functionally agent-blind.
+
+  Fix the cheapest of the three first: create `AGENTS.md` at the repo
+  root naming a canonical entry point and a canonical test command (see
+  the `agent_docs.canonical` fix prompt for the template). Then back
+  those claims with the actual files: add `[project.scripts]` to
+  `pyproject.toml` (or equivalent for your stack) and a `test:` target
+  to your `Makefile`. Goal: an agent reads one file and runs two
+  commands without guessing.
+
+  Verify with: `test -f AGENTS.md && make -n test && grep -E
+  '(project\.scripts|"bin"|main\.go)' pyproject.toml package.json
+  2>/dev/null`

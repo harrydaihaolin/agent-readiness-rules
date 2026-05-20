@@ -41,3 +41,17 @@ verify:
   description: |
     No offline verify exists for branch protection — re-scan is the
     closed loop.
+fix_prompt: |
+  Without this, "the agent can write to main" is true — an agent-opened
+  PR can land without a review or a green CI run.
+
+  Configure a branch ruleset on `main` requiring (1) a pull request
+  before merge, (2) status checks passing, (3) branch up-to-date with
+  base. Use the GitHub UI (Settings → Rules → Rulesets → New ruleset) or
+  the gh CLI: `gh api -X POST "/repos/$(gh repo view --json
+  nameWithOwner -q .nameWithOwner)/rulesets" -f name='main protection'
+  -F enforcement=active -F 'conditions[ref_name][include][]=refs/heads/main'
+  -F 'rules[][type]=pull_request' -F 'rules[][type]=required_status_checks'`.
+
+  Verify with: `gh api repos/<owner>/<repo>/rulesets` returns at least
+  one ruleset.

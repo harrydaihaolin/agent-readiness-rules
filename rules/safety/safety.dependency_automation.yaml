@@ -83,3 +83,17 @@ action:
 verify:
   command: "test -f .github/dependabot.yml || test -f renovate.json"
   description: A dependency automation config must exist.
+fix_prompt: |
+  Without this, transitive deps drift, CVEs accumulate, and "agent
+  merged a small change" silently becomes "merged a CVE".
+
+  Create `.github/dependabot.yml` with three blocks at minimum:
+  `package-ecosystem: github-actions`, `package-ecosystem:
+  {primary_language}` (e.g. `pip`, `npm`, `cargo`), and any others your
+  stack uses, each scheduled `interval: weekly` rooted at `/`. If you
+  prefer Renovate, drop `renovate.json` with `"extends":
+  ["config:recommended"]` instead. For supported languages, also add a
+  CodeQL workflow under `.github/workflows/codeql.yml` (GitHub's "Set up
+  code scanning" wizard generates this).
+
+  Verify with: `test -f .github/dependabot.yml || test -f renovate.json`

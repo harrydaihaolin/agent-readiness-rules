@@ -72,3 +72,16 @@ action:
 verify:
   command: "test -f .devcontainer/devcontainer.json"
   description: .devcontainer/devcontainer.json must exist.
+fix_prompt: |
+  Without this, an agent in a fresh sandbox hits "wrong Python version"
+  / "missing libssl-dev" within minutes of bring-up and can't recover
+  headlessly.
+
+  Create `.devcontainer/devcontainer.json` for this {primary_language}
+  project. Use a Microsoft base image (`mcr.microsoft.com/devcontainers/{primary_language}:1`)
+  and set `postCreateCommand` to your canonical install command (mirror
+  what's in `AGENTS.md`). Add the VS Code extensions you actually use to
+  `customizations.vscode.extensions`. For Nix shops, `flake.nix` with a
+  `devShell` is the equivalent.
+
+  Verify with: `test -f .devcontainer/devcontainer.json`

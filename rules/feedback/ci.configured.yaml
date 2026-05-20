@@ -100,3 +100,15 @@ action:
 verify:
   command: "test -f .github/workflows/ci.yml"
   description: A CI workflow must exist under .github/workflows/.
+fix_prompt: |
+  Without this, an agent's "tests pass on my laptop" never gets
+  challenged by a clean-checkout run and silent regressions ship.
+
+  Create `.github/workflows/ci.yml` with three steps: `actions/checkout@v4`,
+  install dependencies for your {primary_language} project, then run
+  `{language_test_command}`. Trigger on `pull_request` and on `push` to
+  `main`. Even a 20-line workflow is worth more than nothing. If you use
+  a hosted CI provider with no in-repo config (BuildKite, TeamCity), add
+  a status badge to `README.md` so the loop is visible to agents.
+
+  Verify with: `test -f .github/workflows/ci.yml`

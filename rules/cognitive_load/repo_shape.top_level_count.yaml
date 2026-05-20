@@ -53,3 +53,15 @@ action:
 verify:
   command: "true"
   description: Manual; re-scan is the closed loop.
+fix_prompt: |
+  Without this, an agent's first `ls` returns 30+ items and finding
+  anything requires reading every filename.
+
+  Move source files under a single subtree: `src/<package>/` for Python,
+  `pkg/` or `internal/` for Go, `apps/` and `packages/` for monorepos.
+  Move scripts under `scripts/`, docs under `docs/`. The root should hold
+  manifest + README + LICENSE + maybe Makefile and that's it — typically
+  ≤ 12 entries when you list with `ls -1 .`. Don't move dotfiles or
+  license/changelog files; those are expected at root.
+
+  Verify with: `ls -1 . | wc -l` returns ≤ 20 non-dotfile entries.
