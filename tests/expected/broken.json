@@ -23,6 +23,7 @@
           "check_id": "agent_docs.canonical",
           "file": null,
           "fix_hint": "Add an AGENTS.md to the repo root with: canonical commands\n(install/test/lint/run), a do-not-touch list, and commit conventions.\nSee agent-readiness/AGENTS.md for an example.\n",
+          "fix_prompt": "Without this, an agent landing in the repo has no canonical command list\nand will guess install/test/lint by reading shell history.\n\nCreate `AGENTS.md` at the repo root for a python project.\nInclude, in order: (1) one sentence on what this repo does, (2) the\nsingle install command, (3) the single test command, (4) the single\nlint command, (5) the entry-point file path. Keep it under 60 lines so\nit fits any agent's context window. Mirror the canonical commands into\nthe Makefile so they're executable, not just documented.\n\nVerify with: `test -f AGENTS.md`\n",
           "line": null,
           "message": "None of these expected paths exist: AGENTS.md",
           "pillar": "cognitive_load",
@@ -56,6 +57,7 @@
           "check_id": "agent_docs.present",
           "file": null,
           "fix_hint": "Add an AGENTS.md to the root with at least: canonical commands\n(install/test/lint/run), do-not-touch list, and commit conventions.\nAlternatively, document agent-targeted material under .ai/ or\n.cursor/rules/. See agent-readiness/AGENTS.md for an example.\n",
+          "fix_prompt": "Without this, an agent has nowhere to find canonical commands or\ndo-not-touch lists and must reverse-engineer them from CI.\n\nCreate `AGENTS.md` at the repo root with: a one-line repo description,\nthe single setup command, the single test command, and the entry-point\nfile path. Keep it short \u2014 under 60 lines. If your team uses a different\nagent-docs convention (`CLAUDE.md`, `.cursor/rules/`, `.github/copilot-instructions.md`),\neither of those satisfies the rule, but `AGENTS.md` is the most portable.\n\nVerify with: `test -f AGENTS.md`\n",
           "line": null,
           "message": "None of these expected paths exist: AGENTS.md, CLAUDE.md, GEMINI.md, .cursorrules, .cursor/rules/*.mdc, .cursor/settings.json, .github/copilot-instructions.md, .github/instructions/*.md, .ai/**, prompts/**, .windsurfrules, .clinerules, .aider.conf.yml, .aiderconfig, .zed/settings.json, .replit, .bolt/**, .amazon-q/**, .idea/copilot/**",
           "pillar": "cognitive_load",
@@ -103,6 +105,7 @@
           "check_id": "cognitive_load.readme_root_present",
           "file": null,
           "fix_hint": "Add a README.md at the repo root with install, run, and test instructions.\n",
+          "fix_prompt": "Without this, an agent has no orientation surface and must infer the\nproject from filenames and CI alone.\n\nCreate `README.md` at the repo root for a python project.\nOpen with a one-line description, then three sections in this order:\n**Setup** (one fenced code block with the install command), **Test**\n(one fenced block with the canonical test command), **Run** (one fenced\nblock showing how to start the project). Three fenced blocks is the\nfloor.\n\nVerify with: `test -f README.md`\n",
           "line": null,
           "message": "None of these expected paths exist: README.md, readme.md",
           "pillar": "cognitive_load",
@@ -136,6 +139,7 @@
           "check_id": "docs.contributing_guide",
           "file": null,
           "fix_hint": "Add a CONTRIBUTING.md describing branch naming, commit style,\nrequired local checks, and the PR review flow.\n",
+          "fix_prompt": "Without this, an agent has to infer branch naming, commit style, and\nPR conventions from `git log` and gets them wrong on small repos.\n\nCreate `CONTRIBUTING.md` at the repo root. Document: (1) branch naming\n(e.g. `feat/<slug>`, `fix/<slug>`), (2) commit message style (imperative\nmood, one logical change per commit), (3) the local checks that must\npass before pushing (cite your canonical lint and test commands), and\n(4) the PR review flow. Keep it under 80 lines.\n\nVerify with: `test -f CONTRIBUTING.md`\n",
           "line": null,
           "message": "None of these expected paths exist: CONTRIBUTING.md, CONTRIBUTING, .github/CONTRIBUTING.md",
           "pillar": "cognitive_load",
@@ -199,18 +203,19 @@
                 "exists": "README.md"
               }
             ],
-            "template": "\n## Run\n\n```\n install\npython -m pytest tests/\n```\n"
+            "template": "\n## Install\n\n```\npip install -e .\n```\n\n## Test\n\n```\npython -m pytest tests/\n```\n\n## Run\n\n```\n# Replace with this project's canonical entry-point command\n# (see AGENTS.md). For language defaults, see entry_points.detected.\n```\n"
           },
           "check_id": "readme.has_run_instructions",
           "file": null,
           "fix_hint": "Add three short sections to README: Install (one fenced block),\nRun (one fenced block showing the canonical entry point), Test\n(one fenced block). Three fenced blocks is the floor; if your\nproject genuinely needs more, write more.\n",
+          "fix_prompt": "Without this, an agent reading the README finds prose but no copy-able\ncommands and falls back to guessing from manifests.\n\nAppend three short sections to `README.md`: **Install**, **Test**, and\n**Run**. Each section must contain exactly one fenced code block with\nthe canonical command for your python project. Three\nfenced blocks is the floor; add more only if the project genuinely\nneeds them.\n\nSuggested commands (matched to your detected ecosystem):\n- Install: `pip install -e .`\n- Test:    `python -m pytest tests/`\n- Run:     project-specific; see your manifest's scripts/entry-points\n           (e.g. `[project.scripts]` in pyproject, `\"scripts\"` in\n           package.json, `cargo run`, `go run ./cmd/...`).\n\nVerify with: `grep -qE '(make|npm|pnpm|yarn|bun|pip|uv|poetry|cargo|go|bundle|composer|mix|gradle|swift|dart|flutter) ' README.md`\n",
           "line": null,
           "message": "No README found at repo root.",
           "pillar": "cognitive_load",
           "severity": "warn",
           "verify": {
-            "command": "grep -E '(make|npm|pip|cargo|go) ' README.md >/dev/null",
-            "description": "README.md must contain a runnable command."
+            "command": "grep -qE '(make|npm|pnpm|yarn|bun|pip|uv|poetry|cargo|go|bundle|composer|mix|gradle|swift|dart|flutter) ' README.md",
+            "description": "README.md must contain at least one runnable command (any ecosystem)."
           }
         }
       ],
@@ -277,7 +282,8 @@
           },
           "check_id": "ci.configured",
           "file": null,
-          "fix_hint": "Drop a `.github/workflows/ci.yml` that installs deps, runs the test\ncommand, and reports status to PRs. Even a 20-line workflow is\nworth more than nothing \u2014 the agent gets red/green feedback per\npush. If you use a hosted CI system (BuildKite, TeamCity, Jenkins),\nadd a status badge to your README so the loop is visible to agents\neven without an in-repo config file.\n",
+          "fix_hint": "Drop a CI workflow that installs deps, runs the test command, and\nreports status to PRs. The default scaffold writes\n`.github/workflows/ci.yml`, but any of the 25+ providers detected\nby this rule counts \u2014 pick whatever your hosting platform supports\nnatively. Even a 20-line config is worth more than nothing: the\nagent gets red/green feedback per push. If you use a hosted CI\nwith no in-repo file (BuildKite cloud, TeamCity hosted, Jenkins on\na remote server), add a status badge to your README so the loop is\nvisible to agents.\n",
+          "fix_prompt": "Without this, an agent's \"tests pass on my laptop\" never gets\nchallenged by a clean-checkout run and silent regressions ship.\n\nPick the CI provider that matches your hosting platform and check\nin its config. The fastest path for most repos in 2026 is\n`.github/workflows/ci.yml` (GitHub Actions) with three steps:\n`actions/checkout@v4`, install dependencies for python\nwith `pip install -e .`, then run\n`python -m pytest tests/`. Trigger on `pull_request` and on `push`\nto `main`.\n\nEquivalent canonical config paths in other providers (use whichever\nmatches your platform): `.gitlab-ci.yml` (GitLab CI), `.circleci/config.yml`\n(CircleCI), `Jenkinsfile` (Jenkins), `azure-pipelines.yml` (Azure),\n`bitbucket-pipelines.yml` (Bitbucket), `buildspec.yml` (AWS\nCodeBuild), `.drone.yml` (Drone), `.woodpecker.yml` (Woodpecker),\n`cloudbuild.yaml` (GCP Cloud Build), `codemagic.yaml` (Codemagic),\n`.travis.yml` (Travis), `.buildkite/pipeline.yml` (BuildKite),\n`tekton/*.yaml`, `Earthfile`. Any of these closes the loop.\n\nEven a 20-line config is worth more than nothing. If you already\nuse a hosted CI without an in-repo file, add a status badge to\n`README.md` so the loop is visible to agents.\n\nVerify with: `test -f .github/workflows/ci.yml`\n",
           "line": null,
           "message": "At least one CI provider config is present. (no clause matched)",
           "pillar": "feedback",
@@ -305,9 +311,10 @@
           },
           "check_id": "ci.configured",
           "file": null,
-          "fix_hint": "Drop a `.github/workflows/ci.yml` that installs deps, runs the test\ncommand, and reports status to PRs. Even a 20-line workflow is\nworth more than nothing \u2014 the agent gets red/green feedback per\npush. If you use a hosted CI system (BuildKite, TeamCity, Jenkins),\nadd a status badge to your README so the loop is visible to agents\neven without an in-repo config file.\n",
+          "fix_hint": "Drop a CI workflow that installs deps, runs the test command, and\nreports status to PRs. The default scaffold writes\n`.github/workflows/ci.yml`, but any of the 25+ providers detected\nby this rule counts \u2014 pick whatever your hosting platform supports\nnatively. Even a 20-line config is worth more than nothing: the\nagent gets red/green feedback per push. If you use a hosted CI\nwith no in-repo file (BuildKite cloud, TeamCity hosted, Jenkins on\na remote server), add a status badge to your README so the loop is\nvisible to agents.\n",
+          "fix_prompt": "Without this, an agent's \"tests pass on my laptop\" never gets\nchallenged by a clean-checkout run and silent regressions ship.\n\nPick the CI provider that matches your hosting platform and check\nin its config. The fastest path for most repos in 2026 is\n`.github/workflows/ci.yml` (GitHub Actions) with three steps:\n`actions/checkout@v4`, install dependencies for python\nwith `pip install -e .`, then run\n`python -m pytest tests/`. Trigger on `pull_request` and on `push`\nto `main`.\n\nEquivalent canonical config paths in other providers (use whichever\nmatches your platform): `.gitlab-ci.yml` (GitLab CI), `.circleci/config.yml`\n(CircleCI), `Jenkinsfile` (Jenkins), `azure-pipelines.yml` (Azure),\n`bitbucket-pipelines.yml` (Bitbucket), `buildspec.yml` (AWS\nCodeBuild), `.drone.yml` (Drone), `.woodpecker.yml` (Woodpecker),\n`cloudbuild.yaml` (GCP Cloud Build), `codemagic.yaml` (Codemagic),\n`.travis.yml` (Travis), `.buildkite/pipeline.yml` (BuildKite),\n`tekton/*.yaml`, `Earthfile`. Any of these closes the loop.\n\nEven a 20-line config is worth more than nothing. If you already\nuse a hosted CI without an in-repo file, add a status badge to\n`README.md` so the loop is visible to agents.\n\nVerify with: `test -f .github/workflows/ci.yml`\n",
           "line": null,
-          "message": "None of these expected paths exist: .github/workflows/*.yml, .github/workflows/*.yaml, .circleci/config.yml, .gitlab-ci.yml, .travis.yml, azure-pipelines.yml, bitbucket-pipelines.yml, .buildkite/**, .drone.yml, .woodpecker.yml, .woodpecker/**, Jenkinsfile, appveyor.yml, .appveyor.yml, cloudbuild.yaml, .semaphore/**, codefresh.yaml, .teamcity/**",
+          "message": "None of these expected paths exist: .github/workflows/*.yml, .github/workflows/*.yaml, .gitlab-ci.yml, .gitea/workflows/*.yml, .gitea/workflows/*.yaml, .forgejo/workflows/*.yml, .forgejo/workflows/*.yaml, bitbucket-pipelines.yml, .gitea-ci.yml",
           "pillar": "feedback",
           "severity": "warn",
           "verify": {
@@ -333,9 +340,68 @@
           },
           "check_id": "ci.configured",
           "file": null,
-          "fix_hint": "Drop a `.github/workflows/ci.yml` that installs deps, runs the test\ncommand, and reports status to PRs. Even a 20-line workflow is\nworth more than nothing \u2014 the agent gets red/green feedback per\npush. If you use a hosted CI system (BuildKite, TeamCity, Jenkins),\nadd a status badge to your README so the loop is visible to agents\neven without an in-repo config file.\n",
+          "fix_hint": "Drop a CI workflow that installs deps, runs the test command, and\nreports status to PRs. The default scaffold writes\n`.github/workflows/ci.yml`, but any of the 25+ providers detected\nby this rule counts \u2014 pick whatever your hosting platform supports\nnatively. Even a 20-line config is worth more than nothing: the\nagent gets red/green feedback per push. If you use a hosted CI\nwith no in-repo file (BuildKite cloud, TeamCity hosted, Jenkins on\na remote server), add a status badge to your README so the loop is\nvisible to agents.\n",
+          "fix_prompt": "Without this, an agent's \"tests pass on my laptop\" never gets\nchallenged by a clean-checkout run and silent regressions ship.\n\nPick the CI provider that matches your hosting platform and check\nin its config. The fastest path for most repos in 2026 is\n`.github/workflows/ci.yml` (GitHub Actions) with three steps:\n`actions/checkout@v4`, install dependencies for python\nwith `pip install -e .`, then run\n`python -m pytest tests/`. Trigger on `pull_request` and on `push`\nto `main`.\n\nEquivalent canonical config paths in other providers (use whichever\nmatches your platform): `.gitlab-ci.yml` (GitLab CI), `.circleci/config.yml`\n(CircleCI), `Jenkinsfile` (Jenkins), `azure-pipelines.yml` (Azure),\n`bitbucket-pipelines.yml` (Bitbucket), `buildspec.yml` (AWS\nCodeBuild), `.drone.yml` (Drone), `.woodpecker.yml` (Woodpecker),\n`cloudbuild.yaml` (GCP Cloud Build), `codemagic.yaml` (Codemagic),\n`.travis.yml` (Travis), `.buildkite/pipeline.yml` (BuildKite),\n`tekton/*.yaml`, `Earthfile`. Any of these closes the loop.\n\nEven a 20-line config is worth more than nothing. If you already\nuse a hosted CI without an in-repo file, add a status badge to\n`README.md` so the loop is visible to agents.\n\nVerify with: `test -f .github/workflows/ci.yml`\n",
           "line": null,
-          "message": "None of these expected paths exist: tekton/**, dagger.json, dagger.cue, earthly.yml, Earthfile, .prow.yaml",
+          "message": "None of these expected paths exist: .circleci/config.yml, .circleci/config.yaml, .travis.yml, .travis.yaml, azure-pipelines.yml, azure-pipelines.yaml, .azure-pipelines.yml, .azure-pipelines/**, .buildkite/**, buildkite.yml, buildkite.yaml, .drone.yml, .drone.yaml, .woodpecker.yml, .woodpecker.yaml, .woodpecker/**, appveyor.yml, .appveyor.yml, cloudbuild.yaml, cloudbuild.yml, .semaphore/**, semaphore.yml, codefresh.yaml, codefresh.yml, .codefresh/**, .teamcity/**, codemagic.yaml, codemagic.yml, wercker.yml, .wercker.yml, screwdriver.yaml, screwdriver.yml, .nevercode.yml",
+          "pillar": "feedback",
+          "severity": "warn",
+          "verify": {
+            "command": "test -f .github/workflows/ci.yml",
+            "description": "A CI workflow must exist under .github/workflows/."
+          }
+        },
+        {
+          "action": {
+            "context_probe": [
+              {
+                "detect": "primary_language"
+              }
+            ],
+            "kind": "create_file",
+            "path": ".github/workflows/ci.yml",
+            "preconditions": [
+              {
+                "not_exists": ".github/workflows/ci.yml"
+              }
+            ],
+            "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: python -m pytest tests/\n"
+          },
+          "check_id": "ci.configured",
+          "file": null,
+          "fix_hint": "Drop a CI workflow that installs deps, runs the test command, and\nreports status to PRs. The default scaffold writes\n`.github/workflows/ci.yml`, but any of the 25+ providers detected\nby this rule counts \u2014 pick whatever your hosting platform supports\nnatively. Even a 20-line config is worth more than nothing: the\nagent gets red/green feedback per push. If you use a hosted CI\nwith no in-repo file (BuildKite cloud, TeamCity hosted, Jenkins on\na remote server), add a status badge to your README so the loop is\nvisible to agents.\n",
+          "fix_prompt": "Without this, an agent's \"tests pass on my laptop\" never gets\nchallenged by a clean-checkout run and silent regressions ship.\n\nPick the CI provider that matches your hosting platform and check\nin its config. The fastest path for most repos in 2026 is\n`.github/workflows/ci.yml` (GitHub Actions) with three steps:\n`actions/checkout@v4`, install dependencies for python\nwith `pip install -e .`, then run\n`python -m pytest tests/`. Trigger on `pull_request` and on `push`\nto `main`.\n\nEquivalent canonical config paths in other providers (use whichever\nmatches your platform): `.gitlab-ci.yml` (GitLab CI), `.circleci/config.yml`\n(CircleCI), `Jenkinsfile` (Jenkins), `azure-pipelines.yml` (Azure),\n`bitbucket-pipelines.yml` (Bitbucket), `buildspec.yml` (AWS\nCodeBuild), `.drone.yml` (Drone), `.woodpecker.yml` (Woodpecker),\n`cloudbuild.yaml` (GCP Cloud Build), `codemagic.yaml` (Codemagic),\n`.travis.yml` (Travis), `.buildkite/pipeline.yml` (BuildKite),\n`tekton/*.yaml`, `Earthfile`. Any of these closes the loop.\n\nEven a 20-line config is worth more than nothing. If you already\nuse a hosted CI without an in-repo file, add a status badge to\n`README.md` so the loop is visible to agents.\n\nVerify with: `test -f .github/workflows/ci.yml`\n",
+          "line": null,
+          "message": "None of these expected paths exist: Jenkinsfile, jenkinsfile, Jenkinsfile.groovy, jenkins/**, .jenkins/**, tekton/**, .tekton/**, argo/**, .argo/**, .argo-ci/**, .harness/**, .concourse/**, concourse/pipeline.yml, concourse/pipeline.yaml",
+          "pillar": "feedback",
+          "severity": "warn",
+          "verify": {
+            "command": "test -f .github/workflows/ci.yml",
+            "description": "A CI workflow must exist under .github/workflows/."
+          }
+        },
+        {
+          "action": {
+            "context_probe": [
+              {
+                "detect": "primary_language"
+              }
+            ],
+            "kind": "create_file",
+            "path": ".github/workflows/ci.yml",
+            "preconditions": [
+              {
+                "not_exists": ".github/workflows/ci.yml"
+              }
+            ],
+            "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: python -m pytest tests/\n"
+          },
+          "check_id": "ci.configured",
+          "file": null,
+          "fix_hint": "Drop a CI workflow that installs deps, runs the test command, and\nreports status to PRs. The default scaffold writes\n`.github/workflows/ci.yml`, but any of the 25+ providers detected\nby this rule counts \u2014 pick whatever your hosting platform supports\nnatively. Even a 20-line config is worth more than nothing: the\nagent gets red/green feedback per push. If you use a hosted CI\nwith no in-repo file (BuildKite cloud, TeamCity hosted, Jenkins on\na remote server), add a status badge to your README so the loop is\nvisible to agents.\n",
+          "fix_prompt": "Without this, an agent's \"tests pass on my laptop\" never gets\nchallenged by a clean-checkout run and silent regressions ship.\n\nPick the CI provider that matches your hosting platform and check\nin its config. The fastest path for most repos in 2026 is\n`.github/workflows/ci.yml` (GitHub Actions) with three steps:\n`actions/checkout@v4`, install dependencies for python\nwith `pip install -e .`, then run\n`python -m pytest tests/`. Trigger on `pull_request` and on `push`\nto `main`.\n\nEquivalent canonical config paths in other providers (use whichever\nmatches your platform): `.gitlab-ci.yml` (GitLab CI), `.circleci/config.yml`\n(CircleCI), `Jenkinsfile` (Jenkins), `azure-pipelines.yml` (Azure),\n`bitbucket-pipelines.yml` (Bitbucket), `buildspec.yml` (AWS\nCodeBuild), `.drone.yml` (Drone), `.woodpecker.yml` (Woodpecker),\n`cloudbuild.yaml` (GCP Cloud Build), `codemagic.yaml` (Codemagic),\n`.travis.yml` (Travis), `.buildkite/pipeline.yml` (BuildKite),\n`tekton/*.yaml`, `Earthfile`. Any of these closes the loop.\n\nEven a 20-line config is worth more than nothing. If you already\nuse a hosted CI without an in-repo file, add a status badge to\n`README.md` so the loop is visible to agents.\n\nVerify with: `test -f .github/workflows/ci.yml`\n",
+          "line": null,
+          "message": "None of these expected paths exist: buildspec.yml, buildspec.yaml, .buildspec.yml, .buildspec.yaml, dagger.json, dagger.cue, earthly.yml, earthly.yaml, Earthfile, .prow.yaml, .prow.yml, garden.yml, garden.yaml, skaffold.yaml, skaffold.yml",
           "pillar": "feedback",
           "severity": "warn",
           "verify": {
@@ -346,7 +412,7 @@
       ],
       "not_measured": false,
       "pillar": "feedback",
-      "score": 60.0,
+      "score": 40.0,
       "weight": 0.9
     },
     {
@@ -361,38 +427,10 @@
     {
       "check_id": "feedback.test_coverage_hint",
       "explanation": "Coverage configuration (`.coveragerc`, `codecov.yml`, `coveralls.yml`,\n`pyproject.toml [tool.coverage.*]`) signals that the repo tracks which\ncode is exercised by tests. Agents benefit from knowing what is and\nisn't tested before making a change, so they can target tests\nappropriately. Community-contributed demo rule.",
-      "findings": [
-        {
-          "action": {
-            "field_path": "tool.coverage.report.fail_under",
-            "kind": "modify_manifest_field",
-            "manifest": "pyproject.toml",
-            "preconditions": [
-              {
-                "exists": "pyproject.toml"
-              },
-              {
-                "manifest_language": "python"
-              }
-            ],
-            "value": "80"
-          },
-          "check_id": "feedback.test_coverage_hint",
-          "file": null,
-          "fix_hint": "Add a coverage config (`.coveragerc` for pytest-cov, `codecov.yml` for\nCodecov) so coverage signal is visible to both humans and agents.\n",
-          "line": null,
-          "message": "None of these expected paths exist: .coveragerc, codecov.yml, .codecov.yml, coveralls.yml, .coveralls.yml",
-          "pillar": "feedback",
-          "severity": "info",
-          "verify": {
-            "command": "grep -E 'fail_under\\s*=' pyproject.toml >/dev/null",
-            "description": "A coverage threshold must be configured."
-          }
-        }
-      ],
+      "findings": [],
       "not_measured": false,
       "pillar": "feedback",
-      "score": 90.0,
+      "score": 100.0,
       "weight": 0.5
     },
     {
@@ -448,13 +486,14 @@
           "check_id": "manifest.detected",
           "file": null,
           "fix_hint": "Drop a `pyproject.toml` (or `package.json` / `Cargo.toml` / etc.)\nat the repo root with at least name + version + dependencies. For\nmonorepos, every package directory should have its own manifest.\n",
+          "fix_prompt": "Without this, an agent has no contract telling it what the project is,\nhow to install it, or what depends on what \u2014 every action becomes\nguesswork.\n\nCreate a manifest at the repo root matching your python.\nPick the canonical file for your ecosystem:\n- Python: `pyproject.toml`\n- JS/TS (npm/yarn/pnpm/bun): `package.json`\n- Rust: `Cargo.toml`\n- Go: `go.mod`\n- Ruby: `Gemfile` (+ optional `*.gemspec`)\n- PHP: `composer.json`\n- Java/Kotlin/Scala: `pom.xml`, `build.gradle`, or `build.gradle.kts`\n- Swift: `Package.swift`\n- Elixir: `mix.exs`\n- Dart/Flutter: `pubspec.yaml`\n- Clojure: `project.clj` or `deps.edn`\n\nInclude name, version, and at least one declared dependency. For\nmonorepos, drop a manifest in each package directory too (depth \u2264 2).\nIf `your project's manifest` already exists elsewhere, move it to the\nroot or document its location in `AGENTS.md`.\n\nVerify with: `test -f pyproject.toml || test -f package.json || test -f Cargo.toml || test -f go.mod || test -f Gemfile || test -f composer.json || test -f pom.xml || test -f build.gradle || test -f build.gradle.kts || test -f Package.swift || test -f mix.exs || test -f pubspec.yaml`\n",
           "line": null,
           "message": "No project manifest found (pyproject.toml, package.json, Cargo.toml, go.mod, ...).",
           "pillar": "feedback",
           "severity": "warn",
           "verify": {
-            "command": "test -f pyproject.toml || test -f package.json || \\\n  test -f go.mod || test -f Cargo.toml\n",
-            "description": "A primary manifest must exist."
+            "command": "test -f pyproject.toml || test -f package.json || \\\n  test -f go.mod || test -f Cargo.toml || test -f Gemfile || \\\n  test -f composer.json || test -f pom.xml || \\\n  test -f build.gradle || test -f build.gradle.kts || \\\n  test -f Package.swift || test -f mix.exs || \\\n  test -f pubspec.yaml || test -f project.clj\n",
+            "description": "A primary manifest must exist (any supported language)."
           }
         }
       ],
@@ -469,71 +508,74 @@
       "findings": [
         {
           "action": {
-            "command": "# Generate a lockfile using the language's package manager.\n lock ||  install --frozen-lockfile\n",
+            "command": "# Dispatch on the detected package manager. Each branch runs the\n# canonical lockfile-generation command for its ecosystem. When\n# the probe doesn't resolve (`` empty), we fall\n# through and print a no-op message rather than running garbage\n# tokens through `sh`. apply_top_action treats stderr-with-exit-0\n# as success, so the workflow doesn't break on undetectable repos.\npm=\"\"\ncase \"$pm\" in\n  uv)        uv lock ;;\n  poetry)    poetry lock ;;\n  pipenv)    pipenv lock ;;\n  pdm)       pdm lock ;;\n  npm)       npm install --package-lock-only ;;\n  pnpm)      pnpm install --lockfile-only ;;\n  yarn)      yarn install --mode=update-lockfile ;;\n  bun)       bun install --frozen-lockfile || bun install ;;\n  cargo)     cargo generate-lockfile ;;\n  bundler)   bundle lock ;;\n  composer)  composer update --lock ;;\n  go)        go mod tidy ;;\n  *)         echo \"manifest.lockfile_present: package_manager not detected; skipping (no-op)\" ;;\nesac\n",
             "context_probe": [
               {
                 "detect": "package_manager"
               }
             ],
-            "description": "Run the package manager's lock command (e.g. `uv lock`,\n`npm install --package-lock-only`, `cargo generate-lockfile`).\n",
+            "description": "Run the package manager's lock command (e.g. `uv lock`,\n`npm install --package-lock-only`, `cargo generate-lockfile`).\nDispatches on the detected package_manager probe.\n",
             "kind": "run_command"
           },
           "check_id": "manifest.lockfile_present",
           "file": null,
           "fix_hint": "Run `poetry lock` / `npm install` / `cargo update` (whichever your\nmanifest needs) and commit the resulting lockfile. For pip-only\nPython projects, freezing `requirements.txt` to exact versions or\nswitching to `uv` / `poetry` is acceptable.\n",
+          "fix_prompt": "Without this, `pip install` / `npm install` / `bundle install`\nresolves different versions on different machines and the agent's\ngreen run on its laptop can't predict CI's outcome.\n\nGenerate and commit a lockfile using your package manager\n(your package manager). Canonical lock commands by ecosystem:\n\n- uv:      `uv lock`\n- poetry:  `poetry lock`\n- pipenv:  `pipenv lock`\n- pdm:     `pdm lock`\n- npm:     `npm install --package-lock-only`\n- pnpm:    `pnpm install --lockfile-only`\n- yarn:    `yarn install --mode=update-lockfile`\n- bun:     `bun install --frozen-lockfile`\n- cargo:   `cargo generate-lockfile`\n- bundler: `bundle lock`\n- composer:`composer update --lock`\n- go:      `go mod tidy` (regenerates `go.sum`)\n- mix:     `mix deps.get` (writes `mix.lock`)\n\nFor bare-pip Python projects with no lockfile tooling, either switch\nto `uv` or `poetry` for a real lockfile, or pin `requirements.txt`\nto exact versions with `pip freeze > requirements.txt`.\n\nVerify with: `test -f uv.lock || test -f poetry.lock || test -f Pipfile.lock || test -f pdm.lock || test -f package-lock.json || test -f yarn.lock || test -f pnpm-lock.yaml || test -f bun.lock || test -f bun.lockb || test -f Cargo.lock || test -f Gemfile.lock || test -f composer.lock || test -f go.sum || test -f mix.lock`\n",
           "line": null,
           "message": "At least one ecosystem-specific lockfile is committed. (no clause matched)",
           "pillar": "feedback",
           "severity": "warn",
           "verify": {
-            "command": "test -f uv.lock || test -f poetry.lock || test -f package-lock.json || \\\n  test -f yarn.lock || test -f pnpm-lock.yaml || test -f Cargo.lock\n",
-            "description": "A lockfile must exist."
+            "command": "test -f uv.lock || test -f poetry.lock || test -f Pipfile.lock || \\\n  test -f pdm.lock || test -f package-lock.json || \\\n  test -f npm-shrinkwrap.json || test -f yarn.lock || \\\n  test -f pnpm-lock.yaml || test -f bun.lock || test -f bun.lockb || \\\n  test -f Cargo.lock || test -f Gemfile.lock || \\\n  test -f composer.lock || test -f go.sum || test -f mix.lock\n",
+            "description": "A lockfile must exist (any supported ecosystem)."
           }
         },
         {
           "action": {
-            "command": "# Generate a lockfile using the language's package manager.\n lock ||  install --frozen-lockfile\n",
+            "command": "# Dispatch on the detected package manager. Each branch runs the\n# canonical lockfile-generation command for its ecosystem. When\n# the probe doesn't resolve (`` empty), we fall\n# through and print a no-op message rather than running garbage\n# tokens through `sh`. apply_top_action treats stderr-with-exit-0\n# as success, so the workflow doesn't break on undetectable repos.\npm=\"\"\ncase \"$pm\" in\n  uv)        uv lock ;;\n  poetry)    poetry lock ;;\n  pipenv)    pipenv lock ;;\n  pdm)       pdm lock ;;\n  npm)       npm install --package-lock-only ;;\n  pnpm)      pnpm install --lockfile-only ;;\n  yarn)      yarn install --mode=update-lockfile ;;\n  bun)       bun install --frozen-lockfile || bun install ;;\n  cargo)     cargo generate-lockfile ;;\n  bundler)   bundle lock ;;\n  composer)  composer update --lock ;;\n  go)        go mod tidy ;;\n  *)         echo \"manifest.lockfile_present: package_manager not detected; skipping (no-op)\" ;;\nesac\n",
             "context_probe": [
               {
                 "detect": "package_manager"
               }
             ],
-            "description": "Run the package manager's lock command (e.g. `uv lock`,\n`npm install --package-lock-only`, `cargo generate-lockfile`).\n",
+            "description": "Run the package manager's lock command (e.g. `uv lock`,\n`npm install --package-lock-only`, `cargo generate-lockfile`).\nDispatches on the detected package_manager probe.\n",
             "kind": "run_command"
           },
           "check_id": "manifest.lockfile_present",
           "file": null,
           "fix_hint": "Run `poetry lock` / `npm install` / `cargo update` (whichever your\nmanifest needs) and commit the resulting lockfile. For pip-only\nPython projects, freezing `requirements.txt` to exact versions or\nswitching to `uv` / `poetry` is acceptable.\n",
+          "fix_prompt": "Without this, `pip install` / `npm install` / `bundle install`\nresolves different versions on different machines and the agent's\ngreen run on its laptop can't predict CI's outcome.\n\nGenerate and commit a lockfile using your package manager\n(your package manager). Canonical lock commands by ecosystem:\n\n- uv:      `uv lock`\n- poetry:  `poetry lock`\n- pipenv:  `pipenv lock`\n- pdm:     `pdm lock`\n- npm:     `npm install --package-lock-only`\n- pnpm:    `pnpm install --lockfile-only`\n- yarn:    `yarn install --mode=update-lockfile`\n- bun:     `bun install --frozen-lockfile`\n- cargo:   `cargo generate-lockfile`\n- bundler: `bundle lock`\n- composer:`composer update --lock`\n- go:      `go mod tidy` (regenerates `go.sum`)\n- mix:     `mix deps.get` (writes `mix.lock`)\n\nFor bare-pip Python projects with no lockfile tooling, either switch\nto `uv` or `poetry` for a real lockfile, or pin `requirements.txt`\nto exact versions with `pip freeze > requirements.txt`.\n\nVerify with: `test -f uv.lock || test -f poetry.lock || test -f Pipfile.lock || test -f pdm.lock || test -f package-lock.json || test -f yarn.lock || test -f pnpm-lock.yaml || test -f bun.lock || test -f bun.lockb || test -f Cargo.lock || test -f Gemfile.lock || test -f composer.lock || test -f go.sum || test -f mix.lock`\n",
           "line": null,
           "message": "None of these expected paths exist: poetry.lock, uv.lock, Pipfile.lock, pdm.lock, package-lock.json, npm-shrinkwrap.json, yarn.lock, pnpm-lock.yaml, Cargo.lock, Gemfile.lock, composer.lock, go.sum, mix.lock, flake.lock, conda-lock.yml, pixi.lock",
           "pillar": "feedback",
           "severity": "warn",
           "verify": {
-            "command": "test -f uv.lock || test -f poetry.lock || test -f package-lock.json || \\\n  test -f yarn.lock || test -f pnpm-lock.yaml || test -f Cargo.lock\n",
-            "description": "A lockfile must exist."
+            "command": "test -f uv.lock || test -f poetry.lock || test -f Pipfile.lock || \\\n  test -f pdm.lock || test -f package-lock.json || \\\n  test -f npm-shrinkwrap.json || test -f yarn.lock || \\\n  test -f pnpm-lock.yaml || test -f bun.lock || test -f bun.lockb || \\\n  test -f Cargo.lock || test -f Gemfile.lock || \\\n  test -f composer.lock || test -f go.sum || test -f mix.lock\n",
+            "description": "A lockfile must exist (any supported ecosystem)."
           }
         },
         {
           "action": {
-            "command": "# Generate a lockfile using the language's package manager.\n lock ||  install --frozen-lockfile\n",
+            "command": "# Dispatch on the detected package manager. Each branch runs the\n# canonical lockfile-generation command for its ecosystem. When\n# the probe doesn't resolve (`` empty), we fall\n# through and print a no-op message rather than running garbage\n# tokens through `sh`. apply_top_action treats stderr-with-exit-0\n# as success, so the workflow doesn't break on undetectable repos.\npm=\"\"\ncase \"$pm\" in\n  uv)        uv lock ;;\n  poetry)    poetry lock ;;\n  pipenv)    pipenv lock ;;\n  pdm)       pdm lock ;;\n  npm)       npm install --package-lock-only ;;\n  pnpm)      pnpm install --lockfile-only ;;\n  yarn)      yarn install --mode=update-lockfile ;;\n  bun)       bun install --frozen-lockfile || bun install ;;\n  cargo)     cargo generate-lockfile ;;\n  bundler)   bundle lock ;;\n  composer)  composer update --lock ;;\n  go)        go mod tidy ;;\n  *)         echo \"manifest.lockfile_present: package_manager not detected; skipping (no-op)\" ;;\nesac\n",
             "context_probe": [
               {
                 "detect": "package_manager"
               }
             ],
-            "description": "Run the package manager's lock command (e.g. `uv lock`,\n`npm install --package-lock-only`, `cargo generate-lockfile`).\n",
+            "description": "Run the package manager's lock command (e.g. `uv lock`,\n`npm install --package-lock-only`, `cargo generate-lockfile`).\nDispatches on the detected package_manager probe.\n",
             "kind": "run_command"
           },
           "check_id": "manifest.lockfile_present",
           "file": null,
           "fix_hint": "Run `poetry lock` / `npm install` / `cargo update` (whichever your\nmanifest needs) and commit the resulting lockfile. For pip-only\nPython projects, freezing `requirements.txt` to exact versions or\nswitching to `uv` / `poetry` is acceptable.\n",
+          "fix_prompt": "Without this, `pip install` / `npm install` / `bundle install`\nresolves different versions on different machines and the agent's\ngreen run on its laptop can't predict CI's outcome.\n\nGenerate and commit a lockfile using your package manager\n(your package manager). Canonical lock commands by ecosystem:\n\n- uv:      `uv lock`\n- poetry:  `poetry lock`\n- pipenv:  `pipenv lock`\n- pdm:     `pdm lock`\n- npm:     `npm install --package-lock-only`\n- pnpm:    `pnpm install --lockfile-only`\n- yarn:    `yarn install --mode=update-lockfile`\n- bun:     `bun install --frozen-lockfile`\n- cargo:   `cargo generate-lockfile`\n- bundler: `bundle lock`\n- composer:`composer update --lock`\n- go:      `go mod tidy` (regenerates `go.sum`)\n- mix:     `mix deps.get` (writes `mix.lock`)\n\nFor bare-pip Python projects with no lockfile tooling, either switch\nto `uv` or `poetry` for a real lockfile, or pin `requirements.txt`\nto exact versions with `pip freeze > requirements.txt`.\n\nVerify with: `test -f uv.lock || test -f poetry.lock || test -f Pipfile.lock || test -f pdm.lock || test -f package-lock.json || test -f yarn.lock || test -f pnpm-lock.yaml || test -f bun.lock || test -f bun.lockb || test -f Cargo.lock || test -f Gemfile.lock || test -f composer.lock || test -f go.sum || test -f mix.lock`\n",
           "line": null,
           "message": "None of these expected paths exist: requirements*.txt, environment.yml, environment.yaml",
           "pillar": "feedback",
           "severity": "warn",
           "verify": {
-            "command": "test -f uv.lock || test -f poetry.lock || test -f package-lock.json || \\\n  test -f yarn.lock || test -f pnpm-lock.yaml || test -f Cargo.lock\n",
-            "description": "A lockfile must exist."
+            "command": "test -f uv.lock || test -f poetry.lock || test -f Pipfile.lock || \\\n  test -f pdm.lock || test -f package-lock.json || \\\n  test -f npm-shrinkwrap.json || test -f yarn.lock || \\\n  test -f pnpm-lock.yaml || test -f bun.lock || test -f bun.lockb || \\\n  test -f Cargo.lock || test -f Gemfile.lock || \\\n  test -f composer.lock || test -f go.sum || test -f mix.lock\n",
+            "description": "A lockfile must exist (any supported ecosystem)."
           }
         }
       ],
@@ -571,7 +613,7 @@
     },
     {
       "check_id": "devcontainer.present",
-      "explanation": "A devcontainer / Nix flake / Gitpod config / Vagrantfile lets an\nagent (or a new contributor) get a reproducible environment without\nhand-installing system deps. The project that ships one cuts the\n\"wrong Python version\" / \"missing libssl-dev\" class of failure\nto zero.",
+      "explanation": "A devcontainer / Nix flake / Gitpod config / Vagrantfile lets an\nagent (or a new contributor) get a reproducible environment without\nhand-installing system deps. The project that ships one cuts the\n\"wrong runtime version\" / \"missing system library\" class of failure\nto zero.",
       "findings": [
         {
           "action": {
@@ -592,6 +634,7 @@
           "check_id": "devcontainer.present",
           "file": null,
           "fix_hint": "Drop a minimal `.devcontainer/devcontainer.json` referencing a\nMicrosoft base image plus `postCreateCommand: pip install -e .`.\nFor Nix shops, `flake.nix` with a dev shell is the equivalent.\n",
+          "fix_prompt": "Without this, an agent in a fresh sandbox hits \"wrong runtime version\"\n/ \"missing system library\" within minutes of bring-up and can't\nrecover headlessly.\n\nCreate `.devcontainer/devcontainer.json` for this python\nproject. Microsoft publishes language-specific base images at\n`mcr.microsoft.com/devcontainers/<lang>:1` for python, javascript-node,\ntypescript-node, go, rust, java, dotnet, ruby, php, etc. Pick the one\nthat matches python; fall back to\n`mcr.microsoft.com/devcontainers/base:ubuntu` plus a `features:` block\nif no language-specific image fits. Set `postCreateCommand` to your\ncanonical install command (mirror what's in `AGENTS.md` \u2014 for example\n`pip install -e .`). Add the VS Code / Cursor extensions\nyou actually use to `customizations.vscode.extensions`.\n\nFor Nix shops, `flake.nix` with a `devShell` is the equivalent;\nfor Gitpod, `.gitpod.yml` + `.gitpod.Dockerfile`; for tool-version\nmanagers, `.tool-versions` (asdf/mise) is the lightest-weight option.\n\nVerify with: `test -f .devcontainer/devcontainer.json`\n",
           "line": null,
           "message": "At least one reproducible-workspace config is present. (no clause matched)",
           "pillar": "flow",
@@ -620,6 +663,7 @@
           "check_id": "devcontainer.present",
           "file": null,
           "fix_hint": "Drop a minimal `.devcontainer/devcontainer.json` referencing a\nMicrosoft base image plus `postCreateCommand: pip install -e .`.\nFor Nix shops, `flake.nix` with a dev shell is the equivalent.\n",
+          "fix_prompt": "Without this, an agent in a fresh sandbox hits \"wrong runtime version\"\n/ \"missing system library\" within minutes of bring-up and can't\nrecover headlessly.\n\nCreate `.devcontainer/devcontainer.json` for this python\nproject. Microsoft publishes language-specific base images at\n`mcr.microsoft.com/devcontainers/<lang>:1` for python, javascript-node,\ntypescript-node, go, rust, java, dotnet, ruby, php, etc. Pick the one\nthat matches python; fall back to\n`mcr.microsoft.com/devcontainers/base:ubuntu` plus a `features:` block\nif no language-specific image fits. Set `postCreateCommand` to your\ncanonical install command (mirror what's in `AGENTS.md` \u2014 for example\n`pip install -e .`). Add the VS Code / Cursor extensions\nyou actually use to `customizations.vscode.extensions`.\n\nFor Nix shops, `flake.nix` with a `devShell` is the equivalent;\nfor Gitpod, `.gitpod.yml` + `.gitpod.Dockerfile`; for tool-version\nmanagers, `.tool-versions` (asdf/mise) is the lightest-weight option.\n\nVerify with: `test -f .devcontainer/devcontainer.json`\n",
           "line": null,
           "message": "None of these expected paths exist: .devcontainer/devcontainer.json, .devcontainer/**, .devcontainer.json, .gitpod.yml, .gitpod.Dockerfile, flake.nix, shell.nix, default.nix, .nix/**, devbox.json, mise.toml, .mise.toml, .tool-versions, Vagrantfile, .codesandbox/**, docker-compose.dev.yml, docker-compose.dev.yaml, compose.dev.yml, compose.dev.yaml",
           "pillar": "flow",
@@ -666,6 +710,7 @@
           "check_id": "git.has_history",
           "file": null,
           "fix_hint": "If you imported the project as a single squash, re-import preserving\nhistory (`git filter-repo` or a fresh clone of the source). For new\nprojects, just keep committing \u2014 agents need the trail.\n",
+          "fix_prompt": "Without this, an agent that needs to backport, revert, or bisect has\nno commit trail \u2014 every change is a mystery.\n\nIf the repo was imported as a single squash, re-import preserving\nhistory with `git filter-repo` or a fresh clone of the source. For a\ngenuinely new project, just keep committing in small logical chunks\n(one logical change per commit, imperative-mood messages) until you\nhave at least 5 real commits. For shallow clones the rule emits\n`not_measured` rather than firing \u2014 re-clone with full depth to get\na real signal.\n\nVerify with: `test $(git rev-list --count HEAD) -ge 5`\n",
           "line": null,
           "message": "Repository has 1 commits \u2014 fewer than min_commits=5.",
           "pillar": "flow",
@@ -717,6 +762,7 @@
           "check_id": "makefile.help_target",
           "file": "Makefile",
           "fix_hint": "Add a `help:` target that prints each target with its inline `##`\ncomment. Inserting after `.PHONY:` keeps the canonical declaration\nblock tidy.\n",
+          "fix_prompt": "Without this, an agent's first `make help` prints an error and the\nagent must read the entire Makefile by hand to discover what targets\nexist.\n\nInsert a `help:` target into your `Makefile` right after the\n`.PHONY:` declaration block. Use the standard idiom: `@grep -E\n'^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = \":.*?## \"};\n{printf \"  %-20s %s\\n\", $$1, $$2}'`. Then go through each existing\ntarget and add an inline `## Short description` comment so `make help`\nprints a useful catalogue.\n\nVerify with: `make -n help`\n",
           "line": null,
           "message": "Makefile not present.",
           "pillar": "flow",
@@ -759,6 +805,7 @@
           "check_id": "templates.present",
           "file": null,
           "fix_hint": "At minimum: drop `.github/ISSUE_TEMPLATE/bug_report.md` (GitHub has\na wizard), a `.github/PULL_REQUEST_TEMPLATE.md` with a checklist,\nand a `CODEOWNERS` file mapping `*` to the team that should review\nagent-opened PRs.\n",
+          "fix_prompt": "Without this, every agent-opened PR looks the same, has no obvious\nreviewer, and the project picks up routing cost.\n\nCreate three artefacts: (1)\n`.github/PULL_REQUEST_TEMPLATE.md` with a checklist (Summary, Test\nplan, Risk/rollback); (2) `.github/ISSUE_TEMPLATE/bug_report.md` (use\nGitHub's wizard via Settings \u2192 Features \u2192 Issues \u2192 Set up templates);\n(3) `CODEOWNERS` at the repo root mapping `*` to the team that should\nreview agent-opened PRs. The PR template is highest-leverage \u2014\nprioritise that one if you can only land one.\n\nVerify with: `test -f .github/PULL_REQUEST_TEMPLATE.md && test -f\nCODEOWNERS`\n",
           "line": null,
           "message": "Issue templates, PR template, or CODEOWNERS configured. (no clause matched)",
           "pillar": "flow",
@@ -782,6 +829,7 @@
           "check_id": "templates.present",
           "file": null,
           "fix_hint": "At minimum: drop `.github/ISSUE_TEMPLATE/bug_report.md` (GitHub has\na wizard), a `.github/PULL_REQUEST_TEMPLATE.md` with a checklist,\nand a `CODEOWNERS` file mapping `*` to the team that should review\nagent-opened PRs.\n",
+          "fix_prompt": "Without this, every agent-opened PR looks the same, has no obvious\nreviewer, and the project picks up routing cost.\n\nCreate three artefacts: (1)\n`.github/PULL_REQUEST_TEMPLATE.md` with a checklist (Summary, Test\nplan, Risk/rollback); (2) `.github/ISSUE_TEMPLATE/bug_report.md` (use\nGitHub's wizard via Settings \u2192 Features \u2192 Issues \u2192 Set up templates);\n(3) `CODEOWNERS` at the repo root mapping `*` to the team that should\nreview agent-opened PRs. The PR template is highest-leverage \u2014\nprioritise that one if you can only land one.\n\nVerify with: `test -f .github/PULL_REQUEST_TEMPLATE.md && test -f\nCODEOWNERS`\n",
           "line": null,
           "message": "None of these expected paths exist: .github/ISSUE_TEMPLATE/**, .gitlab/issue_templates/**",
           "pillar": "flow",
@@ -805,6 +853,7 @@
           "check_id": "templates.present",
           "file": null,
           "fix_hint": "At minimum: drop `.github/ISSUE_TEMPLATE/bug_report.md` (GitHub has\na wizard), a `.github/PULL_REQUEST_TEMPLATE.md` with a checklist,\nand a `CODEOWNERS` file mapping `*` to the team that should review\nagent-opened PRs.\n",
+          "fix_prompt": "Without this, every agent-opened PR looks the same, has no obvious\nreviewer, and the project picks up routing cost.\n\nCreate three artefacts: (1)\n`.github/PULL_REQUEST_TEMPLATE.md` with a checklist (Summary, Test\nplan, Risk/rollback); (2) `.github/ISSUE_TEMPLATE/bug_report.md` (use\nGitHub's wizard via Settings \u2192 Features \u2192 Issues \u2192 Set up templates);\n(3) `CODEOWNERS` at the repo root mapping `*` to the team that should\nreview agent-opened PRs. The PR template is highest-leverage \u2014\nprioritise that one if you can only land one.\n\nVerify with: `test -f .github/PULL_REQUEST_TEMPLATE.md && test -f\nCODEOWNERS`\n",
           "line": null,
           "message": "None of these expected paths exist: .github/PULL_REQUEST_TEMPLATE.md, .github/PULL_REQUEST_TEMPLATE/**, .github/pull_request_template.md, .gitlab/merge_request_templates/**",
           "pillar": "flow",
@@ -828,6 +877,7 @@
           "check_id": "templates.present",
           "file": null,
           "fix_hint": "At minimum: drop `.github/ISSUE_TEMPLATE/bug_report.md` (GitHub has\na wizard), a `.github/PULL_REQUEST_TEMPLATE.md` with a checklist,\nand a `CODEOWNERS` file mapping `*` to the team that should review\nagent-opened PRs.\n",
+          "fix_prompt": "Without this, every agent-opened PR looks the same, has no obvious\nreviewer, and the project picks up routing cost.\n\nCreate three artefacts: (1)\n`.github/PULL_REQUEST_TEMPLATE.md` with a checklist (Summary, Test\nplan, Risk/rollback); (2) `.github/ISSUE_TEMPLATE/bug_report.md` (use\nGitHub's wizard via Settings \u2192 Features \u2192 Issues \u2192 Set up templates);\n(3) `CODEOWNERS` at the repo root mapping `*` to the team that should\nreview agent-opened PRs. The PR template is highest-leverage \u2014\nprioritise that one if you can only land one.\n\nVerify with: `test -f .github/PULL_REQUEST_TEMPLATE.md && test -f\nCODEOWNERS`\n",
           "line": null,
           "message": "None of these expected paths exist: CODEOWNERS, .github/CODEOWNERS, docs/CODEOWNERS",
           "pillar": "flow",
@@ -877,6 +927,7 @@
           "check_id": "gitignore.covers_junk",
           "file": ".gitignore",
           "fix_hint": "Run `gitignore.io` for your stack and paste the result into\n`.gitignore`. At minimum, cover: `__pycache__`, `node_modules`,\n`.env`, `dist/`, `build/`, `*.log`, IDE settings, coverage dirs.\n",
+          "fix_prompt": "Without this, an agent that runs `pip install` / `npm install` / a\nbuild accidentally commits artefact directories and pollutes every\nfuture diff \u2014 and worse, `.env` files can leak secrets into history.\n\nAppend these groups to `.gitignore` (creating the file if needed):\n`__pycache__/`, `*.py[cod]`, `.venv/`, `venv/`, `node_modules/`,\n`dist/`, `build/`, `target/`, `.idea/`, `.vscode/`, `.DS_Store`,\n`coverage/`, `htmlcov/`, `*.log`, `.env`, `.env.*`, `!.env.example`.\nThe negation on `.env.example` keeps the placeholder file tracked\nwhile ignoring real `.env` files.\n\nVerify with: `grep -E '^(\\.env|node_modules|\\.venv|dist|__pycache__)'\n.gitignore`\n",
           "line": null,
           "message": "No .gitignore found.",
           "pillar": "safety",
@@ -919,6 +970,7 @@
           "check_id": "safety.gitleaks_config",
           "file": null,
           "fix_hint": "Add a `.gitleaks.toml` (or `.secrets.baseline` for detect-secrets) and\nwire it into pre-commit or a GitHub Actions workflow. Example:\nhttps://github.com/gitleaks/gitleaks-action.\n",
+          "fix_prompt": "Without this, an agent one copy-paste away from leaking a credential\nhas no automated catch \u2014 the leak makes it into git history before\nreview.\n\nCreate `.gitleaks.toml` at the repo root with a minimal config: a\n`title` string and one `[allowlist]` block listing your known\nfalse-positive paths (lockfiles, vendor/, node_modules/). Then wire\ngitleaks into pre-commit (add a `gitleaks` hook to\n`.pre-commit-config.yaml`) AND CI (add `.github/workflows/gitleaks.yml`\nusing `gitleaks/gitleaks-action@v2`). Detect-secrets via\n`.secrets.baseline` is an acceptable alternative.\n\nVerify with: `test -f .gitleaks.toml`\n",
           "line": null,
           "message": "None of these expected paths exist: .gitleaks.toml, .gitleaks.yaml, .gitleaks.yml, gitleaks.toml, .trufflehog.yaml, .trufflehog.yml, .secrets.baseline, .pre-commit-config.yaml, .github/workflows/gitleaks.yml, .github/workflows/secret-scan.yml",
           "pillar": "safety",
@@ -947,6 +999,7 @@
           "check_id": "secrets.basic_scan",
           "file": "main.py",
           "fix_hint": "ROTATE the leaked credential immediately (don't just delete it\nfrom the file \u2014 assume it's compromised the moment it touched\ngit). Then remove it from history (`git filter-repo`) and\nconfigure a secrets scanner (`gitleaks`, GitHub secret scanning)\nto prevent recurrence.\n",
+          "fix_prompt": "Without this, a credential already in tracked files is one push away\nfrom public history \u2014 and a rotation after the fact doesn't fully\nhelp, the leaked secret is in git forever.\n\nROTATE the leaked credential FIRST (assume compromised the moment it\ntouched git). Then remove the secret from history with `git filter-repo\n--invert-paths --path <file>` (or `git filter-repo --replace-text\n<file-with-regex>`). Finally, prevent recurrence: install gitleaks\nlocally as a pre-commit hook AND in CI (see the\n`safety.gitleaks_config` fix prompt). Don't just delete the line \u2014 the\nold commit still has the secret.\n\nVerify with: re-run the scanner; no high-confidence patterns (AWS\nAKIA, GitHub ghp_, Slack xox*, Stripe sk_live_, PEM headers) should\nremain in tracked files.\n",
           "line": 4,
           "message": "Possible aws_access_key_id found.",
           "pillar": "safety",
@@ -980,6 +1033,7 @@
           "check_id": "security.policy_present",
           "file": null,
           "fix_hint": "Add a SECURITY.md at the repo root with at least: how to report a\nvulnerability (private channel), supported versions, and expected\nresponse time. GitHub's \"Add a security policy\" template is fine.\n",
+          "fix_prompt": "Without this, an agent that finds a security issue has no documented\nescalation path and may default to opening a public issue, leaking the\nvulnerability before a fix lands.\n\nCreate `SECURITY.md` at the repo root with three sections: (1)\n**Reporting a vulnerability** \u2014 explicitly tell reporters NOT to open\na public issue; give a private channel (`security@<your-domain>` or\nGitHub's private vulnerability reporting if enabled). (2) **Supported\nversions** \u2014 a small table showing which versions you patch. (3)\n**Response window** \u2014 your acknowledgement and fix SLAs (e.g. 2\nbusiness days to ack, 30 days for high-severity).\n\nVerify with: `test -f SECURITY.md`\n",
           "line": null,
           "message": "None of these expected paths exist: SECURITY.md, .github/SECURITY.md, docs/SECURITY.md",
           "pillar": "safety",

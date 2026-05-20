@@ -16,6 +16,23 @@ Usage:
     python3 scripts/regen_snapshots.py
     # or via the Makefile:
     make snapshots
+
+NOTE on git history sensitivity:
+
+The `git.has_history` rule fires when a fixture has < 5 commits. CI
+checks fixtures out with `actions/checkout@v6` at `fetch-depth: 1`
+(shallow), which makes the rule fire with "Repository has 1 commits".
+If your local `agent-readiness-fixtures/` checkout has a full clone
+(commit history > 5), the rule will NOT fire locally and the snapshot
+will silently drift from CI.
+
+To regenerate against the same shallow view CI sees:
+
+    git clone --depth 1 -b v1.0.0 \\
+      https://github.com/harrydaihaolin/agent-readiness-fixtures.git \\
+      /tmp/ar-fixtures-shallow
+    python3 scripts/regen_snapshots.py \\
+      --fixtures-root /tmp/ar-fixtures-shallow/fixtures
 """
 
 from __future__ import annotations
