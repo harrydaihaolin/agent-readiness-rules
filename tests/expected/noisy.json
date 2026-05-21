@@ -9,6 +9,12 @@
             "context_probe": [
               {
                 "detect": "primary_language"
+              },
+              {
+                "detect": "primary_manifest"
+              },
+              {
+                "detect": "package_manager"
               }
             ],
             "kind": "create_file",
@@ -18,7 +24,7 @@
                 "not_exists": "AGENTS.md"
               }
             ],
-            "template": "# Agents guide\n\nA concise (<2 KB) orientation document for autonomous coding agents\nworking in this repository. Document, in order:\n\n1. What this repo does in one sentence.\n2. The single command an agent runs to set up the environment.\n3. The single command to run tests.\n4. The single command to lint.\n5. Where the entry point lives (file path + function/binary name).\n\nKeep it < 60 lines so it fits in any agent's context window.\n"
+            "template": "# Agent guide\n\nThis is a python project. Use the commands in the\nQuick start block below; an agent will trust these over manifest\nsniffing.\n\n## Quick start\n\n```bash\n# Install dependencies\npip install -e .\n\n# Run tests\npython -m pytest tests/\n\n# Lint\nruff check .\n```\n\nIf any of the above is wrong for this project (custom runner,\nmonorepo layout, etc.), edit it now.\n\n## Do-not-touch\n\n- <!-- list paths agents should never modify, e.g. generated/, vendor/ -->\n\n## Conventions\n\n- Branch naming: `feat/<short>`, `fix/<issue>`, `chore/<topic>`.\n- Commit style: Conventional Commits.\n- PR scope: one logical change per PR.\n\n## CI and the feedback loop\n\n**CI is part of the feedback loop.** After you push or update a\nPR, monitor your CI provider's run results. When CI fails, read\nthe logs, fix the root cause, and push follow-up commits. Do not\nstop while checks are red.\n"
           },
           "check_id": "agent_docs.canonical",
           "file": null,
@@ -973,7 +979,7 @@
     },
     {
       "check_id": "gitignore.covers_junk",
-      "explanation": "An agent that runs `pip install` / `npm install` / a build will\nproduce artefact directories (`__pycache__`, `node_modules`,\n`dist/`, `build/`, IDE settings, coverage reports). If the\n`.gitignore` doesn't cover them, those artefacts get accidentally\ncommitted and pollute future diffs. The same pattern catches\nsecrets \u2014 `.env` not being ignored is how API keys end up in\npublic history.",
+      "explanation": "An agent that runs the project's build, test, or install step\nproduces artefact directories for its ecosystem \u2014 `target/` on\nJVM / Rust, `__pycache__/` + `dist/` on Python, `node_modules/`\non Node, `vendor/` on Go, `_build/` on Elixir, etc. If `.gitignore`\ndoesn't cover the artefacts for the *detected* primary language,\nthose directories get accidentally committed and pollute every\nfuture diff. The same pattern catches secrets and IDE state:\n`.env` not being ignored is how API keys end up in public history,\nand stray `.idea/` / `.vscode/` directories show up in PRs nobody\nintended. The rule scores against the per-language groups for the\ndetected stack plus three universal groups (`dotenv`, `ide_junk`,\n`logs`) that matter for every repo.",
       "findings": [
         {
           "action": {
@@ -995,15 +1001,15 @@
           },
           "check_id": "gitignore.covers_junk",
           "file": ".gitignore",
-          "fix_hint": "Run `gitignore.io` for your stack and paste the result into\n`.gitignore`. At minimum, cover: `__pycache__`, `node_modules`,\n`.env`, `dist/`, `build/`, `*.log`, IDE settings, coverage dirs.\n",
-          "fix_prompt": "Without this, an agent that runs `pip install` / `npm install` / a\nbuild accidentally commits artefact directories and pollutes every\nfuture diff \u2014 and worse, `.env` files can leak secrets into history.\n\nAppend these groups to `.gitignore` (creating the file if needed):\n`__pycache__/`, `*.py[cod]`, `.venv/`, `venv/`, `node_modules/`,\n`dist/`, `build/`, `target/`, `.idea/`, `.vscode/`, `.DS_Store`,\n`coverage/`, `htmlcov/`, `*.log`, `.env`, `.env.*`, `!.env.example`.\nThe negation on `.env.example` keeps the placeholder file tracked\nwhile ignoring real `.env` files.\n\nVerify with: `grep -E '^(\\.env|node_modules|\\.venv|dist|__pycache__)'\n.gitignore`\n",
+          "fix_hint": "Generate a `.gitignore` for your stack (e.g. https://gitignore.io)\nand paste the result. At minimum, every repo needs the universal\ngroups (`.env`, IDE state, `*.log`); the rest are scored against\nthe detected primary language only.\n",
+          "fix_prompt": "Without this, an agent that runs the project's build or install\nstep accidentally commits artefact directories and pollutes every\nfuture diff \u2014 and worse, `.env` files can leak secrets into\nhistory.\n\nThree groups are required for *every* repo regardless of language:\n\n- **Secrets**: `.env`, `.env.*`, and `!.env.example` (the negation\n  keeps the placeholder tracked while ignoring real `.env` files).\n- **IDE / OS junk**: `.idea/`, `.vscode/`, `.DS_Store`, `*.swp`.\n- **Logs**: `*.log`.\n\nThen add the build-artefact groups that match your project's primary language\n(the matcher only scores you on these for the language it detected,\nso other ecosystems' patterns are optional padding):\n\n- **Python**: `__pycache__/`, `*.py[cod]`, `*.egg-info/`,\n  `.venv/`, `venv/`, `.pytest_cache/`, `htmlcov/`, `dist/`,\n  `build/`.\n- **JS / TS**: `node_modules/`, `dist/`, `coverage/`.\n- **Go**: `vendor/`.\n- **Rust**: `target/`.\n- **JVM (Java / Kotlin / Scala / Clojure)**: `target/`, `*.class`,\n  `.metals/`, `.bloop/` (Scala-specific build-state dirs).\n- **Swift**: `.build/`, `DerivedData/`.\n\nVerify with: `grep -E '^(\\.env|\\.idea|\\*\\.log)' .gitignore`\n(universal-group check; the language-specific check is\necosystem-dependent).\n",
           "line": null,
-          "message": ".gitignore covers 3/12 groups; missing: node_modules, dotenv, go_vendor, rust_target, jvm_class, ide_junk, coverage, terraform, logs.",
+          "message": ".gitignore covers 3/7 groups; missing: dotenv, ide_junk, coverage, logs.",
           "pillar": "safety",
           "severity": "warn",
           "verify": {
-            "command": "grep -E '^(\\.env|node_modules|\\.venv|dist|__pycache__)' .gitignore >/dev/null\n",
-            "description": ".gitignore must cover the standard junk groups."
+            "command": "grep -E '^(\\.env|\\.idea|\\*\\.log)' .gitignore >/dev/null\n",
+            "description": ".gitignore must cover the universal groups (dotenv / IDE junk /\nlogs). The full language-aware check is enforced by the matcher\nagainst the detected primary language; this verify command only\nasserts the always-required floor.\n"
           }
         }
       ],
