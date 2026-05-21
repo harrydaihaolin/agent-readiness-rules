@@ -2,7 +2,7 @@
   "checks": [
     {
       "check_id": "agent_docs.canonical",
-      "explanation": "AGENTS.md at the repo root is the emerging canonical contract between\nhuman authors and coding agents (canonical commands, do-not-touch\nlists, commit conventions). Other formats (.cursorrules, CLAUDE.md,\n.ai/) help, but a single, well-named file at the root is the most\npredictable surface for any agent. This rule fires `warn` only when\nthe canonical AGENTS.md is missing; partial coverage by sibling\nformats is rewarded by the softer `agent_docs.present` rule.",
+      "explanation": "Agents landing in a repo need a single, predictable file to read for\ncanonical commands, do-not-touch lists, and commit conventions \u2014\nAGENTS.md at the repo root is the emerging canonical contract\nbetween human authors and coding agents. Other formats\n(.cursorrules, CLAUDE.md, .ai/) help, but a single, well-named file\nat the root is the most predictable surface for any agent. This\nrule fires `warn` only when the canonical AGENTS.md is missing;\npartial coverage by sibling formats is rewarded by the softer\n`agent_docs.present` rule.",
       "findings": [
         {
           "action": {
@@ -75,7 +75,7 @@
     },
     {
       "check_id": "code.complexity",
-      "explanation": "High cyclomatic complexity means many independent control-flow\npaths through one function. Agents that try to modify such a\nfunction have to consider every path; they make more wrong-branch\nedits than humans do, who can hold more context in their heads.\nFunctions over CC=15 are the strongest predictor of agent edit\nerrors in a 2026 internal study.",
+      "explanation": "Agents editing a high-complexity function have to reason across\nevery independent control-flow path and ship more wrong-branch\nedits than a human would, who can hold more context in their\nheads. Cyclomatic complexity is the proxy: functions over CC=15\nare the strongest predictor of agent edit errors in a 2026\ninternal study.",
       "findings": [],
       "not_measured": false,
       "pillar": "cognitive_load",
@@ -127,7 +127,7 @@
     },
     {
       "check_id": "git.churn_hotspots",
-      "explanation": "Files that are both large *and* frequently edited are the highest-\nrisk surface for an agent: each touch has the most context to\nre-read and the most history to consider. Splitting them into\nsmaller modules cuts agent error rates more than any other\nrefactor. This rule fires per file that exceeds both the touch and\nsize thresholds; gives `not_measured` on shallow clones and\nrepos with very few commits.",
+      "explanation": "Agents editing a churn-hotspot file pay the maximum re-read cost on\nevery touch \u2014 the most context to re-read, the most history to\nconsider, the highest chance of colliding with an in-flight change.\nFiles that are both large *and* frequently edited are that surface;\nsplitting them into smaller modules cuts agent error rates more\nthan any other refactor. This rule fires per file that exceeds\nboth the touch and size thresholds; gives `not_measured` on\nshallow clones and repos with very few commits.",
       "findings": [],
       "not_measured": false,
       "pillar": "cognitive_load",
@@ -136,7 +136,7 @@
     },
     {
       "check_id": "meta.consistency",
-      "explanation": "Drift between what README documents and what the repo actually has\nis one of the most expensive false starts for an agent: it follows\nthe README, runs into a missing tool, and either reverts or\ninvents a workaround. Common drifts caught here: README mentions\npytest but no pytest config exists; README mentions `npm test`\nbut no package.json; README references `make X` for a target that\ndoesn't exist in the Makefile; README documents `npm run X` but\nthe script is missing from package.json; README documents\n`pip install -e .` but no pyproject.toml/setup.py exists; AGENTS.md\n/ CLAUDE.md is a placeholder.",
+      "explanation": "Agents that follow the README will hit a missing tool or undefined\ntarget and either revert or invent a workaround when README\ndocumentation drifts from what the repo actually has \u2014 one of the\nmost expensive false starts. Common drifts caught here: README\nmentions pytest but no pytest config exists; README mentions\n`npm test` but no package.json; README references `make X` for a\ntarget that doesn't exist in the Makefile; README documents\n`npm run X` but the script is missing from package.json; README\ndocuments `pip install -e .` but no pyproject.toml/setup.py exists;\nAGENTS.md / CLAUDE.md is a placeholder.",
       "findings": [],
       "not_measured": false,
       "pillar": "cognitive_load",
@@ -196,7 +196,7 @@
     },
     {
       "check_id": "repo_shape.large_files",
-      "explanation": "Files over 3000 lines or 300 KB exceed an agent's working memory in\na single read and force a chunked-reading pattern that loses\ncontext across chunk boundaries. This rule excludes lock files,\ngenerated data, binary assets, long-form tests, vendored\nthird-party code, and build/template artefacts \u2014 which are large\nbut not \"source\" files an agent would meaningfully edit. Thresholds\nrecalibrated in v2.0.1 (3000 lines / 300 KB) from v1.5.0's 1500 /\n150 KB setting after EXP-2 fire-rate measurement on the v3.2 cohort;\nsee the rule comment block for cohort calibration history.",
+      "explanation": "Agents reading a 3000+-line file exceed working memory in a single\npass and are forced into chunked reads that lose context across\nboundaries \u2014 files over 3000 lines or 300 KB exceed that budget.\nThis rule excludes lock files, generated data, binary assets,\nlong-form tests, vendored third-party code, and build/template\nartefacts \u2014 which are large but not \"source\" files an agent would\nmeaningfully edit. Thresholds recalibrated in v2.0.1 (3000 lines /\n300 KB) from v1.5.0's 1500 / 150 KB setting after EXP-2 fire-rate\nmeasurement on the v3.2 cohort; see the rule comment block for\ncohort calibration history.",
       "findings": [],
       "not_measured": false,
       "pillar": "cognitive_load",
@@ -223,7 +223,7 @@
     },
     {
       "check_id": "agent_docs.ci_feedback_loop",
-      "explanation": "CI is the main automated feedback channel once an agent pushes a\nbranch. repos that never tell agents to watch workflow results or to\ntreat failing checks as something to fix (not noise) see agents land\nred PRs, declare \"done,\" and disappear \u2014 the same failure mode as\nmissing hooks, only slower. Root `AGENTS.md` should explicitly bind\n**monitor CI / checks \u2192 read failures \u2192 fix and iterate** into the\nagent contract.",
+      "explanation": "Agents that push a PR without an explicit contract to watch CI\ndeclare \"done\" before checking whether the build went red \u2014 the\nfeedback loop is open-circuited and the same failure mode as\nmissing hooks, only slower. CI is the main automated feedback\nchannel once a branch is pushed; the root `AGENTS.md` should\nexplicitly bind **monitor CI / checks \u2192 read failures \u2192 fix and\niterate** into the agent contract.",
       "findings": [],
       "not_measured": false,
       "pillar": "feedback",
@@ -387,7 +387,7 @@
     },
     {
       "check_id": "deploy.smoke_check",
-      "explanation": "When a workflow ships a build to a hosted environment (GitHub Pages,\nNetlify, Vercel, S3/CloudFront, gh-pages branch, Cloud Run, Fly,\nRender, Surge), the only feedback signal an agent gets out of the\nbox is \"the deploy step exited 0.\" That is not the same as \"the\ndeployed site actually loads.\" Without a post-deploy smoke check\n(curl HTTP 200, Playwright/Puppeteer probe, Lighthouse run, etc.),\nsilent prod regressions \u2014 broken `base` paths, broken SPA 404\nfallbacks, asset 404s, missing data files \u2014 ship green and the\nagent declares \"done.\"\n\nThis rule fires when at least one workflow file references a deploy\nstep, AND no workflow file contains evidence of a smoke check\n(HTTP probe, e2e tool, or `lighthouse` invocation).",
+      "explanation": "Agents reading deploy-workflow output get one signal out of the box\n\u2014 \"deploy step exited 0\" \u2014 which is not the same as \"the deployed\nsite loads,\" so silent prod regressions (broken `base` paths,\nbroken SPA 404 fallbacks, asset 404s, missing data files) ship\ngreen and the agent declares \"done.\" Without a post-deploy smoke\ncheck (curl HTTP 200, Playwright/Puppeteer probe, Lighthouse run,\netc.) the agent has no closed-loop verification that the deploy\nactually shipped a working artefact. This rule catches workflows\nthat ship to hosted environments (GitHub Pages, Netlify, Vercel,\nS3/CloudFront, gh-pages branch, Cloud Run, Fly, Render, Surge)\nwithout a smoke-check step.\n\nThis rule fires when at least one workflow file references a deploy\nstep, AND no workflow file contains evidence of a smoke check\n(HTTP probe, e2e tool, or `lighthouse` invocation).",
       "findings": [],
       "not_measured": false,
       "pillar": "feedback",
@@ -396,7 +396,7 @@
     },
     {
       "check_id": "feedback.test_coverage_hint",
-      "explanation": "Coverage configuration (`.coveragerc`, `codecov.yml`, `coveralls.yml`,\n`pyproject.toml [tool.coverage.*]`) signals that the repo tracks which\ncode is exercised by tests. Agents benefit from knowing what is and\nisn't tested before making a change, so they can target tests\nappropriately. Community-contributed demo rule.",
+      "explanation": "Agents making a change need to know which lines are covered by\ntests so they can target new tests appropriately and avoid adding\nbehaviour into an untested path. Coverage configuration\n(`.coveragerc`, `codecov.yml`, `coveralls.yml`,\n`pyproject.toml [tool.coverage.*]`) is the signal that the repo\ntracks this. Community-contributed demo rule.",
       "findings": [],
       "not_measured": false,
       "pillar": "feedback",
@@ -405,7 +405,7 @@
     },
     {
       "check_id": "hooks.configured",
-      "explanation": "Hooks (pre-commit, husky, lefthook, lint-staged, .claude/settings,\n.cursor/settings) are how a project gives an agent feedback *before*\na commit lands rather than after CI fails. A repo that runs format\n+ lint on every commit cuts the agent's edit/wait/fix loop by an\norder of magnitude.",
+      "explanation": "Agents running an edit/wait/fix loop at CI speed (minutes) bleed\ntime on cosmetic feedback that pre-commit hooks would have caught\nin seconds \u2014 a repo that runs format + lint on every commit cuts\nthat loop by an order of magnitude. Hooks (pre-commit, husky,\nlefthook, lint-staged, .claude/settings, .cursor/settings) are how\nthe project gives the agent that feedback *before* a commit lands\nrather than after CI fails.",
       "findings": [],
       "not_measured": false,
       "pillar": "feedback",
@@ -414,7 +414,7 @@
     },
     {
       "check_id": "lint.configured",
-      "explanation": "A configured linter is the difference between an agent's edit being\nimmediately rejected with a clear error and the same edit silently\ndrifting from house style. Even if the linter is permissive, having\n*a* config tells agents which rules are intentional and which are\ndrift.",
+      "explanation": "Agents writing edits without a configured linter silently drift\nfrom house style \u2014 CI reviewers then spend cycles on cosmetic\nfeedback instead of logic, while the agent never learns which\nrules were intentional vs. accidental. A configured linter makes\nthat boundary explicit; even a permissive linter config is enough\nto tell agents which rules are intentional and which are drift.",
       "findings": [],
       "not_measured": false,
       "pillar": "feedback",
@@ -423,7 +423,7 @@
     },
     {
       "check_id": "manifest.detected",
-      "explanation": "A manifest (`pyproject.toml`, `package.json`, `Cargo.toml`,\n`go.mod`, \u2026) is the contract that tells an agent what the project\nis, how to install it, and what depends on what. Without one, the\nagent has to infer everything from filenames and tribal knowledge.\nThis rule looks for a manifest at the repo root or, for monorepos,\nat depth \u2264 2 (`packages/<name>/pyproject.toml`).",
+      "explanation": "Agents need a manifest (`pyproject.toml`, `package.json`,\n`Cargo.toml`, `go.mod`, \u2026) as the contract telling them what the\nproject is, how to install it, and what depends on what \u2014 without\none, every action becomes guesswork from filenames and tribal\nknowledge. This rule looks for a manifest at the repo root or, for\nmonorepos, at depth \u2264 2 (`packages/<name>/pyproject.toml`).",
       "findings": [],
       "not_measured": false,
       "pillar": "feedback",
@@ -432,7 +432,7 @@
     },
     {
       "check_id": "manifest.lockfile_present",
-      "explanation": "A lockfile pins the exact dependency tree the project was last\nvalidated against. Without one, `pip install` / `npm install` will\nresolve different versions on different machines, so an agent that\ninstalls deps and runs tests can't trust a green run on its laptop\nto predict a green run in CI. Some ecosystems (Cargo, Poetry, npm)\nproduce lockfiles automatically; others (bare requirements.txt) do\nnot, and the project has to opt in.",
+      "explanation": "Agents running `pip install` / `npm install` / `bundle install`\nwithout a lockfile resolve different dependency versions on\ndifferent machines, so a green test run on the agent's laptop\ncan't predict CI's outcome. A lockfile pins the exact tree the\nproject was last validated against; some ecosystems (Cargo,\nPoetry, npm) produce one automatically, others (bare\nrequirements.txt) require the project to opt in.",
       "findings": [
         {
           "action": {
@@ -523,7 +523,7 @@
     },
     {
       "check_id": "typecheck.configured",
-      "explanation": "A type checker catches whole categories of agent errors (missing\nfields, wrong arg shapes, stale imports) before they reach runtime.\nStatically-typed language repos pass automatically; for Python and\nJS this is opt-in but high-leverage.",
+      "explanation": "Agents whose edits ship missing fields, wrong arg shapes, or stale\nimports rely on runtime \u2014 and a partial test run \u2014 to catch the\nregression; a type checker catches whole categories of these\nerrors before runtime. Statically-typed language repos pass\nautomatically; for Python and JS this is opt-in but high-leverage.",
       "findings": [],
       "not_measured": false,
       "pillar": "feedback",
@@ -532,7 +532,7 @@
     },
     {
       "check_id": "branch_rulesets.configured",
-      "explanation": "Branch protection (or the newer \"branch rulesets\") forces PRs to\npass review and CI before they touch the default branch. For an\nagent-driven workflow this is doubly important: it's the only\nguard rail against an agent merging something that looks plausible\nbut breaks production. Without it, \"the agent can write to main\"\nis true, and that's bad.",
+      "explanation": "Agents in repos without branch protection can land an agent-opened\nPR on the default branch without a review or a green CI run \u2014 \"the\nagent can write to main\" is true, and that is the failure mode.\nBranch rulesets (or the older branch-protection rules) force PRs\nto pass review and CI before they touch the default branch; for an\nagent-driven workflow this is doubly important as the only guard\nrail against an agent merging something that looks plausible but\nbreaks production.",
       "findings": [],
       "not_measured": false,
       "pillar": "flow",
@@ -541,7 +541,7 @@
     },
     {
       "check_id": "devcontainer.present",
-      "explanation": "A devcontainer / Nix flake / Gitpod config / Vagrantfile lets an\nagent (or a new contributor) get a reproducible environment without\nhand-installing system deps. The project that ships one cuts the\n\"wrong runtime version\" / \"missing system library\" class of failure\nto zero.",
+      "explanation": "Agents in a fresh sandbox hit \"wrong runtime version\" / \"missing\nsystem library\" within minutes of bring-up and can't recover\nheadlessly without a reproducible environment definition. A\ndevcontainer / Nix flake / Gitpod config / Vagrantfile lets the\nagent (or a new contributor) get that environment without\nhand-installing system deps and cuts the class of failure to zero.",
       "findings": [
         {
           "action": {
@@ -759,7 +759,7 @@
     },
     {
       "check_id": "env.example_parity",
-      "explanation": "When code reads from `.env` (or process environment) but no\n`.env.example` documents the expected keys, headless setup\nbreaks: the agent can't tell which env vars to set before running\ntests or the app. The full check is \"code references env vars,\nAND no .env.example-style file exists, AND no equivalent prose\ndocumentation (``export FOO=`` snippets in README/CONTRIBUTING) is\npresent.\" All three halves must hold to fire \u2014 repos that document\nenv vars in narrative form get credit.",
+      "explanation": "Agents reading `os.environ.get(\"API_KEY\")` in code with no\n`.env.example` (and no equivalent prose in README/CONTRIBUTING)\nhave no way to know API_KEY is required before running tests \u2014\nheadless setup breaks on a missing env var. The full check is\n\"code references env vars, AND no .env.example-style file exists,\nAND no equivalent prose documentation (``export FOO=`` snippets in\nREADME/CONTRIBUTING) is present.\" All three halves must hold to\nfire \u2014 repos that document env vars in narrative form get credit.",
       "findings": [],
       "not_measured": false,
       "pillar": "flow",
@@ -806,7 +806,7 @@
     },
     {
       "check_id": "headless.unrunnable_e2e",
-      "explanation": "This is a composite of three already-shipping signals:\n  - agent_docs.present  (cognitive_load)\n  - entry_points.detected  (flow)\n  - test_command.discoverable  (feedback)\nIndividually any one of them is a soft signal. Together \u2014 when ALL\nTHREE are absent \u2014 the repo is functionally agent-blind: no doc to\nread, no thing to run, no way to verify. Most healthy repos satisfy\nat least one; this rule isolates the worst-case intersection.\n\nNote: the sub-conditions are written as AND-of-misses (each leaf\nmatcher fires explicitly when its signal is missing), not as OR-of-\nalternatives mirrored from the source rules. The source rules use\nOR semantics where the regex clauses default to fire_when=match and\ngo silent when their target file is absent \u2014 which makes those rules\nunder-fire on real repos. We avoid that by being explicit here.",
+      "explanation": "Agents landing in a repo with no agent-targeted docs, no detected\nentry point, and no discoverable test command are functionally\nagent-blind: nothing to read, nothing to run, no way to verify.\nThis rule is the composite of three already-shipping signals \u2014\n  - agent_docs.present  (cognitive_load)\n  - entry_points.detected  (flow)\n  - test_command.discoverable  (feedback)\nand only fires when ALL THREE are absent. Individually any one of\nthem is a soft signal; together their absence is the worst case.\nMost healthy repos satisfy at least one.\n\nNote: the sub-conditions are written as AND-of-misses (each leaf\nmatcher fires explicitly when its signal is missing), not as OR-of-\nalternatives mirrored from the source rules. The source rules use\nOR semantics where the regex clauses default to fire_when=match and\ngo silent when their target file is absent \u2014 which makes those rules\nunder-fire on real repos. We avoid that by being explicit here.",
       "findings": [],
       "not_measured": false,
       "pillar": "flow",
@@ -849,7 +849,7 @@
     },
     {
       "check_id": "setup.command_count",
-      "explanation": "Each command in a README's Setup / Installation section is a place\nthe agent can fail (wrong flag, missing prerequisite, version\nmismatch). Agents succeed at 1-3 setup commands at near-100% and\nfall off a cliff after 5. The rule counts distinct shell commands\nin the setup section's fenced code blocks and shell-prompt lines.",
+      "explanation": "Agents chaining 5+ setup commands from a README fall off a cliff\nafter command 3 \u2014 each command is a place to fail (wrong flag,\nmissing prerequisite, version mismatch), and 1\u20133 succeed at\nnear-100% while 5+ collapse. The rule counts distinct shell\ncommands in the setup section's fenced code blocks and shell-\nprompt lines.",
       "findings": [],
       "not_measured": false,
       "pillar": "flow",
@@ -858,7 +858,7 @@
     },
     {
       "check_id": "templates.present",
-      "explanation": "Issue templates, PR templates, and CODEOWNERS make agent-opened PRs\nroutable: the right reviewer is auto-assigned, the right metadata\nfields are filled in, and the project's expectations are explicit.\nRepos without these get a flood of agent PRs that all look the same\nand have no obvious reviewer.",
+      "explanation": "Agents opening PRs into a repo without issue / PR templates and a\nCODEOWNERS file all look the same, have no obvious reviewer, and\nforce the project to absorb the routing cost on every PR. Issue\ntemplates, PR templates, and CODEOWNERS make those PRs routable:\nthe right reviewer is auto-assigned, the right metadata fields\nare filled in, and the project's expectations are explicit.",
       "findings": [
         {
           "action": {
@@ -964,7 +964,7 @@
     },
     {
       "check_id": "workflow.concurrency_guard",
-      "explanation": "GitHub Actions workflows that push back to their own repo (typical\nfor daily-scan / weekly-rebuild / scheduled data-publishing\npatterns) without a top-level `concurrency:` block can race\nthemselves. Two scheduled runs (or a manual edit colliding with the\ncron) lose one set of changes silently \u2014 the second `git push` is\nrejected by the remote, the workflow exits 0, and the data drift is\ninvisible until a human notices stale dashboards.\n\nThe fix is one block per workflow. For write workflows, prefer\n`cancel-in-progress: false` so the second run waits for the first\nrather than tossing its work.",
+      "explanation": "Agents (and humans) read \"workflow exited 0\" as success \u2014 but two\nscheduled runs of a self-pushing workflow without a top-level\n`concurrency:` block race each other: the second `git push` is\nrejected silently, the workflow exits 0, and one set of changes is\nlost until a human notices stale dashboards. The pattern bites\ndaily-scan / weekly-rebuild / scheduled data-publishing workflows\nmost often (a manual edit colliding with the cron is the second\ncommon trigger).\n\nThe fix is one block per workflow. For write workflows, prefer\n`cancel-in-progress: false` so the second run waits for the first\nrather than tossing its work.",
       "findings": [],
       "not_measured": false,
       "pillar": "flow",
@@ -1014,7 +1014,7 @@
     },
     {
       "check_id": "safety.dependency_automation",
-      "explanation": "Stale dependencies and unscanned third-party code are the most\ncommon path from \"agent merged a small change\" to \"merged a CVE\".\nA repo that declares Dependabot, Renovate, Snyk, FOSSA, Mend, or\nCodeQL gets PRs / alerts for vulnerable transitive deps and unsafe\npatterns automatically, so agents reviewing those PRs can act on\nthem rather than re-discovering the issue from scratch.",
+      "explanation": "Agents merging small changes against stale, unscanned dependencies\nare the most common path from \"merged a small change\" to \"merged a\nCVE\" \u2014 transitive deps drift silently and unsafe third-party code\naccumulates risk. A repo that declares Dependabot, Renovate, Snyk,\nFOSSA, Mend, or CodeQL gets PRs / alerts for vulnerable transitive\ndeps and unsafe patterns automatically, so agents reviewing those\nPRs can act on them rather than re-discovering the issue from\nscratch.",
       "findings": [],
       "not_measured": false,
       "pillar": "safety",
@@ -1057,7 +1057,7 @@
     },
     {
       "check_id": "secrets.basic_scan",
-      "explanation": "Tracked files containing AWS access keys, GitHub tokens, Slack\ntokens, Google API keys, Stripe live keys, or PEM private keys\nare almost always a credential leak. Even rotating after the fact\ndoesn't help \u2014 the leaked secret is in git history forever. This\nrule catches the high-confidence patterns; for full coverage,\nlayer a tool like `gitleaks` (see safety.gitleaks_config) on top.",
+      "explanation": "Agents (and humans) who land a credential into a tracked file are\none push away from public git history \u2014 rotating the secret after\nthe fact doesn't fully help, because the leaked value is in git\nforever. This rule catches the high-confidence patterns (AWS\naccess keys, GitHub tokens, Slack tokens, Google API keys, Stripe\nlive keys, PEM private keys); for full coverage, layer a tool like\n`gitleaks` on top (see `safety.gitleaks_config`).",
       "findings": [],
       "not_measured": false,
       "pillar": "safety",
@@ -1066,7 +1066,7 @@
     },
     {
       "check_id": "security.policy_present",
-      "explanation": "A SECURITY.md (or .github/SECURITY.md / docs/SECURITY.md) tells\nagents and reporters where to send vulnerability disclosures and what\nthe project's response window is. Without it, a coding agent that\nfinds a security issue has no documented escalation path and may\ndefault to opening a public issue.",
+      "explanation": "Agents that find a security issue with no SECURITY.md (or\n.github/SECURITY.md / docs/SECURITY.md) have no documented\nescalation path and may default to opening a public issue,\nleaking the vulnerability before a fix lands. SECURITY.md tells\nagents and reporters where to send vulnerability disclosures and\nwhat the project's response window is.",
       "findings": [
         {
           "action": {
