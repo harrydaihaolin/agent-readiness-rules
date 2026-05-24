@@ -4,9 +4,10 @@
 # with the GitHub Actions run. The Makefile and ci.yml stay in sync via
 # code review; bump both when protocol cuts a new tag.
 #
-# Pinned to protocol v0.4.0 (PR #12) which adds the optional
+# Pinned to protocol v0.6.0 which adds Rule.applies_when (the
+# language-gating selector). v0.4.0 (PR #12) introduced the optional
 # `fix_prompt` field on `Rule` (and `Finding`).
-PROTOCOL_TAG ?= v0.4.0
+PROTOCOL_TAG ?= v0.6.0
 SCHEMA_URL = https://raw.githubusercontent.com/harrydaihaolin/agent-readiness-insights-protocol/$(PROTOCOL_TAG)/schemas/rule.schema.json
 
 schema-fetch:
