@@ -14,9 +14,14 @@ schema-fetch:
 	@echo "Fetching rule.schema.json from agent-readiness-insights-protocol@$(PROTOCOL_TAG)..."
 	curl -fsSL -o rule.schema.json $(SCHEMA_URL)
 
+# Prefer a sibling checkout of agent-readiness-insights-protocol when present
+# (needed for pillars/match types ahead of a published protocol tag).
+_LOCAL_SCHEMA = ../agent-readiness-insights-protocol/schemas/rule.schema.json
+SCHEMA_FILE = $(if $(wildcard $(_LOCAL_SCHEMA)),$(_LOCAL_SCHEMA),rule.schema.json)
+
 validate: schema-fetch
-	@echo "Validating rules against schema..."
-	check-jsonschema --schemafile rule.schema.json rules/**/*.yaml
+	@echo "Validating rules against schema ($(SCHEMA_FILE))..."
+	check-jsonschema --schemafile $(SCHEMA_FILE) rules/**/*.yaml
 
 eval:
 	@echo "Running reference evaluator on agent-readiness-fixtures..."
