@@ -996,24 +996,6 @@
       "weight": 0.5
     },
     {
-      "check_id": "ontology.interface_types_satisfied",
-      "explanation": "Every `implements:` claim on a ratified Object instance must have\nsatisfaction == \"ratified\". Failing claims indicate the repo drifted\naway from its declared contract.",
-      "findings": [],
-      "not_measured": true,
-      "pillar": "ontology",
-      "score": 100.0,
-      "weight": 0.8
-    },
-    {
-      "check_id": "ontology.link_types_referentially_closed",
-      "explanation": "Closure invariant. A ratified Link cannot reference a non-ratified atom.\nDangling endpoints break dependency traversal and release-order functions.",
-      "findings": [],
-      "not_measured": true,
-      "pillar": "ontology",
-      "score": 100.0,
-      "weight": 1.0
-    },
-    {
       "check_id": "ontology.mcp_surface_present",
       "explanation": "When the workspace ships a runnable ontology MCP server, agents can\nprogrammatically introspect the ontology. We accept either the\nstandalone server being present, or the passthrough being declared\nin agent-readiness-mcp/pyproject.toml.",
       "findings": [],
@@ -1025,6 +1007,24 @@
     {
       "check_id": "ontology.object_types_declared",
       "explanation": "An agent-ready workspace declares ratified Object Type definitions\n(Repo, Library, Protocol, RulesPack at minimum) so agents can resolve\nreferences by type rather than by file path.",
+      "findings": [],
+      "not_measured": true,
+      "pillar": "ontology",
+      "score": 100.0,
+      "weight": 1.0
+    },
+    {
+      "check_id": "ontology.interface_types_satisfied",
+      "explanation": "Every `implements:` claim on a ratified Object instance must have\nsatisfaction == \"ratified\". Failing claims indicate the repo drifted\naway from its declared contract.",
+      "findings": [],
+      "not_measured": true,
+      "pillar": "ontology",
+      "score": 100.0,
+      "weight": 0.8
+    },
+    {
+      "check_id": "ontology.link_types_referentially_closed",
+      "explanation": "Closure invariant. A ratified Link cannot reference a non-ratified atom.\nDangling endpoints break dependency traversal and release-order functions.",
       "findings": [],
       "not_measured": true,
       "pillar": "ontology",

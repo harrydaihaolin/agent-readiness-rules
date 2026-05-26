@@ -2,6 +2,7 @@ rules_version: 2
 id: ontology.object_types_declared
 provenance: agent-readiness/ontology.object_types_declared
 pillar: ontology
+namespace: schema
 title: Workspace declares the five Object Types
 weight: 1.0
 severity: warn

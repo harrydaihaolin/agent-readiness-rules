@@ -2,6 +2,7 @@ rules_version: 2
 id: ontology.mcp_surface_present
 provenance: agent-readiness/ontology.mcp_surface_present
 pillar: ontology
+namespace: schema
 title: agent-readiness-ontology-mcp server is reachable
 weight: 1.0
 severity: info

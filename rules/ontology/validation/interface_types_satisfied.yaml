@@ -2,6 +2,7 @@ rules_version: 2
 id: ontology.interface_types_satisfied
 provenance: agent-readiness/ontology.interface_types_satisfied
 pillar: ontology
+namespace: validation
 title: Declared Interface claims pass their satisfaction proofs
 weight: 0.8
 severity: warn

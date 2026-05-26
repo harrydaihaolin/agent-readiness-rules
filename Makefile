@@ -4,13 +4,15 @@
 # with the GitHub Actions run. The Makefile and ci.yml stay in sync via
 # code review; bump both when protocol cuts a new tag.
 #
-# Pinned to protocol v0.8.2 which adds the `ontology` value to the
-# Pillar enum (introduced in v0.8.1 alongside the Ontology pillar
-# primitives + Lifecycle + ProposalEnvelope + DriftReport). Required
-# for the M3.5 `rules/ontology/*.yaml` rules to validate. v0.6.0 added
-# Rule.applies_when (the language-gating selector); v0.4.0 (PR #12)
-# introduced the optional `fix_prompt` field on `Rule` (and `Finding`).
-PROTOCOL_TAG ?= v0.8.2
+# Pinned to protocol v0.8.3 which adds the optional `Rule.namespace`
+# field (Literal["schema", "validation"] | None) — required for the
+# Ontology pillar's declarative-vs-prescriptive register split.
+# v0.8.2 added `ontology` to the Pillar enum; v0.8.1 shipped the
+# Ontology pillar primitives + Lifecycle + ProposalEnvelope +
+# DriftReport. v0.6.0 added Rule.applies_when (language-gating
+# selector); v0.4.0 (PR #12) introduced the optional `fix_prompt`
+# field on `Rule` (and `Finding`).
+PROTOCOL_TAG ?= v0.8.3
 SCHEMA_URL = https://raw.githubusercontent.com/harrydaihaolin/agent-readiness-insights-protocol/$(PROTOCOL_TAG)/schemas/rule.schema.json
 
 schema-fetch:
@@ -24,7 +26,12 @@ SCHEMA_FILE = $(if $(wildcard $(_LOCAL_SCHEMA)),$(_LOCAL_SCHEMA),rule.schema.jso
 
 validate: schema-fetch
 	@echo "Validating rules against schema ($(SCHEMA_FILE))..."
-	check-jsonschema --schemafile $(SCHEMA_FILE) rules/**/*.yaml
+	# Use `find` instead of `rules/**/*.yaml` so we pick up files
+	# nested arbitrarily deep — bash on Ubuntu (CI) does not enable
+	# globstar by default, so `**` collapses to a single-level glob
+	# and silently misses `rules/ontology/{schema,validation}/*.yaml`
+	# introduced by the A1 namespace split.
+	check-jsonschema --schemafile $(SCHEMA_FILE) $$(find rules -name '*.yaml')
 
 eval:
 	@echo "Running reference evaluator on agent-readiness-fixtures..."
