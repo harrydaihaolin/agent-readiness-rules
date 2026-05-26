@@ -14,9 +14,11 @@ env:
   # protocol main can't red rules CI overnight. Bump deliberately when
   # the protocol cuts a new tag. See AGENTS.md for bump cadence.
   #
-  # Pinned to protocol v0.3.0 (PR #11) — `provenance:` is now schema-
-  # required on every rule.
-  PROTOCOL_TAG: v0.6.0
+  # Pinned to protocol v0.8.2 — adds `ontology` to the Pillar enum
+  # (introduced in v0.8.1) so the M3.5 `rules/ontology/*.yaml` rules
+  # validate. v0.6.0 added `applies_when`; v0.3.0 (PR #11) made
+  # `provenance:` schema-required on every rule.
+  PROTOCOL_TAG: v0.8.2
   FIXTURES_TAG: v1.0.0
   # Engine `main` carries the EXP-1 action-contract change (#64) and
   # the v2.0.0 release. Pinning to main keeps reference-eval honest
