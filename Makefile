@@ -4,10 +4,13 @@
 # with the GitHub Actions run. The Makefile and ci.yml stay in sync via
 # code review; bump both when protocol cuts a new tag.
 #
-# Pinned to protocol v0.6.0 which adds Rule.applies_when (the
-# language-gating selector). v0.4.0 (PR #12) introduced the optional
-# `fix_prompt` field on `Rule` (and `Finding`).
-PROTOCOL_TAG ?= v0.6.0
+# Pinned to protocol v0.8.2 which adds the `ontology` value to the
+# Pillar enum (introduced in v0.8.1 alongside the Ontology pillar
+# primitives + Lifecycle + ProposalEnvelope + DriftReport). Required
+# for the M3.5 `rules/ontology/*.yaml` rules to validate. v0.6.0 added
+# Rule.applies_when (the language-gating selector); v0.4.0 (PR #12)
+# introduced the optional `fix_prompt` field on `Rule` (and `Finding`).
+PROTOCOL_TAG ?= v0.8.2
 SCHEMA_URL = https://raw.githubusercontent.com/harrydaihaolin/agent-readiness-insights-protocol/$(PROTOCOL_TAG)/schemas/rule.schema.json
 
 schema-fetch:
