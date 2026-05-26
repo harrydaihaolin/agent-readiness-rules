@@ -3,6 +3,7 @@ id: ontology.function_types_typed
 provenance: agent-readiness/ontology.function_types_typed
 pillar: ontology
 namespace: schema
+confidence: high
 title: Functions are typed and implemented
 weight: 0.5
 severity: info

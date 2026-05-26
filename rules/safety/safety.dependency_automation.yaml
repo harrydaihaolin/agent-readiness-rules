@@ -2,6 +2,7 @@ rules_version: 2
 id: safety.dependency_automation
 provenance: agent-readiness/safety.dependency_automation
 pillar: safety
+confidence: high
 title: Automated dependency / vulnerability scanning configured
 weight: 1.0
 severity: warn

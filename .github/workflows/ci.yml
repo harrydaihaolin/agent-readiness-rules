@@ -14,12 +14,14 @@ env:
   # protocol main can't red rules CI overnight. Bump deliberately when
   # the protocol cuts a new tag. See AGENTS.md for bump cadence.
   #
-  # Pinned to protocol v0.8.3 — adds the optional `Rule.namespace`
-  # field (Literal["schema", "validation"] | None) for the Ontology
-  # pillar's declarative-vs-prescriptive register split. v0.8.2 added
-  # `ontology` to the Pillar enum; v0.6.0 added `applies_when`;
-  # v0.3.0 (PR #11) made `provenance:` schema-required on every rule.
-  PROTOCOL_TAG: v0.8.3
+  # Pinned to protocol v0.9.0 — adds the optional `Rule.confidence`
+  # field (Literal["high","medium","low"], default "medium") used by
+  # the per-rule confidence audit in this release, plus the
+  # Gap/Clarification/Assumption models the MCP server's v0.6 tools
+  # persist. v0.8.3 added Rule.namespace; v0.8.2 added `ontology` to
+  # the Pillar enum; v0.6.0 added `applies_when`; v0.3.0 (PR #11)
+  # made `provenance:` schema-required on every rule.
+  PROTOCOL_TAG: v0.9.0
   FIXTURES_TAG: v1.0.0
   # Engine `main` carries the EXP-1 action-contract change (#64) and
   # the v2.0.0 release. Pinning to main keeps reference-eval honest

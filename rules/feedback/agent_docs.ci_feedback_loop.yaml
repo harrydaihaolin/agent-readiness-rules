@@ -2,6 +2,7 @@ rules_version: 2
 id: agent_docs.ci_feedback_loop
 provenance: agent-readiness/agent_docs.ci_feedback_loop
 pillar: feedback
+confidence: high
 title: AGENTS.md documents CI monitoring as feedback
 weight: 0.75
 severity: warn

@@ -1,0 +1,54 @@
+rules_version: 2
+id: ontology.gaps_unresolved
+provenance: agent-readiness/ontology.gaps_unresolved
+pillar: ontology
+namespace: validation
+confidence: high
+title: Workspace has no unresolved gaps recorded by agent sessions
+severity: warn
+weight: 1.0
+explanation: |
+  When an agent calls `record_gap()` (via the MCP server's
+  `record_gap_tool` or `agent-readiness gap record` CLI) it commits
+  to surfacing what it couldn't confidently resolve. A workspace
+  with unresolved gaps has open agent-flagged ambiguities — review
+  them before merging agent-authored changes.
+
+  This rule reads `.agent-readiness/gaps.jsonl` from the repo root
+  (the file the MCP server's gap-aware tools write to) and emits
+  one finding per unresolved Gap row. Clarifications and Assumptions
+  in the same file are informational and don't fire findings.
+match:
+  type: gaps_jsonl_unresolved
+fix_hint: |
+  Review and resolve each gap. Run `agent-readiness gap list` to
+  see them, then `agent-readiness gap resolve <id>` once the
+  underlying ambiguity has been addressed (e.g. the candidate
+  resolution applied, the manifest field filled in, the interface
+  picked).
+insight_query: agent-recorded gap unresolved review
+action:
+  kind: run_command
+  command: agent-readiness gap list
+  description: |
+    Lists every unresolved Gap recorded for this workspace. Pair the
+    output with `agent-readiness gap resolve <id>` once each
+    underlying ambiguity has been addressed.
+verify:
+  command: "test ! -f .agent-readiness/gaps.jsonl || ! grep -q '\"resolved\": false' .agent-readiness/gaps.jsonl"
+  description: |
+    Verify passes when either: (a) no gaps file exists, or
+    (b) every line in the gaps file has resolved set to true
+    (or omits the key — defensive against older rows).
+fix_prompt: |
+  An agent session recorded one or more gaps it couldn't confidently
+  resolve. Run `agent-readiness gap list` to see them, then for each:
+
+    1. Investigate the underlying ambiguity (the gap's `detail` and
+       `candidate_resolutions` explain what the agent was stuck on).
+    2. Apply one of the candidates (or a different fix you reason
+       through).
+    3. Run `agent-readiness gap resolve <id>` to mark it resolved.
+
+  The resolved gaps stay in `.agent-readiness/gaps.jsonl` for audit
+  but no longer cost the workspace score.

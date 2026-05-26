@@ -3,6 +3,7 @@ id: ontology.repos_enumerated
 provenance: agent-readiness/ontology.repos_enumerated
 pillar: ontology
 namespace: validation
+confidence: medium
 title: All git children of the workspace appear as ratified Repo instances
 weight: 1.0
 severity: error

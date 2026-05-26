@@ -79,3 +79,41 @@ SHA so the diff is greppable. Do not pin to `main`.
 - `explanation` short and points at an agent failure mode.
 - `insight_query` is a free-text hint the engine uses for RAG retrieval.
 - Severity is `warn` by default; reserve `error` for safety pillar.
+
+## Confidence audit (Bundle B, protocol v0.9.0+)
+
+Every rule carries a `confidence:` field (`high` / `medium` / `low`,
+default `medium` at the protocol layer) that drives the engine's
+`apply_top_action` branching in `agent-readiness >= 3.2.0`:
+
+| Value    | What `apply_top_action` does                                     |
+| -------- | ---------------------------------------------------------------- |
+| `high`   | Applies the structured fix as it always did.                     |
+| `medium` | Refuses to mutate; returns `confirm_required` so a human can OK. |
+| `low`    | Refuses to mutate; returns `gap_payload` so a Gap is recorded.   |
+
+The existing rule set was bulk-audited in the same PR that pinned
+`PROTOCOL_TAG` to v0.9.0. Default for **new** rules is the protocol
+default (`medium`); rule authors must opt in to `high` deliberately
+once their fix is well-tested across the fixture matrix. The audit
+floor:
+
+- **`high`** for rules whose `match.type` is **declarative**:
+  - `path_glob`, `manifest_introspection`, `command_in_makefile`
+  - `composite` (composed of declarative children)
+  - `gaps_jsonl_unresolved` (deterministic JSONL read)
+- **`medium`** for rules whose `match.type` is **heuristic, regex, or
+  count-based** — these can false-positive on edge-case repos and
+  shouldn't silently mutate:
+  - `ast_complexity`, `git_log_query`, `cross_file_consistency`,
+    `naming_search`, `prompt_scan`, `regex_secret_scan`,
+    `tree_aggregate`, `setup_command_count`, `file_size`,
+    `gitignore_coverage`, `secret_scanning_config`, `gh_cli_query`
+  - `ontology_instance_count`, `ontology_ref_closure`,
+    `ontology_interface_satisfaction` (graph traversals that depend
+    on the workspace's ontology being correctly declared first)
+- **`low`** is unused for the OSS rule set today. Reserve for future
+  rules whose auto-fix is genuinely ambiguous (e.g. "pick one of N
+  candidate object types"); in those cases the rule author should
+  populate `fix_hint` with the candidate set so the engine's
+  `apply_top_action` can surface them in the `gap_payload`.

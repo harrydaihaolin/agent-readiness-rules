@@ -2,6 +2,7 @@ rules_version: 2
 id: headless.unrunnable_e2e
 provenance: agent-readiness/headless.unrunnable_e2e
 pillar: flow
+confidence: high
 title: Repo is unrunnable end-to-end by an agent
 # Heaviest single rule in the pack — this is the "all three load-bearing
 # affordances are missing" composite. If this fires, an agent landing in

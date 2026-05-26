@@ -2,6 +2,7 @@ rules_version: 2
 id: test_command.discoverable
 provenance: agent-readiness/test_command.discoverable
 pillar: feedback
+confidence: high
 title: Test command is statically discoverable
 weight: 2.0
 severity: warn
