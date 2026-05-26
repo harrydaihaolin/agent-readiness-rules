@@ -52,6 +52,7 @@
             "template": "# Contributing\n\n## Setup\n`make install`\n\n## Test\n`make test`\n\n## Lint\n`make lint`\n\n## Submitting changes\nFork, branch, PR. CI must be green before review.\n"
           },
           "check_id": "docs.contributing_guide",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Add a CONTRIBUTING.md describing branch naming, commit style,\nrequired local checks, and the PR review flow.\n",
           "fix_prompt": "Without this, an agent has to infer branch naming, commit style, and\nPR conventions from `git log` and gets them wrong on small repos.\n\nCreate `CONTRIBUTING.md` at the repo root. Document: (1) branch naming\n(e.g. `feat/<slug>`, `fix/<slug>`), (2) commit message style (imperative\nmood, one logical change per commit), (3) the local checks that must\npass before pushing (cite your canonical lint and test commands), and\n(4) the PR review flow. Keep it under 80 lines.\n\nVerify with: `test -f CONTRIBUTING.md`\n",
@@ -149,6 +150,7 @@
             "template": "# Agents guide\n\n## Feedback loop\n\n- Preview locally: `make ci-local` (or your project's equivalent)\n- Re-run the failing CI step from CLI:\n  - GitHub Actions: `gh run rerun --failed`\n  - GitLab CI: `glab ci retry`\n  - CircleCI: `circleci local execute`\n- CI artifacts are uploaded to the provider's run page.\n"
           },
           "check_id": "agent_docs.ci_feedback_loop",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Add a short \"CI and the feedback loop\" section to `AGENTS.md`: after\npushing or updating a PR, monitor workflow / PR check results; when CI\nfails, use logs as signal, fix the root cause, and iterate until green.\n",
           "fix_prompt": "Without this, an agent pushes a PR and declares \"done\" without checking\nwhether CI went red \u2014 the feedback loop is open-circuited.\n\nAppend a `## CI and the feedback loop` section to `AGENTS.md`. State\nexplicitly: \"After you push or update a PR, monitor your CI provider's\nrun/check results (GitHub Actions, GitLab CI, CircleCI, Jenkins,\nBuildKite, or whatever your repo uses) and treat failing checks as\nsignal to act on, not noise. When CI fails, read the logs, fix the\nroot cause, and push follow-up commits. Do not stop while checks are\nred.\"\n\nCite the canonical command an agent should run to inspect runs. For\nGitHub Actions: `gh run watch`. For GitLab: `glab ci status`. For\nCircleCI: `circleci local execute` (preview) or the PR's checks tab.\nFor Jenkins: the build URL in the PR. Pick whichever matches the CI\nprovider this repo uses.\n\nVerify with: `grep -i 'feedback\\|ci\\|workflow' AGENTS.md`\n",
@@ -188,6 +190,7 @@
             "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: npm test\n"
           },
           "check_id": "ci.configured",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Drop a CI workflow that installs deps, runs the test command, and\nreports status to PRs. The default scaffold writes\n`.github/workflows/ci.yml`, but any of the 25+ providers detected\nby this rule counts \u2014 pick whatever your hosting platform supports\nnatively. Even a 20-line config is worth more than nothing: the\nagent gets red/green feedback per push. If you use a hosted CI\nwith no in-repo file (BuildKite cloud, TeamCity hosted, Jenkins on\na remote server), add a status badge to your README so the loop is\nvisible to agents.\n",
           "fix_prompt": "Without this, an agent's \"tests pass on my laptop\" never gets\nchallenged by a clean-checkout run and silent regressions ship.\n\nPick the CI provider that matches your hosting platform and check\nin its config. The fastest path for most repos in 2026 is\n`.github/workflows/ci.yml` (GitHub Actions) with three steps:\n`actions/checkout@v4`, install dependencies for javascript\nwith `npm install`, then run\n`npm test`. Trigger on `pull_request` and on `push`\nto `main`.\n\nEquivalent canonical config paths in other providers (use whichever\nmatches your platform): `.gitlab-ci.yml` (GitLab CI), `.circleci/config.yml`\n(CircleCI), `Jenkinsfile` (Jenkins), `azure-pipelines.yml` (Azure),\n`bitbucket-pipelines.yml` (Bitbucket), `buildspec.yml` (AWS\nCodeBuild), `.drone.yml` (Drone), `.woodpecker.yml` (Woodpecker),\n`cloudbuild.yaml` (GCP Cloud Build), `codemagic.yaml` (Codemagic),\n`.travis.yml` (Travis), `.buildkite/pipeline.yml` (BuildKite),\n`tekton/*.yaml`, `Earthfile`. Any of these closes the loop.\n\nEven a 20-line config is worth more than nothing. If you already\nuse a hosted CI without an in-repo file, add a status badge to\n`README.md` so the loop is visible to agents.\n\nVerify with: `test -f .github/workflows/ci.yml`\n",
@@ -217,6 +220,7 @@
             "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: npm test\n"
           },
           "check_id": "ci.configured",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Drop a CI workflow that installs deps, runs the test command, and\nreports status to PRs. The default scaffold writes\n`.github/workflows/ci.yml`, but any of the 25+ providers detected\nby this rule counts \u2014 pick whatever your hosting platform supports\nnatively. Even a 20-line config is worth more than nothing: the\nagent gets red/green feedback per push. If you use a hosted CI\nwith no in-repo file (BuildKite cloud, TeamCity hosted, Jenkins on\na remote server), add a status badge to your README so the loop is\nvisible to agents.\n",
           "fix_prompt": "Without this, an agent's \"tests pass on my laptop\" never gets\nchallenged by a clean-checkout run and silent regressions ship.\n\nPick the CI provider that matches your hosting platform and check\nin its config. The fastest path for most repos in 2026 is\n`.github/workflows/ci.yml` (GitHub Actions) with three steps:\n`actions/checkout@v4`, install dependencies for javascript\nwith `npm install`, then run\n`npm test`. Trigger on `pull_request` and on `push`\nto `main`.\n\nEquivalent canonical config paths in other providers (use whichever\nmatches your platform): `.gitlab-ci.yml` (GitLab CI), `.circleci/config.yml`\n(CircleCI), `Jenkinsfile` (Jenkins), `azure-pipelines.yml` (Azure),\n`bitbucket-pipelines.yml` (Bitbucket), `buildspec.yml` (AWS\nCodeBuild), `.drone.yml` (Drone), `.woodpecker.yml` (Woodpecker),\n`cloudbuild.yaml` (GCP Cloud Build), `codemagic.yaml` (Codemagic),\n`.travis.yml` (Travis), `.buildkite/pipeline.yml` (BuildKite),\n`tekton/*.yaml`, `Earthfile`. Any of these closes the loop.\n\nEven a 20-line config is worth more than nothing. If you already\nuse a hosted CI without an in-repo file, add a status badge to\n`README.md` so the loop is visible to agents.\n\nVerify with: `test -f .github/workflows/ci.yml`\n",
@@ -246,6 +250,7 @@
             "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: npm test\n"
           },
           "check_id": "ci.configured",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Drop a CI workflow that installs deps, runs the test command, and\nreports status to PRs. The default scaffold writes\n`.github/workflows/ci.yml`, but any of the 25+ providers detected\nby this rule counts \u2014 pick whatever your hosting platform supports\nnatively. Even a 20-line config is worth more than nothing: the\nagent gets red/green feedback per push. If you use a hosted CI\nwith no in-repo file (BuildKite cloud, TeamCity hosted, Jenkins on\na remote server), add a status badge to your README so the loop is\nvisible to agents.\n",
           "fix_prompt": "Without this, an agent's \"tests pass on my laptop\" never gets\nchallenged by a clean-checkout run and silent regressions ship.\n\nPick the CI provider that matches your hosting platform and check\nin its config. The fastest path for most repos in 2026 is\n`.github/workflows/ci.yml` (GitHub Actions) with three steps:\n`actions/checkout@v4`, install dependencies for javascript\nwith `npm install`, then run\n`npm test`. Trigger on `pull_request` and on `push`\nto `main`.\n\nEquivalent canonical config paths in other providers (use whichever\nmatches your platform): `.gitlab-ci.yml` (GitLab CI), `.circleci/config.yml`\n(CircleCI), `Jenkinsfile` (Jenkins), `azure-pipelines.yml` (Azure),\n`bitbucket-pipelines.yml` (Bitbucket), `buildspec.yml` (AWS\nCodeBuild), `.drone.yml` (Drone), `.woodpecker.yml` (Woodpecker),\n`cloudbuild.yaml` (GCP Cloud Build), `codemagic.yaml` (Codemagic),\n`.travis.yml` (Travis), `.buildkite/pipeline.yml` (BuildKite),\n`tekton/*.yaml`, `Earthfile`. Any of these closes the loop.\n\nEven a 20-line config is worth more than nothing. If you already\nuse a hosted CI without an in-repo file, add a status badge to\n`README.md` so the loop is visible to agents.\n\nVerify with: `test -f .github/workflows/ci.yml`\n",
@@ -275,6 +280,7 @@
             "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: npm test\n"
           },
           "check_id": "ci.configured",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Drop a CI workflow that installs deps, runs the test command, and\nreports status to PRs. The default scaffold writes\n`.github/workflows/ci.yml`, but any of the 25+ providers detected\nby this rule counts \u2014 pick whatever your hosting platform supports\nnatively. Even a 20-line config is worth more than nothing: the\nagent gets red/green feedback per push. If you use a hosted CI\nwith no in-repo file (BuildKite cloud, TeamCity hosted, Jenkins on\na remote server), add a status badge to your README so the loop is\nvisible to agents.\n",
           "fix_prompt": "Without this, an agent's \"tests pass on my laptop\" never gets\nchallenged by a clean-checkout run and silent regressions ship.\n\nPick the CI provider that matches your hosting platform and check\nin its config. The fastest path for most repos in 2026 is\n`.github/workflows/ci.yml` (GitHub Actions) with three steps:\n`actions/checkout@v4`, install dependencies for javascript\nwith `npm install`, then run\n`npm test`. Trigger on `pull_request` and on `push`\nto `main`.\n\nEquivalent canonical config paths in other providers (use whichever\nmatches your platform): `.gitlab-ci.yml` (GitLab CI), `.circleci/config.yml`\n(CircleCI), `Jenkinsfile` (Jenkins), `azure-pipelines.yml` (Azure),\n`bitbucket-pipelines.yml` (Bitbucket), `buildspec.yml` (AWS\nCodeBuild), `.drone.yml` (Drone), `.woodpecker.yml` (Woodpecker),\n`cloudbuild.yaml` (GCP Cloud Build), `codemagic.yaml` (Codemagic),\n`.travis.yml` (Travis), `.buildkite/pipeline.yml` (BuildKite),\n`tekton/*.yaml`, `Earthfile`. Any of these closes the loop.\n\nEven a 20-line config is worth more than nothing. If you already\nuse a hosted CI without an in-repo file, add a status badge to\n`README.md` so the loop is visible to agents.\n\nVerify with: `test -f .github/workflows/ci.yml`\n",
@@ -304,6 +310,7 @@
             "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: npm test\n"
           },
           "check_id": "ci.configured",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Drop a CI workflow that installs deps, runs the test command, and\nreports status to PRs. The default scaffold writes\n`.github/workflows/ci.yml`, but any of the 25+ providers detected\nby this rule counts \u2014 pick whatever your hosting platform supports\nnatively. Even a 20-line config is worth more than nothing: the\nagent gets red/green feedback per push. If you use a hosted CI\nwith no in-repo file (BuildKite cloud, TeamCity hosted, Jenkins on\na remote server), add a status badge to your README so the loop is\nvisible to agents.\n",
           "fix_prompt": "Without this, an agent's \"tests pass on my laptop\" never gets\nchallenged by a clean-checkout run and silent regressions ship.\n\nPick the CI provider that matches your hosting platform and check\nin its config. The fastest path for most repos in 2026 is\n`.github/workflows/ci.yml` (GitHub Actions) with three steps:\n`actions/checkout@v4`, install dependencies for javascript\nwith `npm install`, then run\n`npm test`. Trigger on `pull_request` and on `push`\nto `main`.\n\nEquivalent canonical config paths in other providers (use whichever\nmatches your platform): `.gitlab-ci.yml` (GitLab CI), `.circleci/config.yml`\n(CircleCI), `Jenkinsfile` (Jenkins), `azure-pipelines.yml` (Azure),\n`bitbucket-pipelines.yml` (Bitbucket), `buildspec.yml` (AWS\nCodeBuild), `.drone.yml` (Drone), `.woodpecker.yml` (Woodpecker),\n`cloudbuild.yaml` (GCP Cloud Build), `codemagic.yaml` (Codemagic),\n`.travis.yml` (Travis), `.buildkite/pipeline.yml` (BuildKite),\n`tekton/*.yaml`, `Earthfile`. Any of these closes the loop.\n\nEven a 20-line config is worth more than nothing. If you already\nuse a hosted CI without an in-repo file, add a status badge to\n`README.md` so the loop is visible to agents.\n\nVerify with: `test -f .github/workflows/ci.yml`\n",
@@ -383,6 +390,7 @@
             "kind": "run_command"
           },
           "check_id": "manifest.lockfile_present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Run `poetry lock` / `npm install` / `cargo update` (whichever your\nmanifest needs) and commit the resulting lockfile. For pip-only\nPython projects, freezing `requirements.txt` to exact versions or\nswitching to `uv` / `poetry` is acceptable.\n",
           "fix_prompt": "Without this, `pip install` / `npm install` / `bundle install`\nresolves different versions on different machines and the agent's\ngreen run on its laptop can't predict CI's outcome.\n\nGenerate and commit a lockfile using your package manager\n(your package manager). Canonical lock commands by ecosystem:\n\n- uv:      `uv lock`\n- poetry:  `poetry lock`\n- pipenv:  `pipenv lock`\n- pdm:     `pdm lock`\n- npm:     `npm install --package-lock-only`\n- pnpm:    `pnpm install --lockfile-only`\n- yarn:    `yarn install --mode=update-lockfile`\n- bun:     `bun install --frozen-lockfile`\n- cargo:   `cargo generate-lockfile`\n- bundler: `bundle lock`\n- composer:`composer update --lock`\n- go:      `go mod tidy` (regenerates `go.sum`)\n- mix:     `mix deps.get` (writes `mix.lock`)\n\nFor bare-pip Python projects with no lockfile tooling, either switch\nto `uv` or `poetry` for a real lockfile, or pin `requirements.txt`\nto exact versions with `pip freeze > requirements.txt`.\n\nVerify with: `test -f uv.lock || test -f poetry.lock || test -f Pipfile.lock || test -f pdm.lock || test -f package-lock.json || test -f yarn.lock || test -f pnpm-lock.yaml || test -f bun.lock || test -f bun.lockb || test -f Cargo.lock || test -f Gemfile.lock || test -f composer.lock || test -f go.sum || test -f mix.lock`\n",
@@ -407,6 +415,7 @@
             "kind": "run_command"
           },
           "check_id": "manifest.lockfile_present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Run `poetry lock` / `npm install` / `cargo update` (whichever your\nmanifest needs) and commit the resulting lockfile. For pip-only\nPython projects, freezing `requirements.txt` to exact versions or\nswitching to `uv` / `poetry` is acceptable.\n",
           "fix_prompt": "Without this, `pip install` / `npm install` / `bundle install`\nresolves different versions on different machines and the agent's\ngreen run on its laptop can't predict CI's outcome.\n\nGenerate and commit a lockfile using your package manager\n(your package manager). Canonical lock commands by ecosystem:\n\n- uv:      `uv lock`\n- poetry:  `poetry lock`\n- pipenv:  `pipenv lock`\n- pdm:     `pdm lock`\n- npm:     `npm install --package-lock-only`\n- pnpm:    `pnpm install --lockfile-only`\n- yarn:    `yarn install --mode=update-lockfile`\n- bun:     `bun install --frozen-lockfile`\n- cargo:   `cargo generate-lockfile`\n- bundler: `bundle lock`\n- composer:`composer update --lock`\n- go:      `go mod tidy` (regenerates `go.sum`)\n- mix:     `mix deps.get` (writes `mix.lock`)\n\nFor bare-pip Python projects with no lockfile tooling, either switch\nto `uv` or `poetry` for a real lockfile, or pin `requirements.txt`\nto exact versions with `pip freeze > requirements.txt`.\n\nVerify with: `test -f uv.lock || test -f poetry.lock || test -f Pipfile.lock || test -f pdm.lock || test -f package-lock.json || test -f yarn.lock || test -f pnpm-lock.yaml || test -f bun.lock || test -f bun.lockb || test -f Cargo.lock || test -f Gemfile.lock || test -f composer.lock || test -f go.sum || test -f mix.lock`\n",
@@ -431,6 +440,7 @@
             "kind": "run_command"
           },
           "check_id": "manifest.lockfile_present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Run `poetry lock` / `npm install` / `cargo update` (whichever your\nmanifest needs) and commit the resulting lockfile. For pip-only\nPython projects, freezing `requirements.txt` to exact versions or\nswitching to `uv` / `poetry` is acceptable.\n",
           "fix_prompt": "Without this, `pip install` / `npm install` / `bundle install`\nresolves different versions on different machines and the agent's\ngreen run on its laptop can't predict CI's outcome.\n\nGenerate and commit a lockfile using your package manager\n(your package manager). Canonical lock commands by ecosystem:\n\n- uv:      `uv lock`\n- poetry:  `poetry lock`\n- pipenv:  `pipenv lock`\n- pdm:     `pdm lock`\n- npm:     `npm install --package-lock-only`\n- pnpm:    `pnpm install --lockfile-only`\n- yarn:    `yarn install --mode=update-lockfile`\n- bun:     `bun install --frozen-lockfile`\n- cargo:   `cargo generate-lockfile`\n- bundler: `bundle lock`\n- composer:`composer update --lock`\n- go:      `go mod tidy` (regenerates `go.sum`)\n- mix:     `mix deps.get` (writes `mix.lock`)\n\nFor bare-pip Python projects with no lockfile tooling, either switch\nto `uv` or `poetry` for a real lockfile, or pin `requirements.txt`\nto exact versions with `pip freeze > requirements.txt`.\n\nVerify with: `test -f uv.lock || test -f poetry.lock || test -f Pipfile.lock || test -f pdm.lock || test -f package-lock.json || test -f yarn.lock || test -f pnpm-lock.yaml || test -f bun.lock || test -f bun.lockb || test -f Cargo.lock || test -f Gemfile.lock || test -f composer.lock || test -f go.sum || test -f mix.lock`\n",
@@ -497,6 +507,7 @@
             "template": "{\n  \"name\": \"{primary_language} dev\",\n  \"image\": \"mcr.microsoft.com/devcontainers/{primary_language}:1\",\n  \"postCreateCommand\": \"make install\"\n}\n"
           },
           "check_id": "devcontainer.present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Drop a minimal `.devcontainer/devcontainer.json` referencing a\nMicrosoft base image plus `postCreateCommand: pip install -e .`.\nFor Nix shops, `flake.nix` with a dev shell is the equivalent.\n",
           "fix_prompt": "Without this, an agent in a fresh sandbox hits \"wrong runtime version\"\n/ \"missing system library\" within minutes of bring-up and can't\nrecover headlessly.\n\nCreate `.devcontainer/devcontainer.json` for this javascript\nproject. Microsoft publishes language-specific base images at\n`mcr.microsoft.com/devcontainers/<lang>:1` for python, javascript-node,\ntypescript-node, go, rust, java, dotnet, ruby, php, etc. Pick the one\nthat matches javascript; fall back to\n`mcr.microsoft.com/devcontainers/base:ubuntu` plus a `features:` block\nif no language-specific image fits. Set `postCreateCommand` to your\ncanonical install command (mirror what's in `AGENTS.md` \u2014 for example\n`npm install`). Add the VS Code / Cursor extensions\nyou actually use to `customizations.vscode.extensions`.\n\nFor Nix shops, `flake.nix` with a `devShell` is the equivalent;\nfor Gitpod, `.gitpod.yml` + `.gitpod.Dockerfile`; for tool-version\nmanagers, `.tool-versions` (asdf/mise) is the lightest-weight option.\n\nVerify with: `test -f .devcontainer/devcontainer.json`\n",
@@ -526,6 +537,7 @@
             "template": "{\n  \"name\": \"{primary_language} dev\",\n  \"image\": \"mcr.microsoft.com/devcontainers/{primary_language}:1\",\n  \"postCreateCommand\": \"make install\"\n}\n"
           },
           "check_id": "devcontainer.present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Drop a minimal `.devcontainer/devcontainer.json` referencing a\nMicrosoft base image plus `postCreateCommand: pip install -e .`.\nFor Nix shops, `flake.nix` with a dev shell is the equivalent.\n",
           "fix_prompt": "Without this, an agent in a fresh sandbox hits \"wrong runtime version\"\n/ \"missing system library\" within minutes of bring-up and can't\nrecover headlessly.\n\nCreate `.devcontainer/devcontainer.json` for this javascript\nproject. Microsoft publishes language-specific base images at\n`mcr.microsoft.com/devcontainers/<lang>:1` for python, javascript-node,\ntypescript-node, go, rust, java, dotnet, ruby, php, etc. Pick the one\nthat matches javascript; fall back to\n`mcr.microsoft.com/devcontainers/base:ubuntu` plus a `features:` block\nif no language-specific image fits. Set `postCreateCommand` to your\ncanonical install command (mirror what's in `AGENTS.md` \u2014 for example\n`npm install`). Add the VS Code / Cursor extensions\nyou actually use to `customizations.vscode.extensions`.\n\nFor Nix shops, `flake.nix` with a `devShell` is the equivalent;\nfor Gitpod, `.gitpod.yml` + `.gitpod.Dockerfile`; for tool-version\nmanagers, `.tool-versions` (asdf/mise) is the lightest-weight option.\n\nVerify with: `test -f .devcontainer/devcontainer.json`\n",
@@ -573,6 +585,7 @@
             "kind": "run_command"
           },
           "check_id": "git.has_history",
+          "confidence": "medium",
           "file": null,
           "fix_hint": "If you imported the project as a single squash, re-import preserving\nhistory (`git filter-repo` or a fresh clone of the source). For new\nprojects, just keep committing \u2014 agents need the trail.\n",
           "fix_prompt": "Without this, an agent that needs to backport, revert, or bisect has\nno commit trail \u2014 every change is a mystery.\n\nIf the repo was imported as a single squash, re-import preserving\nhistory with `git filter-repo` or a fresh clone of the source. For a\ngenuinely new project, just keep committing in small logical chunks\n(one logical change per commit, imperative-mood messages) until you\nhave at least 5 real commits. For shallow clones the rule emits\n`not_measured` rather than firing \u2014 re-clone with full depth to get\na real signal.\n\nVerify with: `test $(git rev-list --count HEAD) -ge 5`\n",
@@ -625,6 +638,7 @@
             "template": "\n.PHONY: help\nhelp:\n\t@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) \\\n\t  | awk 'BEGIN {FS = \":.*?## \"}; {printf \"%-20s %s\\n\", $$1, $$2}'\n"
           },
           "check_id": "makefile.help_target",
+          "confidence": "high",
           "file": "Makefile",
           "fix_hint": "Add a `help:` target that prints each target with its inline `##`\ncomment. Inserting after `.PHONY:` keeps the canonical declaration\nblock tidy.\n",
           "fix_prompt": "Without this, an agent's first `make help` prints an error and the\nagent must read the entire Makefile by hand to discover what targets\nexist.\n\nInsert a `help:` target into your `Makefile` right after the\n`.PHONY:` declaration block. Use the standard idiom: `@grep -E\n'^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = \":.*?## \"};\n{printf \"  %-20s %s\\n\", $$1, $$2}'`. Then go through each existing\ntarget and add an inline `## Short description` comment so `make help`\nprints a useful catalogue.\n\nVerify with: `make -n help`\n",
@@ -668,6 +682,7 @@
             "template": "## Summary\n\nWhat does this change do, in 1-2 sentences?\n\n## Test plan\n\n- [ ] Unit tests\n- [ ] Manual verification\n"
           },
           "check_id": "templates.present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "At minimum: drop `.github/ISSUE_TEMPLATE/bug_report.md` (GitHub has\na wizard), a `.github/PULL_REQUEST_TEMPLATE.md` with a checklist,\nand a `CODEOWNERS` file mapping `*` to the team that should review\nagent-opened PRs.\n",
           "fix_prompt": "Without this, every agent-opened PR looks the same, has no obvious\nreviewer, and the project picks up routing cost.\n\nCreate three artefacts: (1)\n`.github/PULL_REQUEST_TEMPLATE.md` with a checklist (Summary, Test\nplan, Risk/rollback); (2) `.github/ISSUE_TEMPLATE/bug_report.md` (use\nGitHub's wizard via Settings \u2192 Features \u2192 Issues \u2192 Set up templates);\n(3) `CODEOWNERS` at the repo root mapping `*` to the team that should\nreview agent-opened PRs. The PR template is highest-leverage \u2014\nprioritise that one if you can only land one.\n\nVerify with: `test -f .github/PULL_REQUEST_TEMPLATE.md && test -f\nCODEOWNERS`\n",
@@ -692,6 +707,7 @@
             "template": "## Summary\n\nWhat does this change do, in 1-2 sentences?\n\n## Test plan\n\n- [ ] Unit tests\n- [ ] Manual verification\n"
           },
           "check_id": "templates.present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "At minimum: drop `.github/ISSUE_TEMPLATE/bug_report.md` (GitHub has\na wizard), a `.github/PULL_REQUEST_TEMPLATE.md` with a checklist,\nand a `CODEOWNERS` file mapping `*` to the team that should review\nagent-opened PRs.\n",
           "fix_prompt": "Without this, every agent-opened PR looks the same, has no obvious\nreviewer, and the project picks up routing cost.\n\nCreate three artefacts: (1)\n`.github/PULL_REQUEST_TEMPLATE.md` with a checklist (Summary, Test\nplan, Risk/rollback); (2) `.github/ISSUE_TEMPLATE/bug_report.md` (use\nGitHub's wizard via Settings \u2192 Features \u2192 Issues \u2192 Set up templates);\n(3) `CODEOWNERS` at the repo root mapping `*` to the team that should\nreview agent-opened PRs. The PR template is highest-leverage \u2014\nprioritise that one if you can only land one.\n\nVerify with: `test -f .github/PULL_REQUEST_TEMPLATE.md && test -f\nCODEOWNERS`\n",
@@ -716,6 +732,7 @@
             "template": "## Summary\n\nWhat does this change do, in 1-2 sentences?\n\n## Test plan\n\n- [ ] Unit tests\n- [ ] Manual verification\n"
           },
           "check_id": "templates.present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "At minimum: drop `.github/ISSUE_TEMPLATE/bug_report.md` (GitHub has\na wizard), a `.github/PULL_REQUEST_TEMPLATE.md` with a checklist,\nand a `CODEOWNERS` file mapping `*` to the team that should review\nagent-opened PRs.\n",
           "fix_prompt": "Without this, every agent-opened PR looks the same, has no obvious\nreviewer, and the project picks up routing cost.\n\nCreate three artefacts: (1)\n`.github/PULL_REQUEST_TEMPLATE.md` with a checklist (Summary, Test\nplan, Risk/rollback); (2) `.github/ISSUE_TEMPLATE/bug_report.md` (use\nGitHub's wizard via Settings \u2192 Features \u2192 Issues \u2192 Set up templates);\n(3) `CODEOWNERS` at the repo root mapping `*` to the team that should\nreview agent-opened PRs. The PR template is highest-leverage \u2014\nprioritise that one if you can only land one.\n\nVerify with: `test -f .github/PULL_REQUEST_TEMPLATE.md && test -f\nCODEOWNERS`\n",
@@ -740,6 +757,7 @@
             "template": "## Summary\n\nWhat does this change do, in 1-2 sentences?\n\n## Test plan\n\n- [ ] Unit tests\n- [ ] Manual verification\n"
           },
           "check_id": "templates.present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "At minimum: drop `.github/ISSUE_TEMPLATE/bug_report.md` (GitHub has\na wizard), a `.github/PULL_REQUEST_TEMPLATE.md` with a checklist,\nand a `CODEOWNERS` file mapping `*` to the team that should review\nagent-opened PRs.\n",
           "fix_prompt": "Without this, every agent-opened PR looks the same, has no obvious\nreviewer, and the project picks up routing cost.\n\nCreate three artefacts: (1)\n`.github/PULL_REQUEST_TEMPLATE.md` with a checklist (Summary, Test\nplan, Risk/rollback); (2) `.github/ISSUE_TEMPLATE/bug_report.md` (use\nGitHub's wizard via Settings \u2192 Features \u2192 Issues \u2192 Set up templates);\n(3) `CODEOWNERS` at the repo root mapping `*` to the team that should\nreview agent-opened PRs. The PR template is highest-leverage \u2014\nprioritise that one if you can only land one.\n\nVerify with: `test -f .github/PULL_REQUEST_TEMPLATE.md && test -f\nCODEOWNERS`\n",
@@ -804,6 +822,15 @@
       "weight": 1.0
     },
     {
+      "check_id": "ontology.gaps_unresolved",
+      "explanation": "When an agent calls `record_gap()` (via the MCP server's\n`record_gap_tool` or `agent-readiness gap record` CLI) it commits\nto surfacing what it couldn't confidently resolve. A workspace\nwith unresolved gaps has open agent-flagged ambiguities \u2014 review\nthem before merging agent-authored changes.\n\nThis rule reads `.agent-readiness/gaps.jsonl` from the repo root\n(the file the MCP server's gap-aware tools write to) and emits\none finding per unresolved Gap row. Clarifications and Assumptions\nin the same file are informational and don't fire findings.",
+      "findings": [],
+      "not_measured": false,
+      "pillar": "ontology",
+      "score": 100.0,
+      "weight": 1.0
+    },
+    {
       "check_id": "ontology.interface_types_satisfied",
       "explanation": "Every `implements:` claim on a ratified Object instance must have\nsatisfaction == \"ratified\". Failing claims indicate the repo drifted\naway from its declared contract.",
       "findings": [],
@@ -853,6 +880,7 @@
             "kind": "edit_gitignore"
           },
           "check_id": "gitignore.covers_junk",
+          "confidence": "medium",
           "file": ".gitignore",
           "fix_hint": "Generate a `.gitignore` for your stack (e.g. https://gitignore.io)\nand paste the result. At minimum, every repo needs the universal\ngroups (`.env`, IDE state, `*.log`); the rest are scored against\nthe detected primary language only.\n",
           "fix_prompt": "Without this, an agent that runs the project's build or install\nstep accidentally commits artefact directories and pollutes every\nfuture diff \u2014 and worse, `.env` files can leak secrets into\nhistory.\n\nThree groups are required for *every* repo regardless of language:\n\n- **Secrets**: `.env`, `.env.*`, and `!.env.example` (the negation\n  keeps the placeholder tracked while ignoring real `.env` files).\n- **IDE / OS junk**: `.idea/`, `.vscode/`, `.DS_Store`, `*.swp`.\n- **Logs**: `*.log`.\n\nThen add the build-artefact groups that match your project's primary language\n(the matcher only scores you on these for the language it detected,\nso other ecosystems' patterns are optional padding):\n\n- **Python**: `__pycache__/`, `*.py[cod]`, `*.egg-info/`,\n  `.venv/`, `venv/`, `.pytest_cache/`, `htmlcov/`, `dist/`,\n  `build/`.\n- **JS / TS**: `node_modules/`, `dist/`, `coverage/`.\n- **Go**: `vendor/`.\n- **Rust**: `target/`.\n- **JVM (Java / Kotlin / Scala / Clojure)**: `target/`, `*.class`,\n  `.metals/`, `.bloop/` (Scala-specific build-state dirs).\n- **Swift**: `.build/`, `DerivedData/`.\n\nVerify with: `grep -E '^(\\.env|\\.idea|\\*\\.log)' .gitignore`\n(universal-group check; the language-specific check is\necosystem-dependent).\n",
@@ -914,6 +942,7 @@
             "template": "# Security policy\n\n## Reporting a vulnerability\n\nEmail security@example.com or open a GitHub Security Advisory.\nWe respond within 48 hours and aim to ship a fix within 14 days.\n"
           },
           "check_id": "security.policy_present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Add a SECURITY.md at the repo root with at least: how to report a\nvulnerability (private channel), supported versions, and expected\nresponse time. GitHub's \"Add a security policy\" template is fine.\n",
           "fix_prompt": "Without this, an agent that finds a security issue has no documented\nescalation path and may default to opening a public issue, leaking the\nvulnerability before a fix lands.\n\nCreate `SECURITY.md` at the repo root with three sections: (1)\n**Reporting a vulnerability** \u2014 explicitly tell reporters NOT to open\na public issue; give a private channel (`security@<your-domain>` or\nGitHub's private vulnerability reporting if enabled). (2) **Supported\nversions** \u2014 a small table showing which versions you patch. (3)\n**Response window** \u2014 your acknowledgement and fix SLAs (e.g. 2\nbusiness days to ack, 30 days for high-severity).\n\nVerify with: `test -f SECURITY.md`\n",
@@ -934,5 +963,5 @@
     }
   ],
   "repo_path": "fixtures/monorepo",
-  "rules_evaluated": 45
+  "rules_evaluated": 46
 }

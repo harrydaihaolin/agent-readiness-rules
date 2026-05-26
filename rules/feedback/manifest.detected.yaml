@@ -2,6 +2,7 @@ rules_version: 2
 id: manifest.detected
 provenance: agent-readiness/manifest.detected
 pillar: feedback
+confidence: high
 title: Project manifest detected
 weight: 1.0
 severity: warn

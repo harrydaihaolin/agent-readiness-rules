@@ -2,6 +2,7 @@ rules_version: 2
 id: ci.configured
 provenance: agent-readiness/ci.configured
 pillar: feedback
+confidence: high
 title: CI pipeline configured
 weight: 0.9
 severity: warn

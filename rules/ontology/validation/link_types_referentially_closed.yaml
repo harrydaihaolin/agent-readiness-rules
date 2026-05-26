@@ -3,6 +3,7 @@ id: ontology.link_types_referentially_closed
 provenance: agent-readiness/ontology.link_types_referentially_closed
 pillar: ontology
 namespace: validation
+confidence: medium
 title: Every Link instance points to ratified Object instances
 weight: 1.0
 severity: error

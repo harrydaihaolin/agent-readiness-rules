@@ -2,6 +2,7 @@ rules_version: 2
 id: branch_rulesets.configured
 provenance: agent-readiness/branch_rulesets.configured
 pillar: flow
+confidence: medium
 title: GitHub branch rulesets / protection configured
 weight: 0.8
 severity: info

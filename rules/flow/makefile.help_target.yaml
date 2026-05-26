@@ -2,6 +2,7 @@ rules_version: 2
 id: makefile.help_target
 provenance: agent-readiness/makefile.help_target
 pillar: flow
+confidence: high
 title: Makefile exposes a `help:` target
 weight: 0.3
 severity: info

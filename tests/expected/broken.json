@@ -27,6 +27,7 @@
             "template": "# Agent guide\n\nThis is a python project. Use the commands in the\nQuick start block below; an agent will trust these over manifest\nsniffing.\n\n## Quick start\n\n```bash\n# Install dependencies\npip install -e .\n\n# Run tests\npython -m pytest tests/\n\n# Lint\nruff check .\n```\n\nIf any of the above is wrong for this project (custom runner,\nmonorepo layout, etc.), edit it now.\n\n## Do-not-touch\n\n- <!-- list paths agents should never modify, e.g. generated/, vendor/ -->\n\n## Conventions\n\n- Branch naming: `feat/<short>`, `fix/<issue>`, `chore/<topic>`.\n- Commit style: Conventional Commits.\n- PR scope: one logical change per PR.\n\n## CI and the feedback loop\n\n**CI is part of the feedback loop.** After you push or update a\nPR, monitor your CI provider's run results. When CI fails, read\nthe logs, fix the root cause, and push follow-up commits. Do not\nstop while checks are red.\n"
           },
           "check_id": "agent_docs.canonical",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Add an AGENTS.md to the repo root with: canonical commands\n(install/test/lint/run), a do-not-touch list, and commit conventions.\nSee agent-readiness/AGENTS.md for an example.\n",
           "fix_prompt": "Without this, an agent landing in the repo has no canonical command list\nand will guess install/test/lint by reading shell history.\n\nCreate `AGENTS.md` at the repo root for a python project.\nInclude, in order: (1) one sentence on what this repo does, (2) the\nsingle install command, (3) the single test command, (4) the single\nlint command, (5) the entry-point file path. Keep it under 60 lines so\nit fits any agent's context window. Mirror the canonical commands into\nthe Makefile so they're executable, not just documented.\n\nVerify with: `test -f AGENTS.md`\n",
@@ -61,6 +62,7 @@
             "template": "# Agents guide\n\nSingle-page orientation for AI coding agents. Spell out the setup\ncommand, the test command, and the entry point. Keep it short.\n"
           },
           "check_id": "agent_docs.present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Add an AGENTS.md to the root with at least: canonical commands\n(install/test/lint/run), do-not-touch list, and commit conventions.\nAlternatively, document agent-targeted material under .ai/ or\n.cursor/rules/. See agent-readiness/AGENTS.md for an example.\n",
           "fix_prompt": "Without this, an agent has nowhere to find canonical commands or\ndo-not-touch lists and must reverse-engineer them from CI.\n\nCreate `AGENTS.md` at the repo root with: a one-line repo description,\nthe single setup command, the single test command, and the entry-point\nfile path. Keep it short \u2014 under 60 lines. If your team uses a different\nagent-docs convention (`CLAUDE.md`, `.cursor/rules/`, `.github/copilot-instructions.md`),\neither of those satisfies the rule, but `AGENTS.md` is the most portable.\n\nVerify with: `test -f AGENTS.md`\n",
@@ -109,6 +111,7 @@
             "template": "# python project\n\nOne-line description.\n\n## Setup\n`make install`\n\n## Test\n`make test`\n"
           },
           "check_id": "cognitive_load.readme_root_present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Add a README.md at the repo root with install, run, and test instructions.\n",
           "fix_prompt": "Without this, an agent has no orientation surface and must infer the\nproject from filenames and CI alone.\n\nCreate `README.md` at the repo root for a python project.\nOpen with a one-line description, then three sections in this order:\n**Setup** (one fenced code block with the install command), **Test**\n(one fenced block with the canonical test command), **Run** (one fenced\nblock showing how to start the project). Three fenced blocks is the\nfloor.\n\nVerify with: `test -f README.md`\n",
@@ -143,6 +146,7 @@
             "template": "# Contributing\n\n## Setup\n`make install`\n\n## Test\n`make test`\n\n## Lint\n`make lint`\n\n## Submitting changes\nFork, branch, PR. CI must be green before review.\n"
           },
           "check_id": "docs.contributing_guide",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Add a CONTRIBUTING.md describing branch naming, commit style,\nrequired local checks, and the PR review flow.\n",
           "fix_prompt": "Without this, an agent has to infer branch naming, commit style, and\nPR conventions from `git log` and gets them wrong on small repos.\n\nCreate `CONTRIBUTING.md` at the repo root. Document: (1) branch naming\n(e.g. `feat/<slug>`, `fix/<slug>`), (2) commit message style (imperative\nmood, one logical change per commit), (3) the local checks that must\npass before pushing (cite your canonical lint and test commands), and\n(4) the PR review flow. Keep it under 80 lines.\n\nVerify with: `test -f CONTRIBUTING.md`\n",
@@ -212,6 +216,7 @@
             "template": "\n## Install\n\n```\npip install -e .\n```\n\n## Test\n\n```\npython -m pytest tests/\n```\n\n## Run\n\n```\n# Replace with this project's canonical entry-point command\n# (see AGENTS.md). For language defaults, see entry_points.detected.\n```\n"
           },
           "check_id": "readme.has_run_instructions",
+          "confidence": "medium",
           "file": null,
           "fix_hint": "Add three short sections to README: Install (one fenced block),\nRun (one fenced block showing the canonical entry point), Test\n(one fenced block). Three fenced blocks is the floor; if your\nproject genuinely needs more, write more.\n",
           "fix_prompt": "Without this, an agent reading the README finds prose but no copy-able\ncommands and falls back to guessing from manifests.\n\nAppend three short sections to `README.md`: **Install**, **Test**, and\n**Run**. Each section must contain exactly one fenced code block with\nthe canonical command for your python project. Three\nfenced blocks is the floor; add more only if the project genuinely\nneeds them.\n\nSuggested commands (matched to your detected ecosystem):\n- Install: `pip install -e .`\n- Test:    `python -m pytest tests/`\n- Run:     project-specific; see your manifest's scripts/entry-points\n           (e.g. `[project.scripts]` in pyproject, `\"scripts\"` in\n           package.json, `cargo run`, `go run ./cmd/...`).\n\nVerify with: `grep -qE '(make|npm|pnpm|yarn|bun|pip|uv|poetry|cargo|go|bundle|composer|mix|gradle|swift|dart|flutter) ' README.md`\n",
@@ -287,6 +292,7 @@
             "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: python -m pytest tests/\n"
           },
           "check_id": "ci.configured",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Drop a CI workflow that installs deps, runs the test command, and\nreports status to PRs. The default scaffold writes\n`.github/workflows/ci.yml`, but any of the 25+ providers detected\nby this rule counts \u2014 pick whatever your hosting platform supports\nnatively. Even a 20-line config is worth more than nothing: the\nagent gets red/green feedback per push. If you use a hosted CI\nwith no in-repo file (BuildKite cloud, TeamCity hosted, Jenkins on\na remote server), add a status badge to your README so the loop is\nvisible to agents.\n",
           "fix_prompt": "Without this, an agent's \"tests pass on my laptop\" never gets\nchallenged by a clean-checkout run and silent regressions ship.\n\nPick the CI provider that matches your hosting platform and check\nin its config. The fastest path for most repos in 2026 is\n`.github/workflows/ci.yml` (GitHub Actions) with three steps:\n`actions/checkout@v4`, install dependencies for python\nwith `pip install -e .`, then run\n`python -m pytest tests/`. Trigger on `pull_request` and on `push`\nto `main`.\n\nEquivalent canonical config paths in other providers (use whichever\nmatches your platform): `.gitlab-ci.yml` (GitLab CI), `.circleci/config.yml`\n(CircleCI), `Jenkinsfile` (Jenkins), `azure-pipelines.yml` (Azure),\n`bitbucket-pipelines.yml` (Bitbucket), `buildspec.yml` (AWS\nCodeBuild), `.drone.yml` (Drone), `.woodpecker.yml` (Woodpecker),\n`cloudbuild.yaml` (GCP Cloud Build), `codemagic.yaml` (Codemagic),\n`.travis.yml` (Travis), `.buildkite/pipeline.yml` (BuildKite),\n`tekton/*.yaml`, `Earthfile`. Any of these closes the loop.\n\nEven a 20-line config is worth more than nothing. If you already\nuse a hosted CI without an in-repo file, add a status badge to\n`README.md` so the loop is visible to agents.\n\nVerify with: `test -f .github/workflows/ci.yml`\n",
@@ -316,6 +322,7 @@
             "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: python -m pytest tests/\n"
           },
           "check_id": "ci.configured",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Drop a CI workflow that installs deps, runs the test command, and\nreports status to PRs. The default scaffold writes\n`.github/workflows/ci.yml`, but any of the 25+ providers detected\nby this rule counts \u2014 pick whatever your hosting platform supports\nnatively. Even a 20-line config is worth more than nothing: the\nagent gets red/green feedback per push. If you use a hosted CI\nwith no in-repo file (BuildKite cloud, TeamCity hosted, Jenkins on\na remote server), add a status badge to your README so the loop is\nvisible to agents.\n",
           "fix_prompt": "Without this, an agent's \"tests pass on my laptop\" never gets\nchallenged by a clean-checkout run and silent regressions ship.\n\nPick the CI provider that matches your hosting platform and check\nin its config. The fastest path for most repos in 2026 is\n`.github/workflows/ci.yml` (GitHub Actions) with three steps:\n`actions/checkout@v4`, install dependencies for python\nwith `pip install -e .`, then run\n`python -m pytest tests/`. Trigger on `pull_request` and on `push`\nto `main`.\n\nEquivalent canonical config paths in other providers (use whichever\nmatches your platform): `.gitlab-ci.yml` (GitLab CI), `.circleci/config.yml`\n(CircleCI), `Jenkinsfile` (Jenkins), `azure-pipelines.yml` (Azure),\n`bitbucket-pipelines.yml` (Bitbucket), `buildspec.yml` (AWS\nCodeBuild), `.drone.yml` (Drone), `.woodpecker.yml` (Woodpecker),\n`cloudbuild.yaml` (GCP Cloud Build), `codemagic.yaml` (Codemagic),\n`.travis.yml` (Travis), `.buildkite/pipeline.yml` (BuildKite),\n`tekton/*.yaml`, `Earthfile`. Any of these closes the loop.\n\nEven a 20-line config is worth more than nothing. If you already\nuse a hosted CI without an in-repo file, add a status badge to\n`README.md` so the loop is visible to agents.\n\nVerify with: `test -f .github/workflows/ci.yml`\n",
@@ -345,6 +352,7 @@
             "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: python -m pytest tests/\n"
           },
           "check_id": "ci.configured",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Drop a CI workflow that installs deps, runs the test command, and\nreports status to PRs. The default scaffold writes\n`.github/workflows/ci.yml`, but any of the 25+ providers detected\nby this rule counts \u2014 pick whatever your hosting platform supports\nnatively. Even a 20-line config is worth more than nothing: the\nagent gets red/green feedback per push. If you use a hosted CI\nwith no in-repo file (BuildKite cloud, TeamCity hosted, Jenkins on\na remote server), add a status badge to your README so the loop is\nvisible to agents.\n",
           "fix_prompt": "Without this, an agent's \"tests pass on my laptop\" never gets\nchallenged by a clean-checkout run and silent regressions ship.\n\nPick the CI provider that matches your hosting platform and check\nin its config. The fastest path for most repos in 2026 is\n`.github/workflows/ci.yml` (GitHub Actions) with three steps:\n`actions/checkout@v4`, install dependencies for python\nwith `pip install -e .`, then run\n`python -m pytest tests/`. Trigger on `pull_request` and on `push`\nto `main`.\n\nEquivalent canonical config paths in other providers (use whichever\nmatches your platform): `.gitlab-ci.yml` (GitLab CI), `.circleci/config.yml`\n(CircleCI), `Jenkinsfile` (Jenkins), `azure-pipelines.yml` (Azure),\n`bitbucket-pipelines.yml` (Bitbucket), `buildspec.yml` (AWS\nCodeBuild), `.drone.yml` (Drone), `.woodpecker.yml` (Woodpecker),\n`cloudbuild.yaml` (GCP Cloud Build), `codemagic.yaml` (Codemagic),\n`.travis.yml` (Travis), `.buildkite/pipeline.yml` (BuildKite),\n`tekton/*.yaml`, `Earthfile`. Any of these closes the loop.\n\nEven a 20-line config is worth more than nothing. If you already\nuse a hosted CI without an in-repo file, add a status badge to\n`README.md` so the loop is visible to agents.\n\nVerify with: `test -f .github/workflows/ci.yml`\n",
@@ -374,6 +382,7 @@
             "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: python -m pytest tests/\n"
           },
           "check_id": "ci.configured",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Drop a CI workflow that installs deps, runs the test command, and\nreports status to PRs. The default scaffold writes\n`.github/workflows/ci.yml`, but any of the 25+ providers detected\nby this rule counts \u2014 pick whatever your hosting platform supports\nnatively. Even a 20-line config is worth more than nothing: the\nagent gets red/green feedback per push. If you use a hosted CI\nwith no in-repo file (BuildKite cloud, TeamCity hosted, Jenkins on\na remote server), add a status badge to your README so the loop is\nvisible to agents.\n",
           "fix_prompt": "Without this, an agent's \"tests pass on my laptop\" never gets\nchallenged by a clean-checkout run and silent regressions ship.\n\nPick the CI provider that matches your hosting platform and check\nin its config. The fastest path for most repos in 2026 is\n`.github/workflows/ci.yml` (GitHub Actions) with three steps:\n`actions/checkout@v4`, install dependencies for python\nwith `pip install -e .`, then run\n`python -m pytest tests/`. Trigger on `pull_request` and on `push`\nto `main`.\n\nEquivalent canonical config paths in other providers (use whichever\nmatches your platform): `.gitlab-ci.yml` (GitLab CI), `.circleci/config.yml`\n(CircleCI), `Jenkinsfile` (Jenkins), `azure-pipelines.yml` (Azure),\n`bitbucket-pipelines.yml` (Bitbucket), `buildspec.yml` (AWS\nCodeBuild), `.drone.yml` (Drone), `.woodpecker.yml` (Woodpecker),\n`cloudbuild.yaml` (GCP Cloud Build), `codemagic.yaml` (Codemagic),\n`.travis.yml` (Travis), `.buildkite/pipeline.yml` (BuildKite),\n`tekton/*.yaml`, `Earthfile`. Any of these closes the loop.\n\nEven a 20-line config is worth more than nothing. If you already\nuse a hosted CI without an in-repo file, add a status badge to\n`README.md` so the loop is visible to agents.\n\nVerify with: `test -f .github/workflows/ci.yml`\n",
@@ -403,6 +412,7 @@
             "template": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: python -m pytest tests/\n"
           },
           "check_id": "ci.configured",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Drop a CI workflow that installs deps, runs the test command, and\nreports status to PRs. The default scaffold writes\n`.github/workflows/ci.yml`, but any of the 25+ providers detected\nby this rule counts \u2014 pick whatever your hosting platform supports\nnatively. Even a 20-line config is worth more than nothing: the\nagent gets red/green feedback per push. If you use a hosted CI\nwith no in-repo file (BuildKite cloud, TeamCity hosted, Jenkins on\na remote server), add a status badge to your README so the loop is\nvisible to agents.\n",
           "fix_prompt": "Without this, an agent's \"tests pass on my laptop\" never gets\nchallenged by a clean-checkout run and silent regressions ship.\n\nPick the CI provider that matches your hosting platform and check\nin its config. The fastest path for most repos in 2026 is\n`.github/workflows/ci.yml` (GitHub Actions) with three steps:\n`actions/checkout@v4`, install dependencies for python\nwith `pip install -e .`, then run\n`python -m pytest tests/`. Trigger on `pull_request` and on `push`\nto `main`.\n\nEquivalent canonical config paths in other providers (use whichever\nmatches your platform): `.gitlab-ci.yml` (GitLab CI), `.circleci/config.yml`\n(CircleCI), `Jenkinsfile` (Jenkins), `azure-pipelines.yml` (Azure),\n`bitbucket-pipelines.yml` (Bitbucket), `buildspec.yml` (AWS\nCodeBuild), `.drone.yml` (Drone), `.woodpecker.yml` (Woodpecker),\n`cloudbuild.yaml` (GCP Cloud Build), `codemagic.yaml` (Codemagic),\n`.travis.yml` (Travis), `.buildkite/pipeline.yml` (BuildKite),\n`tekton/*.yaml`, `Earthfile`. Any of these closes the loop.\n\nEven a 20-line config is worth more than nothing. If you already\nuse a hosted CI without an in-repo file, add a status badge to\n`README.md` so the loop is visible to agents.\n\nVerify with: `test -f .github/workflows/ci.yml`\n",
@@ -490,6 +500,7 @@
             "template": "[project]\nname = \"python-project\"\nversion = \"0.1.0\"\nrequires-python = \">=3.11\"\n\n[build-system]\nrequires = [\"hatchling\"]\nbuild-backend = \"hatchling.build\"\n"
           },
           "check_id": "manifest.detected",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Drop a `pyproject.toml` (or `package.json` / `Cargo.toml` / etc.)\nat the repo root with at least name + version + dependencies. For\nmonorepos, every package directory should have its own manifest.\n",
           "fix_prompt": "Without this, an agent has no contract telling it what the project is,\nhow to install it, or what depends on what \u2014 every action becomes\nguesswork.\n\nCreate a manifest at the repo root matching your python.\nPick the canonical file for your ecosystem:\n- Python: `pyproject.toml`\n- JS/TS (npm/yarn/pnpm/bun): `package.json`\n- Rust: `Cargo.toml`\n- Go: `go.mod`\n- Ruby: `Gemfile` (+ optional `*.gemspec`)\n- PHP: `composer.json`\n- Java/Kotlin/Scala: `pom.xml`, `build.gradle`, or `build.gradle.kts`\n- Swift: `Package.swift`\n- Elixir: `mix.exs`\n- Dart/Flutter: `pubspec.yaml`\n- Clojure: `project.clj` or `deps.edn`\n\nInclude name, version, and at least one declared dependency. For\nmonorepos, drop a manifest in each package directory too (depth \u2264 2).\nIf `your project's manifest` already exists elsewhere, move it to the\nroot or document its location in `AGENTS.md`.\n\nVerify with: `test -f pyproject.toml || test -f package.json || test -f Cargo.toml || test -f go.mod || test -f Gemfile || test -f composer.json || test -f pom.xml || test -f build.gradle || test -f build.gradle.kts || test -f Package.swift || test -f mix.exs || test -f pubspec.yaml`\n",
@@ -524,6 +535,7 @@
             "kind": "run_command"
           },
           "check_id": "manifest.lockfile_present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Run `poetry lock` / `npm install` / `cargo update` (whichever your\nmanifest needs) and commit the resulting lockfile. For pip-only\nPython projects, freezing `requirements.txt` to exact versions or\nswitching to `uv` / `poetry` is acceptable.\n",
           "fix_prompt": "Without this, `pip install` / `npm install` / `bundle install`\nresolves different versions on different machines and the agent's\ngreen run on its laptop can't predict CI's outcome.\n\nGenerate and commit a lockfile using your package manager\n(your package manager). Canonical lock commands by ecosystem:\n\n- uv:      `uv lock`\n- poetry:  `poetry lock`\n- pipenv:  `pipenv lock`\n- pdm:     `pdm lock`\n- npm:     `npm install --package-lock-only`\n- pnpm:    `pnpm install --lockfile-only`\n- yarn:    `yarn install --mode=update-lockfile`\n- bun:     `bun install --frozen-lockfile`\n- cargo:   `cargo generate-lockfile`\n- bundler: `bundle lock`\n- composer:`composer update --lock`\n- go:      `go mod tidy` (regenerates `go.sum`)\n- mix:     `mix deps.get` (writes `mix.lock`)\n\nFor bare-pip Python projects with no lockfile tooling, either switch\nto `uv` or `poetry` for a real lockfile, or pin `requirements.txt`\nto exact versions with `pip freeze > requirements.txt`.\n\nVerify with: `test -f uv.lock || test -f poetry.lock || test -f Pipfile.lock || test -f pdm.lock || test -f package-lock.json || test -f yarn.lock || test -f pnpm-lock.yaml || test -f bun.lock || test -f bun.lockb || test -f Cargo.lock || test -f Gemfile.lock || test -f composer.lock || test -f go.sum || test -f mix.lock`\n",
@@ -548,6 +560,7 @@
             "kind": "run_command"
           },
           "check_id": "manifest.lockfile_present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Run `poetry lock` / `npm install` / `cargo update` (whichever your\nmanifest needs) and commit the resulting lockfile. For pip-only\nPython projects, freezing `requirements.txt` to exact versions or\nswitching to `uv` / `poetry` is acceptable.\n",
           "fix_prompt": "Without this, `pip install` / `npm install` / `bundle install`\nresolves different versions on different machines and the agent's\ngreen run on its laptop can't predict CI's outcome.\n\nGenerate and commit a lockfile using your package manager\n(your package manager). Canonical lock commands by ecosystem:\n\n- uv:      `uv lock`\n- poetry:  `poetry lock`\n- pipenv:  `pipenv lock`\n- pdm:     `pdm lock`\n- npm:     `npm install --package-lock-only`\n- pnpm:    `pnpm install --lockfile-only`\n- yarn:    `yarn install --mode=update-lockfile`\n- bun:     `bun install --frozen-lockfile`\n- cargo:   `cargo generate-lockfile`\n- bundler: `bundle lock`\n- composer:`composer update --lock`\n- go:      `go mod tidy` (regenerates `go.sum`)\n- mix:     `mix deps.get` (writes `mix.lock`)\n\nFor bare-pip Python projects with no lockfile tooling, either switch\nto `uv` or `poetry` for a real lockfile, or pin `requirements.txt`\nto exact versions with `pip freeze > requirements.txt`.\n\nVerify with: `test -f uv.lock || test -f poetry.lock || test -f Pipfile.lock || test -f pdm.lock || test -f package-lock.json || test -f yarn.lock || test -f pnpm-lock.yaml || test -f bun.lock || test -f bun.lockb || test -f Cargo.lock || test -f Gemfile.lock || test -f composer.lock || test -f go.sum || test -f mix.lock`\n",
@@ -572,6 +585,7 @@
             "kind": "run_command"
           },
           "check_id": "manifest.lockfile_present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Run `poetry lock` / `npm install` / `cargo update` (whichever your\nmanifest needs) and commit the resulting lockfile. For pip-only\nPython projects, freezing `requirements.txt` to exact versions or\nswitching to `uv` / `poetry` is acceptable.\n",
           "fix_prompt": "Without this, `pip install` / `npm install` / `bundle install`\nresolves different versions on different machines and the agent's\ngreen run on its laptop can't predict CI's outcome.\n\nGenerate and commit a lockfile using your package manager\n(your package manager). Canonical lock commands by ecosystem:\n\n- uv:      `uv lock`\n- poetry:  `poetry lock`\n- pipenv:  `pipenv lock`\n- pdm:     `pdm lock`\n- npm:     `npm install --package-lock-only`\n- pnpm:    `pnpm install --lockfile-only`\n- yarn:    `yarn install --mode=update-lockfile`\n- bun:     `bun install --frozen-lockfile`\n- cargo:   `cargo generate-lockfile`\n- bundler: `bundle lock`\n- composer:`composer update --lock`\n- go:      `go mod tidy` (regenerates `go.sum`)\n- mix:     `mix deps.get` (writes `mix.lock`)\n\nFor bare-pip Python projects with no lockfile tooling, either switch\nto `uv` or `poetry` for a real lockfile, or pin `requirements.txt`\nto exact versions with `pip freeze > requirements.txt`.\n\nVerify with: `test -f uv.lock || test -f poetry.lock || test -f Pipfile.lock || test -f pdm.lock || test -f package-lock.json || test -f yarn.lock || test -f pnpm-lock.yaml || test -f bun.lock || test -f bun.lockb || test -f Cargo.lock || test -f Gemfile.lock || test -f composer.lock || test -f go.sum || test -f mix.lock`\n",
@@ -638,6 +652,7 @@
             "template": "{\n  \"name\": \"{primary_language} dev\",\n  \"image\": \"mcr.microsoft.com/devcontainers/{primary_language}:1\",\n  \"postCreateCommand\": \"make install\"\n}\n"
           },
           "check_id": "devcontainer.present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Drop a minimal `.devcontainer/devcontainer.json` referencing a\nMicrosoft base image plus `postCreateCommand: pip install -e .`.\nFor Nix shops, `flake.nix` with a dev shell is the equivalent.\n",
           "fix_prompt": "Without this, an agent in a fresh sandbox hits \"wrong runtime version\"\n/ \"missing system library\" within minutes of bring-up and can't\nrecover headlessly.\n\nCreate `.devcontainer/devcontainer.json` for this python\nproject. Microsoft publishes language-specific base images at\n`mcr.microsoft.com/devcontainers/<lang>:1` for python, javascript-node,\ntypescript-node, go, rust, java, dotnet, ruby, php, etc. Pick the one\nthat matches python; fall back to\n`mcr.microsoft.com/devcontainers/base:ubuntu` plus a `features:` block\nif no language-specific image fits. Set `postCreateCommand` to your\ncanonical install command (mirror what's in `AGENTS.md` \u2014 for example\n`pip install -e .`). Add the VS Code / Cursor extensions\nyou actually use to `customizations.vscode.extensions`.\n\nFor Nix shops, `flake.nix` with a `devShell` is the equivalent;\nfor Gitpod, `.gitpod.yml` + `.gitpod.Dockerfile`; for tool-version\nmanagers, `.tool-versions` (asdf/mise) is the lightest-weight option.\n\nVerify with: `test -f .devcontainer/devcontainer.json`\n",
@@ -667,6 +682,7 @@
             "template": "{\n  \"name\": \"{primary_language} dev\",\n  \"image\": \"mcr.microsoft.com/devcontainers/{primary_language}:1\",\n  \"postCreateCommand\": \"make install\"\n}\n"
           },
           "check_id": "devcontainer.present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Drop a minimal `.devcontainer/devcontainer.json` referencing a\nMicrosoft base image plus `postCreateCommand: pip install -e .`.\nFor Nix shops, `flake.nix` with a dev shell is the equivalent.\n",
           "fix_prompt": "Without this, an agent in a fresh sandbox hits \"wrong runtime version\"\n/ \"missing system library\" within minutes of bring-up and can't\nrecover headlessly.\n\nCreate `.devcontainer/devcontainer.json` for this python\nproject. Microsoft publishes language-specific base images at\n`mcr.microsoft.com/devcontainers/<lang>:1` for python, javascript-node,\ntypescript-node, go, rust, java, dotnet, ruby, php, etc. Pick the one\nthat matches python; fall back to\n`mcr.microsoft.com/devcontainers/base:ubuntu` plus a `features:` block\nif no language-specific image fits. Set `postCreateCommand` to your\ncanonical install command (mirror what's in `AGENTS.md` \u2014 for example\n`pip install -e .`). Add the VS Code / Cursor extensions\nyou actually use to `customizations.vscode.extensions`.\n\nFor Nix shops, `flake.nix` with a `devShell` is the equivalent;\nfor Gitpod, `.gitpod.yml` + `.gitpod.Dockerfile`; for tool-version\nmanagers, `.tool-versions` (asdf/mise) is the lightest-weight option.\n\nVerify with: `test -f .devcontainer/devcontainer.json`\n",
@@ -714,6 +730,7 @@
             "kind": "run_command"
           },
           "check_id": "git.has_history",
+          "confidence": "medium",
           "file": null,
           "fix_hint": "If you imported the project as a single squash, re-import preserving\nhistory (`git filter-repo` or a fresh clone of the source). For new\nprojects, just keep committing \u2014 agents need the trail.\n",
           "fix_prompt": "Without this, an agent that needs to backport, revert, or bisect has\nno commit trail \u2014 every change is a mystery.\n\nIf the repo was imported as a single squash, re-import preserving\nhistory with `git filter-repo` or a fresh clone of the source. For a\ngenuinely new project, just keep committing in small logical chunks\n(one logical change per commit, imperative-mood messages) until you\nhave at least 5 real commits. For shallow clones the rule emits\n`not_measured` rather than firing \u2014 re-clone with full depth to get\na real signal.\n\nVerify with: `test $(git rev-list --count HEAD) -ge 5`\n",
@@ -766,6 +783,7 @@
             "template": "\n.PHONY: help\nhelp:\n\t@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) \\\n\t  | awk 'BEGIN {FS = \":.*?## \"}; {printf \"%-20s %s\\n\", $$1, $$2}'\n"
           },
           "check_id": "makefile.help_target",
+          "confidence": "high",
           "file": "Makefile",
           "fix_hint": "Add a `help:` target that prints each target with its inline `##`\ncomment. Inserting after `.PHONY:` keeps the canonical declaration\nblock tidy.\n",
           "fix_prompt": "Without this, an agent's first `make help` prints an error and the\nagent must read the entire Makefile by hand to discover what targets\nexist.\n\nInsert a `help:` target into your `Makefile` right after the\n`.PHONY:` declaration block. Use the standard idiom: `@grep -E\n'^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = \":.*?## \"};\n{printf \"  %-20s %s\\n\", $$1, $$2}'`. Then go through each existing\ntarget and add an inline `## Short description` comment so `make help`\nprints a useful catalogue.\n\nVerify with: `make -n help`\n",
@@ -809,6 +827,7 @@
             "template": "## Summary\n\nWhat does this change do, in 1-2 sentences?\n\n## Test plan\n\n- [ ] Unit tests\n- [ ] Manual verification\n"
           },
           "check_id": "templates.present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "At minimum: drop `.github/ISSUE_TEMPLATE/bug_report.md` (GitHub has\na wizard), a `.github/PULL_REQUEST_TEMPLATE.md` with a checklist,\nand a `CODEOWNERS` file mapping `*` to the team that should review\nagent-opened PRs.\n",
           "fix_prompt": "Without this, every agent-opened PR looks the same, has no obvious\nreviewer, and the project picks up routing cost.\n\nCreate three artefacts: (1)\n`.github/PULL_REQUEST_TEMPLATE.md` with a checklist (Summary, Test\nplan, Risk/rollback); (2) `.github/ISSUE_TEMPLATE/bug_report.md` (use\nGitHub's wizard via Settings \u2192 Features \u2192 Issues \u2192 Set up templates);\n(3) `CODEOWNERS` at the repo root mapping `*` to the team that should\nreview agent-opened PRs. The PR template is highest-leverage \u2014\nprioritise that one if you can only land one.\n\nVerify with: `test -f .github/PULL_REQUEST_TEMPLATE.md && test -f\nCODEOWNERS`\n",
@@ -833,6 +852,7 @@
             "template": "## Summary\n\nWhat does this change do, in 1-2 sentences?\n\n## Test plan\n\n- [ ] Unit tests\n- [ ] Manual verification\n"
           },
           "check_id": "templates.present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "At minimum: drop `.github/ISSUE_TEMPLATE/bug_report.md` (GitHub has\na wizard), a `.github/PULL_REQUEST_TEMPLATE.md` with a checklist,\nand a `CODEOWNERS` file mapping `*` to the team that should review\nagent-opened PRs.\n",
           "fix_prompt": "Without this, every agent-opened PR looks the same, has no obvious\nreviewer, and the project picks up routing cost.\n\nCreate three artefacts: (1)\n`.github/PULL_REQUEST_TEMPLATE.md` with a checklist (Summary, Test\nplan, Risk/rollback); (2) `.github/ISSUE_TEMPLATE/bug_report.md` (use\nGitHub's wizard via Settings \u2192 Features \u2192 Issues \u2192 Set up templates);\n(3) `CODEOWNERS` at the repo root mapping `*` to the team that should\nreview agent-opened PRs. The PR template is highest-leverage \u2014\nprioritise that one if you can only land one.\n\nVerify with: `test -f .github/PULL_REQUEST_TEMPLATE.md && test -f\nCODEOWNERS`\n",
@@ -857,6 +877,7 @@
             "template": "## Summary\n\nWhat does this change do, in 1-2 sentences?\n\n## Test plan\n\n- [ ] Unit tests\n- [ ] Manual verification\n"
           },
           "check_id": "templates.present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "At minimum: drop `.github/ISSUE_TEMPLATE/bug_report.md` (GitHub has\na wizard), a `.github/PULL_REQUEST_TEMPLATE.md` with a checklist,\nand a `CODEOWNERS` file mapping `*` to the team that should review\nagent-opened PRs.\n",
           "fix_prompt": "Without this, every agent-opened PR looks the same, has no obvious\nreviewer, and the project picks up routing cost.\n\nCreate three artefacts: (1)\n`.github/PULL_REQUEST_TEMPLATE.md` with a checklist (Summary, Test\nplan, Risk/rollback); (2) `.github/ISSUE_TEMPLATE/bug_report.md` (use\nGitHub's wizard via Settings \u2192 Features \u2192 Issues \u2192 Set up templates);\n(3) `CODEOWNERS` at the repo root mapping `*` to the team that should\nreview agent-opened PRs. The PR template is highest-leverage \u2014\nprioritise that one if you can only land one.\n\nVerify with: `test -f .github/PULL_REQUEST_TEMPLATE.md && test -f\nCODEOWNERS`\n",
@@ -881,6 +902,7 @@
             "template": "## Summary\n\nWhat does this change do, in 1-2 sentences?\n\n## Test plan\n\n- [ ] Unit tests\n- [ ] Manual verification\n"
           },
           "check_id": "templates.present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "At minimum: drop `.github/ISSUE_TEMPLATE/bug_report.md` (GitHub has\na wizard), a `.github/PULL_REQUEST_TEMPLATE.md` with a checklist,\nand a `CODEOWNERS` file mapping `*` to the team that should review\nagent-opened PRs.\n",
           "fix_prompt": "Without this, every agent-opened PR looks the same, has no obvious\nreviewer, and the project picks up routing cost.\n\nCreate three artefacts: (1)\n`.github/PULL_REQUEST_TEMPLATE.md` with a checklist (Summary, Test\nplan, Risk/rollback); (2) `.github/ISSUE_TEMPLATE/bug_report.md` (use\nGitHub's wizard via Settings \u2192 Features \u2192 Issues \u2192 Set up templates);\n(3) `CODEOWNERS` at the repo root mapping `*` to the team that should\nreview agent-opened PRs. The PR template is highest-leverage \u2014\nprioritise that one if you can only land one.\n\nVerify with: `test -f .github/PULL_REQUEST_TEMPLATE.md && test -f\nCODEOWNERS`\n",
@@ -945,6 +967,15 @@
       "weight": 1.0
     },
     {
+      "check_id": "ontology.gaps_unresolved",
+      "explanation": "When an agent calls `record_gap()` (via the MCP server's\n`record_gap_tool` or `agent-readiness gap record` CLI) it commits\nto surfacing what it couldn't confidently resolve. A workspace\nwith unresolved gaps has open agent-flagged ambiguities \u2014 review\nthem before merging agent-authored changes.\n\nThis rule reads `.agent-readiness/gaps.jsonl` from the repo root\n(the file the MCP server's gap-aware tools write to) and emits\none finding per unresolved Gap row. Clarifications and Assumptions\nin the same file are informational and don't fire findings.",
+      "findings": [],
+      "not_measured": false,
+      "pillar": "ontology",
+      "score": 100.0,
+      "weight": 1.0
+    },
+    {
       "check_id": "ontology.interface_types_satisfied",
       "explanation": "Every `implements:` claim on a ratified Object instance must have\nsatisfaction == \"ratified\". Failing claims indicate the repo drifted\naway from its declared contract.",
       "findings": [],
@@ -994,6 +1025,7 @@
             "kind": "edit_gitignore"
           },
           "check_id": "gitignore.covers_junk",
+          "confidence": "medium",
           "file": ".gitignore",
           "fix_hint": "Generate a `.gitignore` for your stack (e.g. https://gitignore.io)\nand paste the result. At minimum, every repo needs the universal\ngroups (`.env`, IDE state, `*.log`); the rest are scored against\nthe detected primary language only.\n",
           "fix_prompt": "Without this, an agent that runs the project's build or install\nstep accidentally commits artefact directories and pollutes every\nfuture diff \u2014 and worse, `.env` files can leak secrets into\nhistory.\n\nThree groups are required for *every* repo regardless of language:\n\n- **Secrets**: `.env`, `.env.*`, and `!.env.example` (the negation\n  keeps the placeholder tracked while ignoring real `.env` files).\n- **IDE / OS junk**: `.idea/`, `.vscode/`, `.DS_Store`, `*.swp`.\n- **Logs**: `*.log`.\n\nThen add the build-artefact groups that match your project's primary language\n(the matcher only scores you on these for the language it detected,\nso other ecosystems' patterns are optional padding):\n\n- **Python**: `__pycache__/`, `*.py[cod]`, `*.egg-info/`,\n  `.venv/`, `venv/`, `.pytest_cache/`, `htmlcov/`, `dist/`,\n  `build/`.\n- **JS / TS**: `node_modules/`, `dist/`, `coverage/`.\n- **Go**: `vendor/`.\n- **Rust**: `target/`.\n- **JVM (Java / Kotlin / Scala / Clojure)**: `target/`, `*.class`,\n  `.metals/`, `.bloop/` (Scala-specific build-state dirs).\n- **Swift**: `.build/`, `DerivedData/`.\n\nVerify with: `grep -E '^(\\.env|\\.idea|\\*\\.log)' .gitignore`\n(universal-group check; the language-specific check is\necosystem-dependent).\n",
@@ -1037,6 +1069,7 @@
             "template": "# gitleaks configuration: tunes which paths and rules are scanned\n# for secrets in pre-commit hooks and CI.\ntitle = \"gitleaks config\"\n\n[[allowlist.regexes]]\ndescription = \"Allow .env.example placeholder values\"\nregex = '''EXAMPLE_VAR\\s*='''\n"
           },
           "check_id": "safety.gitleaks_config",
+          "confidence": "medium",
           "file": null,
           "fix_hint": "Add a `.gitleaks.toml` (or `.secrets.baseline` for detect-secrets) and\nwire it into pre-commit or a GitHub Actions workflow. Example:\nhttps://github.com/gitleaks/gitleaks-action.\n",
           "fix_prompt": "This rule fired because your repo shows evidence of handling\nsecrets (env-file usage, env-var reads in source, cloud SDK imports,\nor compose / IaC declarations that bind secrets) but ships no\nsecret-scanning config. Without one, an agent one copy-paste away\nfrom leaking a credential has no automated catch \u2014 the leak makes\nit into git history before review.\n\nCreate `.gitleaks.toml` at the repo root with a minimal config: a\n`title` string and one `[allowlist]` block listing your known\nfalse-positive paths (lockfiles, vendor/, node_modules/). Then wire\ngitleaks into pre-commit (add a `gitleaks` hook to\n`.pre-commit-config.yaml`) AND CI (add `.github/workflows/gitleaks.yml`\nusing `gitleaks/gitleaks-action@v2`). Detect-secrets via\n`.secrets.baseline` is an acceptable alternative.\n\nIf your repo genuinely has no credential surface area (a pure\nlibrary, a numerics package, a docs-only repo) the scanner\nsuppresses this rule automatically \u2014 there's nothing to do.\n\nVerify with: `test -f .gitleaks.toml`\n",
@@ -1066,6 +1099,7 @@
             "kind": "run_command"
           },
           "check_id": "secrets.basic_scan",
+          "confidence": "medium",
           "file": "main.py",
           "fix_hint": "ROTATE the leaked credential immediately (don't just delete it\nfrom the file \u2014 assume it's compromised the moment it touched\ngit). Then remove it from history (`git filter-repo`) and\nconfigure a secrets scanner (`gitleaks`, GitHub secret scanning)\nto prevent recurrence.\n",
           "fix_prompt": "Without this, a credential already in tracked files is one push away\nfrom public history \u2014 and a rotation after the fact doesn't fully\nhelp, the leaked secret is in git forever.\n\nROTATE the leaked credential FIRST (assume compromised the moment it\ntouched git). Then remove the secret from history with `git filter-repo\n--invert-paths --path <file>` (or `git filter-repo --replace-text\n<file-with-regex>`). Finally, prevent recurrence: install gitleaks\nlocally as a pre-commit hook AND in CI (see the\n`safety.gitleaks_config` fix prompt). Don't just delete the line \u2014 the\nold commit still has the secret.\n\nVerify with: re-run the scanner; no high-confidence patterns (AWS\nAKIA, GitHub ghp_, Slack xox*, Stripe sk_live_, PEM headers) should\nremain in tracked files.\n",
@@ -1100,6 +1134,7 @@
             "template": "# Security policy\n\n## Reporting a vulnerability\n\nEmail security@example.com or open a GitHub Security Advisory.\nWe respond within 48 hours and aim to ship a fix within 14 days.\n"
           },
           "check_id": "security.policy_present",
+          "confidence": "high",
           "file": null,
           "fix_hint": "Add a SECURITY.md at the repo root with at least: how to report a\nvulnerability (private channel), supported versions, and expected\nresponse time. GitHub's \"Add a security policy\" template is fine.\n",
           "fix_prompt": "Without this, an agent that finds a security issue has no documented\nescalation path and may default to opening a public issue, leaking the\nvulnerability before a fix lands.\n\nCreate `SECURITY.md` at the repo root with three sections: (1)\n**Reporting a vulnerability** \u2014 explicitly tell reporters NOT to open\na public issue; give a private channel (`security@<your-domain>` or\nGitHub's private vulnerability reporting if enabled). (2) **Supported\nversions** \u2014 a small table showing which versions you patch. (3)\n**Response window** \u2014 your acknowledgement and fix SLAs (e.g. 2\nbusiness days to ack, 30 days for high-severity).\n\nVerify with: `test -f SECURITY.md`\n",
@@ -1120,5 +1155,5 @@
     }
   ],
   "repo_path": "fixtures/broken",
-  "rules_evaluated": 45
+  "rules_evaluated": 46
 }
