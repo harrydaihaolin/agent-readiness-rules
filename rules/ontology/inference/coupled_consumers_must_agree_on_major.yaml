@@ -1,0 +1,76 @@
+rules_version: 2
+id: ontology.inference.coupled_consumers_must_agree_on_major
+provenance: agent-readiness/ontology.inference.coupled_consumers_must_agree_on_major
+pillar: ontology
+namespace: inference
+confidence: high
+title: Coupled consumers must agree on a Protocol's major version
+severity: error
+weight: 1.0
+explanation: |
+  The flagship value-prop rule for the *inference* register: if
+  Repo A `dependsOn` Repo B and both repos `consumesProtocol` the
+  same Protocol, then their consumed major versions must agree. A
+  disagreement means A imports B at runtime expecting one major and
+  B is actually expecting another — undefined behaviour territory.
+
+  This is the rule that would have caught the pin skew between
+  `agent-readiness-ontology-mcp` (originally pinned at protocol
+  `<0.8.0`) and its sibling `agent-readiness-mcp` (on `>=0.9.0`)
+  *before* the manual pin-bump PR was written, if the manifest
+  reflected the pyproject pins accurately.
+
+  Version comparison: the rule splits the target id at `@` and
+  treats the first two dot-segments as the breaking-change axis
+  (so 0.7 ↔ 0.9 is flagged, not just 1.x ↔ 2.x). This handles
+  pre-1.0 packages where the minor is the practical major.
+
+  Note that the rule depends on the *manifest* having
+  `consumesProtocol` instances that match the actual pyproject
+  pins. The manifest is the source of truth here; if pyproject and
+  manifest disagree, run `agent-readiness ontology drift` first.
+match:
+  type: ontology_inference
+  rule_id: ontology.inference.coupled_consumers_must_agree_on_major
+fix_hint: |
+  Two transitively-coupled repos consume the same Protocol at
+  incompatible versions. The fix is one of:
+
+  * Bump the trailing repo's pin to match the leading one (the
+    usual choice — `compute_publish_order` likely already wants
+    this).
+  * Add an adapter shim in the dependent repo.
+  * Break the `dependsOn` link if it's spurious.
+
+  Choose, then update both the pyproject pin AND the manifest
+  `consumesProtocol` instance.
+insight_query: coupled consumers protocol version disagreement
+action:
+  kind: run_command
+  command: agent-readiness ontology reason --rule ontology.inference.coupled_consumers_must_agree_on_major
+  description: |
+    Lists each pair of transitively-coupled repos disagreeing on a
+    Protocol major version.
+verify:
+  command: |
+    test -z "$(agent-readiness ontology reason --rule ontology.inference.coupled_consumers_must_agree_on_major 2>/dev/null | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get(\"violations\") or \"\")')"
+  description: |
+    Verify passes when every dependsOn-connected pair of repos
+    consuming the same Protocol agrees on (X.Y) of the pin.
+fix_prompt: |
+  Two transitively-coupled repos consume the same Protocol at
+  incompatible versions. This is the same class of bug that
+  motivated this rule.
+
+  1. Run the rule to see the offending pair and the Protocol name.
+  2. Decide the right resolution: bump the trailing repo, add a
+     compat shim, or break the dependsOn link if it's spurious.
+  3. Update both:
+     * The trailing repo's `pyproject.toml` pin to the agreed-upon
+       version, OR write the adapter, OR open a PR breaking the
+       dependsOn relationship.
+     * The matching `consumesProtocol` instance in
+       `agent-readiness-manifest/ontology/instances/consumesProtocol/`.
+  4. Run `agent-readiness ontology drift` to confirm the manifest
+     and the pyproject pins agree.
+  5. Re-run the rule; the pair should drop out.

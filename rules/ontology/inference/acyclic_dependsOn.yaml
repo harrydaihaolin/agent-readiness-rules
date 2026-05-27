@@ -1,0 +1,63 @@
+rules_version: 2
+id: ontology.inference.acyclic_dependsOn
+provenance: agent-readiness/ontology.inference.acyclic_dependsOn
+pillar: ontology
+namespace: inference
+confidence: high
+title: dependsOn graph is acyclic
+severity: error
+weight: 1.0
+explanation: |
+  The `dependsOn` LinkType declares `axioms.acyclic: true`. The
+  umbrella's release-cascade machinery (`compute_publish_order` and
+  the release Intent steps) walks the graph assuming a DAG; a cycle
+  here means an infinite-recursion bug the moment anyone tries to
+  cut a release.
+
+  This rule is part of the *inference* register (Bundle C / agent-
+  readiness v3.3.0). It runs the deterministic forward chainer over
+  the loaded `Ontology` value — not a file-by-file scan — so it
+  catches cycles regardless of which sub-repo introduced the edge.
+
+  Self-loops are reported by `ontology.inference.irreflexive_dependsOn`
+  instead, to keep one bug from firing two findings.
+match:
+  type: ontology_inference
+  rule_id: ontology.inference.acyclic_dependsOn
+fix_hint: |
+  A cycle in `dependsOn` is almost always a manifest-data error: a
+  ratified link mistakenly inverted, or two repos that should share
+  a single upstream now pointing at each other. Inspect the cycle
+  detail (`Cycle in dependsOn graph: a → b → a`), pick the link
+  that's wrong, and either un-ratify it (move it back to `proposed`)
+  or delete the file under
+  `agent-readiness-manifest/ontology/instances/dependsOn/`.
+insight_query: dependsOn cycle ontology inference
+action:
+  kind: run_command
+  command: agent-readiness ontology reason --rule ontology.inference.acyclic_dependsOn
+  description: |
+    Lists each detected cycle in the workspace `dependsOn` graph.
+    Each entry names the participants in traversal order so the
+    offending link is unambiguous.
+verify:
+  command: |
+    test -z "$(agent-readiness ontology reason --rule ontology.inference.acyclic_dependsOn 2>/dev/null | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get(\"violations\") or \"\")')"
+  description: |
+    Verify passes when the rule emits zero violations against the
+    current workspace ontology.
+fix_prompt: |
+  The workspace `dependsOn` graph has a cycle. This is a manifest
+  error — fix it before the next release cascade.
+
+  1. Run `agent-readiness ontology reason --rule ontology.inference.acyclic_dependsOn`
+     to see the participating repos.
+  2. Identify which `dependsOn` link in
+     `agent-readiness-manifest/ontology/instances/dependsOn/` is
+     wrong. If you genuinely have a circular dep at code level, that
+     itself is the bug — break the cycle by extracting a shared
+     library or inverting one direction.
+  3. Either delete the link file (if the edge shouldn't exist) or
+     flip its `lifecycle.state` back to `proposed` (if it needs
+     human review).
+  4. Re-run the rule; expect zero violations.

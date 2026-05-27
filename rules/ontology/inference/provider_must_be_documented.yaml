@@ -1,0 +1,58 @@
+rules_version: 2
+id: ontology.inference.provider_must_be_documented
+provenance: agent-readiness/ontology.inference.provider_must_be_documented
+pillar: ontology
+namespace: inference
+confidence: medium
+title: Every Repo providing a Protocol must claim the Documented interface
+severity: warn
+weight: 0.5
+explanation: |
+  Consumers pin to specific Protocol releases (`name@X.Y.Z`). When
+  the provider repo's docs are missing or stale, the consumer's pin
+  references a contract the provider can't explain.
+
+  This rule walks the `providesProtocol` edge set and, for each
+  provider Repo, checks whether the Repo's `spec.implements` list
+  carries a ratified or proposed `Documented` interface claim. Part
+  of the *inference* register — the provider-Documented coupling
+  isn't visible from inside any single repo, only from
+  cross-referencing two ontology shapes.
+
+  Confidence is `medium` because the fix (write docs, then add the
+  claim) is not unambiguously automatable — an agent should propose
+  the claim path but not silently write it.
+match:
+  type: ontology_inference
+  rule_id: ontology.inference.provider_must_be_documented
+fix_hint: |
+  For each flagged Repo, evaluate the Documented interface via
+  `agent-readiness ontology bootstrap propose-interface-claims
+  --interface Documented`, then move the proposed claim file from
+  `proposed` to `ratified` once a human has reviewed the docs the
+  proof_refs point at.
+insight_query: provider Repo Documented interface claim
+action:
+  kind: run_command
+  command: agent-readiness ontology reason --rule ontology.inference.provider_must_be_documented
+  description: |
+    Lists each provider Repo missing a Documented interface claim.
+verify:
+  command: |
+    test -z "$(agent-readiness ontology reason --rule ontology.inference.provider_must_be_documented 2>/dev/null | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get(\"violations\") or \"\")')"
+  description: |
+    Verify passes when every Repo providing a Protocol has a
+    Documented interface claim in its ratified ObjectInstance.
+fix_prompt: |
+  A Repo that provides a Protocol does not claim the Documented
+  interface. Consumers pin to its releases but have no audited
+  contract reference.
+
+  1. Confirm the docs exist (a `README.md` at minimum, ideally a
+     `docs/` directory with the contract surfaced).
+  2. Propose the Documented claim:
+     `agent-readiness ontology bootstrap propose-interface-claims --interface Documented`.
+  3. Have a human review the proof_refs the proposer points at,
+     then move the claim's `lifecycle.state` to `ratified`.
+  4. Re-run the rule; the provider should drop out of the violation
+     list.
