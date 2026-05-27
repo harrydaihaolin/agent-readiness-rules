@@ -1,0 +1,52 @@
+rules_version: 2
+id: ontology.inference.protocol_provider_must_be_releasable
+provenance: agent-readiness/ontology.inference.protocol_provider_must_be_releasable
+pillar: ontology
+namespace: inference
+confidence: medium
+title: Every Repo providing a Protocol must claim the Releasable interface
+severity: warn
+weight: 0.5
+explanation: |
+  If a Protocol provider can't cut versioned releases (no audited
+  release pipeline, no tagged history, no PyPI/npm publish), then
+  downstream `consumesProtocol p@X.Y.Z` pins reference fiction. The
+  umbrella's release-cascade Intent depends on the provider being
+  able to tag, build, and publish; the Releasable claim is the
+  audited token of that capability.
+
+  Distinct from `provider_must_be_documented` so the fix_hint can
+  point at the Releasable proof (CI workflow, release script,
+  PyPI/npm trust config) rather than the Documented proof.
+match:
+  type: ontology_inference
+  rule_id: ontology.inference.protocol_provider_must_be_releasable
+fix_hint: |
+  Evaluate the Releasable interface via `agent-readiness ontology
+  bootstrap propose-interface-claims --interface Releasable`, then
+  audit the proof_refs (the release workflow, the publish script,
+  the trust config) before ratifying the claim.
+insight_query: provider Repo Releasable interface claim
+action:
+  kind: run_command
+  command: agent-readiness ontology reason --rule ontology.inference.protocol_provider_must_be_releasable
+  description: |
+    Lists each provider Repo missing a Releasable interface claim.
+verify:
+  command: |
+    test -z "$(agent-readiness ontology reason --rule ontology.inference.protocol_provider_must_be_releasable 2>/dev/null | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get(\"violations\") or \"\")')"
+  description: |
+    Verify passes when every Repo providing a Protocol has a
+    Releasable interface claim in its ratified ObjectInstance.
+fix_prompt: |
+  A Repo that provides a Protocol does not claim the Releasable
+  interface — consumers cannot pin a release with confidence the
+  provider can actually cut one.
+
+  1. Confirm the release pipeline exists (CI `release.yml` or
+     equivalent, publish to PyPI/npm, signed tags).
+  2. Propose the Releasable claim:
+     `agent-readiness ontology bootstrap propose-interface-claims --interface Releasable`.
+  3. Have a human audit the proof_refs the proposer points at.
+  4. Move the claim's `lifecycle.state` to `ratified`.
+  5. Re-run the rule; the provider should drop out.

@@ -1,0 +1,51 @@
+rules_version: 2
+id: ontology.inference.consumer_must_pin_protocol_version
+provenance: agent-readiness/ontology.inference.consumer_must_pin_protocol_version
+pillar: ontology
+namespace: inference
+confidence: high
+title: Every consumesProtocol link must target a versioned Protocol id
+severity: warn
+weight: 0.7
+explanation: |
+  Manifest convention: a ratified `consumesProtocol` link targets a
+  versioned Protocol id of the form `<name>@<X.Y.Z>` (e.g.
+  `agent-readiness-insights-protocol@0.10.0`). Pointing at the
+  unversioned name is a smell — the consumer implicitly tracks
+  "latest", which silently breaks under upstream majors.
+
+  This rule iterates every ratified `consumesProtocol` link and
+  fires when the target Protocol id has no `@` segment.
+match:
+  type: ontology_inference
+  rule_id: ontology.inference.consumer_must_pin_protocol_version
+fix_hint: |
+  Re-emit the offending consumesProtocol link with a pinned target
+  id. The finding's `subject_id` is the link id (the file under
+  `agent-readiness-manifest/ontology/instances/consumesProtocol/`).
+  Read the consumer's pyproject pin, suffix the target id with
+  `@<pinned-version>`, re-ratify.
+insight_query: consumesProtocol unversioned pin
+action:
+  kind: run_command
+  command: agent-readiness ontology reason --rule ontology.inference.consumer_must_pin_protocol_version
+  description: |
+    Lists every consumesProtocol link with an unversioned target.
+verify:
+  command: |
+    test -z "$(agent-readiness ontology reason --rule ontology.inference.consumer_must_pin_protocol_version 2>/dev/null | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get(\"violations\") or \"\")')"
+  description: |
+    Verify passes when every ratified consumesProtocol target id
+    carries an `@X.Y.Z` suffix.
+fix_prompt: |
+  An agent-flagged consumer references a Protocol without a version
+  pin. This silently tracks the latest release.
+
+  1. Open the link file under
+     `agent-readiness-manifest/ontology/instances/consumesProtocol/`.
+  2. Read the consumer repo's pyproject (or package.json) to find
+     the actual version constraint it ships.
+  3. Update `spec.to.id` to include `@<concrete-version>` matching
+     that constraint's lower bound.
+  4. Re-ratify the link file with `lifecycle.state: ratified`.
+  5. Re-run the rule; the link should drop out.

@@ -1,0 +1,44 @@
+rules_version: 2
+id: ontology.inference.irreflexive_dependsOn
+provenance: agent-readiness/ontology.inference.irreflexive_dependsOn
+pillar: ontology
+namespace: inference
+confidence: high
+title: dependsOn graph is irreflexive (no self-loops)
+severity: error
+weight: 1.0
+explanation: |
+  The `dependsOn` LinkType declares `axioms.irreflexive: true`. A
+  ratified self-loop almost always means a ratification slipped past
+  the human reviewer (the bootstrap proposers in `agent-readiness`
+  refuse to emit reflexive edges in the first place).
+
+  Part of the *inference* register (Bundle C / agent-readiness
+  v3.3.0). The chainer walks the ratified `dependsOn` link set and
+  emits one finding per self-loop.
+match:
+  type: ontology_inference
+  rule_id: ontology.inference.irreflexive_dependsOn
+fix_hint: |
+  A self-loop is a manifest-data error: the link's `spec.from.id`
+  equals `spec.to.id`. Locate the offending file under
+  `agent-readiness-manifest/ontology/instances/dependsOn/` (the
+  finding's subject_id is the link id), delete it, and re-ratify.
+insight_query: dependsOn self-loop ontology inference
+action:
+  kind: run_command
+  command: agent-readiness ontology reason --rule ontology.inference.irreflexive_dependsOn
+  description: |
+    Lists each self-loop in the workspace `dependsOn` graph.
+verify:
+  command: |
+    test -z "$(agent-readiness ontology reason --rule ontology.inference.irreflexive_dependsOn 2>/dev/null | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get(\"violations\") or \"\")')"
+  description: |
+    Verify passes when the rule emits zero violations.
+fix_prompt: |
+  A repo declares `dependsOn` itself. This is a manifest error.
+
+  1. Run the rule to find the offending link id.
+  2. Delete the file at
+     `agent-readiness-manifest/ontology/instances/dependsOn/<link-id>.yaml`.
+  3. Re-run the rule; expect zero violations.

@@ -117,3 +117,26 @@ floor:
   candidate object types"); in those cases the rule author should
   populate `fix_hint` with the candidate set so the engine's
   `apply_top_action` can surface them in the `gap_payload`.
+
+## Ontology namespaces (Bundle A1 + Bundle C, protocol v0.10.0+)
+
+Rules under `pillar: ontology` may also declare a `namespace:`
+finer-grained register. Three values are accepted today, mirroring
+the Ontology Layer split:
+
+| `namespace`   | Question the rule answers                                                  | Matcher kind                            |
+| ------------- | -------------------------------------------------------------------------- | --------------------------------------- |
+| `schema`      | Does the workspace declare X?                                              | declarative (path/glob/manifest probes) |
+| `validation`  | Do the declarations hold together?                                         | heuristic / cross-file traversal        |
+| `inference`   | What facts can be deduced from the declarations?                           | `ontology_inference` (Bundle C)         |
+
+Rules in the `inference` register reference the new
+`ontology_inference` private matcher (shipped in `agent-readiness`
+v3.3.0). Each rule sets `match.rule_id: ontology.inference.<name>`;
+the matcher looks up the named evaluator in
+`agent_readiness.ontology.reasoning.REGISTRY` and turns its
+`DerivedViolation` records into scan findings. Adding a new
+inference rule requires both a YAML here AND a Python evaluator
+module under
+`agent_readiness/ontology/reasoning/evaluators/` in the engine
+repo, with the matching `@register("ontology.inference.<name>")`.

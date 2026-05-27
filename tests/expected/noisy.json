@@ -794,31 +794,10 @@
     {
       "check_id": "git.has_history",
       "explanation": "An agent that needs to reason about *why* a piece of code looks the\nway it does \u2014 to backport, to revert, to bisect \u2014 depends on\ncommit history. A repo with one squash-import commit looks the same\nas a repo with no history at all: every change is a mystery. This\nrule fires when fewer than `min_commits` commits exist (and gives\na `not_measured` finding on shallow clones).",
-      "findings": [
-        {
-          "action": {
-            "command": "# Initialize the repo and stage an initial commit so agents can\n# see a baseline diff.\ngit init && git add -A && git commit -m 'initial commit'\n",
-            "description": "Initialize a git repo (or commit at least 5 changes). Required for\nagents that diff against the merge base.\n",
-            "kind": "run_command"
-          },
-          "check_id": "git.has_history",
-          "confidence": "medium",
-          "file": null,
-          "fix_hint": "If you imported the project as a single squash, re-import preserving\nhistory (`git filter-repo` or a fresh clone of the source). For new\nprojects, just keep committing \u2014 agents need the trail.\n",
-          "fix_prompt": "Without this, an agent that needs to backport, revert, or bisect has\nno commit trail \u2014 every change is a mystery.\n\nIf the repo was imported as a single squash, re-import preserving\nhistory with `git filter-repo` or a fresh clone of the source. For a\ngenuinely new project, just keep committing in small logical chunks\n(one logical change per commit, imperative-mood messages) until you\nhave at least 5 real commits. For shallow clones the rule emits\n`not_measured` rather than firing \u2014 re-clone with full depth to get\na real signal.\n\nVerify with: `test $(git rev-list --count HEAD) -ge 5`\n",
-          "line": null,
-          "message": "Repository has 1 commits \u2014 fewer than min_commits=5.",
-          "pillar": "flow",
-          "severity": "warn",
-          "verify": {
-            "command": "test $(git rev-list --count HEAD 2>/dev/null) -ge 5",
-            "description": "Repo must have \u2265 5 commits."
-          }
-        }
-      ],
+      "findings": [],
       "not_measured": false,
       "pillar": "flow",
-      "score": 80.0,
+      "score": 100.0,
       "weight": 1.0
     },
     {
@@ -1003,6 +982,60 @@
       "weight": 0.7
     },
     {
+      "check_id": "ontology.inference.acyclic_dependsOn",
+      "explanation": "The `dependsOn` LinkType declares `axioms.acyclic: true`. The\numbrella's release-cascade machinery (`compute_publish_order` and\nthe release Intent steps) walks the graph assuming a DAG; a cycle\nhere means an infinite-recursion bug the moment anyone tries to\ncut a release.\n\nThis rule is part of the *inference* register (Bundle C / agent-\nreadiness v3.3.0). It runs the deterministic forward chainer over\nthe loaded `Ontology` value \u2014 not a file-by-file scan \u2014 so it\ncatches cycles regardless of which sub-repo introduced the edge.\n\nSelf-loops are reported by `ontology.inference.irreflexive_dependsOn`\ninstead, to keep one bug from firing two findings.",
+      "findings": [],
+      "not_measured": false,
+      "pillar": "ontology",
+      "score": 100.0,
+      "weight": 1.0
+    },
+    {
+      "check_id": "ontology.inference.consumer_must_pin_protocol_version",
+      "explanation": "Manifest convention: a ratified `consumesProtocol` link targets a\nversioned Protocol id of the form `<name>@<X.Y.Z>` (e.g.\n`agent-readiness-insights-protocol@0.10.0`). Pointing at the\nunversioned name is a smell \u2014 the consumer implicitly tracks\n\"latest\", which silently breaks under upstream majors.\n\nThis rule iterates every ratified `consumesProtocol` link and\nfires when the target Protocol id has no `@` segment.",
+      "findings": [],
+      "not_measured": false,
+      "pillar": "ontology",
+      "score": 100.0,
+      "weight": 0.7
+    },
+    {
+      "check_id": "ontology.inference.coupled_consumers_must_agree_on_major",
+      "explanation": "The flagship value-prop rule for the *inference* register: if\nRepo A `dependsOn` Repo B and both repos `consumesProtocol` the\nsame Protocol, then their consumed major versions must agree. A\ndisagreement means A imports B at runtime expecting one major and\nB is actually expecting another \u2014 undefined behaviour territory.\n\nThis is the rule that would have caught the pin skew between\n`agent-readiness-ontology-mcp` (originally pinned at protocol\n`<0.8.0`) and its sibling `agent-readiness-mcp` (on `>=0.9.0`)\n*before* the manual pin-bump PR was written, if the manifest\nreflected the pyproject pins accurately.\n\nVersion comparison: the rule splits the target id at `@` and\ntreats the first two dot-segments as the breaking-change axis\n(so 0.7 \u2194 0.9 is flagged, not just 1.x \u2194 2.x). This handles\npre-1.0 packages where the minor is the practical major.\n\nNote that the rule depends on the *manifest* having\n`consumesProtocol` instances that match the actual pyproject\npins. The manifest is the source of truth here; if pyproject and\nmanifest disagree, run `agent-readiness ontology drift` first.",
+      "findings": [],
+      "not_measured": false,
+      "pillar": "ontology",
+      "score": 100.0,
+      "weight": 1.0
+    },
+    {
+      "check_id": "ontology.inference.irreflexive_dependsOn",
+      "explanation": "The `dependsOn` LinkType declares `axioms.irreflexive: true`. A\nratified self-loop almost always means a ratification slipped past\nthe human reviewer (the bootstrap proposers in `agent-readiness`\nrefuse to emit reflexive edges in the first place).\n\nPart of the *inference* register (Bundle C / agent-readiness\nv3.3.0). The chainer walks the ratified `dependsOn` link set and\nemits one finding per self-loop.",
+      "findings": [],
+      "not_measured": false,
+      "pillar": "ontology",
+      "score": 100.0,
+      "weight": 1.0
+    },
+    {
+      "check_id": "ontology.inference.protocol_provider_must_be_releasable",
+      "explanation": "If a Protocol provider can't cut versioned releases (no audited\nrelease pipeline, no tagged history, no PyPI/npm publish), then\ndownstream `consumesProtocol p@X.Y.Z` pins reference fiction. The\numbrella's release-cascade Intent depends on the provider being\nable to tag, build, and publish; the Releasable claim is the\naudited token of that capability.\n\nDistinct from `provider_must_be_documented` so the fix_hint can\npoint at the Releasable proof (CI workflow, release script,\nPyPI/npm trust config) rather than the Documented proof.",
+      "findings": [],
+      "not_measured": false,
+      "pillar": "ontology",
+      "score": 100.0,
+      "weight": 0.5
+    },
+    {
+      "check_id": "ontology.inference.provider_must_be_documented",
+      "explanation": "Consumers pin to specific Protocol releases (`name@X.Y.Z`). When\nthe provider repo's docs are missing or stale, the consumer's pin\nreferences a contract the provider can't explain.\n\nThis rule walks the `providesProtocol` edge set and, for each\nprovider Repo, checks whether the Repo's `spec.implements` list\ncarries a ratified or proposed `Documented` interface claim. Part\nof the *inference* register \u2014 the provider-Documented coupling\nisn't visible from inside any single repo, only from\ncross-referencing two ontology shapes.\n\nConfidence is `medium` because the fix (write docs, then add the\nclaim) is not unambiguously automatable \u2014 an agent should propose\nthe claim path but not silently write it.",
+      "findings": [],
+      "not_measured": false,
+      "pillar": "ontology",
+      "score": 100.0,
+      "weight": 0.5
+    },
+    {
       "check_id": "ontology.action_intent_split_declared",
       "explanation": "Action Types describe single-system mutations; Intent Types describe\ncross-repo orchestration. Both must be declared for agents to choose\nthe right tool.",
       "findings": [],
@@ -1180,5 +1213,5 @@
     }
   ],
   "repo_path": "fixtures/noisy",
-  "rules_evaluated": 46
+  "rules_evaluated": 52
 }
