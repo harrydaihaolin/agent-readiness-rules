@@ -6,13 +6,13 @@ Review each YAML before merge.
 ### Round data
 ```json
 {
-  "round_id": "20260510T084951Z",
-  "generated_at": "2026-05-10T08:49:52.289981+00:00",
+  "round_id": "20260628T095446Z",
+  "generated_at": "2026-06-28T09:54:47.653387+00:00",
   "proposals": [
     {
       "id": "cognitive_load.readme_root_present",
       "verdict": "rejected",
-      "reason": "Schema validation errors were encountered.\n  /tmp/tmpycmkuxzr.yaml::$: 'provenance' is a required property\n",
+      "reason": "Schema validation errors were encountered.\n  /tmp/tmpo29_v5w_.yaml::$: 'provenance' is a required property\n",
       "yaml": "rules_version: 1\nid: cognitive_load.readme_root_present\npillar: cognitive_load\ntitle: README at repository root\nweight: 0.8\nseverity: warn\nexplanation: |\n  Agents and contributors expect a root README.md as the primary orientation\n  surface. Its absence forces guesswork from filenames and CI config alone.\nmatch:\n  type: path_glob\n  require_globs:\n    - README.md\n    - readme.md\nfix_hint: |\n  Add a README.md at the repo root with install, run, and test instructions.\ninsight_query: README missing repository root documentation orientation\n",
       "pillar": "cognitive_load"
     }
