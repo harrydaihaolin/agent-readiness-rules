@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin to v6
-      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # pin to v6
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # pin to v6
         with:
           python-version: "3.12"
       - name: Install check-jsonschema
@@ -69,7 +69,7 @@ jobs:
           repository: harrydaihaolin/agent-readiness
           ref: ${{ env.ENGINE_REF }}
           path: agent-readiness
-      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # pin to v6
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # pin to v6
         with:
           python-version: "3.12"
       - name: Install agent-readiness with insights-protocol
@@ -135,7 +135,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin to v6
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # pin to v6
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # pin to v6
         with:
           python-version: "3.12"
       # Pin to a major range so a PyPI release can't red CI overnight.
